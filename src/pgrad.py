@@ -10,7 +10,7 @@ repo: https://github.com/weathertrader/battery_charge
 # python ./src/pgrad.py --model_name=hrrr --process_name=download --bucket_name=data --batch_mode=operational
 # python ./src/pgrad.py --model_name=hrrr --process_name=process_grib --bucket_name=data --batch_mode=operational
 # python ./src/pgrad.py --model_name=hrrr --process_name=process_csv --bucket_name=data --batch_mode=operational
-
+ 
 # python ./src/pgrad.py --model_name=nam --process_name=download --bucket_name=data --batch_mode=operational
 # python ./src/pgrad.py --model_name=nam --process_name=process_grib --bucket_name=data --batch_mode=operational
 # python ./src/pgrad.py --model_name=nam --process_name=process_csv --bucket_name=data --batch_mode=operational
@@ -20,16 +20,17 @@ repo: https://github.com/weathertrader/battery_charge
 # python ./src/pgrad.py --model_name=gfs --process_name=process_csv --bucket_name=data --batch_mode=operational
 
 # python ./src/pgrad.py --process_name=calc_pgrad --bucket_name=data --batch_mode=operational
+# python ./src/pgrad.py --process_name=plot_data --bucket_name=data --batch_mode=operational
 
 
 ######################################
 # mvp pgrad - 10 full days
 
-# 1d   static png plots
-#      latest init, all models
-#      single model, last 4 inits
-#      3d, 5d, 10d 
-#      station pairs 
+# 1 hr reduce # of stations from new station list 
+#      reprocess all files 
+
+# 1/2d update forecasts avail csv 
+
 
 # 2d   website static jquery
 
@@ -46,10 +47,7 @@ repo: https://github.com/weathertrader/battery_charge
 #      download local
 #      download static
 
-# 1/2d update forecasts avail csv 
 
-# 1d   units conversion
-#      calc p_sfc from which variable
 
 ######################################
 # after deployment of mvp 
@@ -119,7 +117,8 @@ def create_log_file(log_name_full_file_path, dt_start_utc, time_zone_label):
 ###############################################################################
 def close_logger(logger, process_name, dt_start_lt, utc_conversion, time_zone_label):
     dt_end_lt = dt.utcnow() - td(hours=utc_conversion)
-    time_delta_minutes = (dt_start_lt - dt_end_lt).seconds/3600.0
+    #time_delta_minutes = (dt_start_lt - dt_end_lt).seconds/3600.0
+    time_delta_minutes = (dt_start_lt - dt_end_lt).seconds/(3600.0*24)
     print      ('total_time %s %05.1f minutes, %s - %s [%s]  ' % (process_name, time_delta_minutes, dt_start_lt.strftime('%Y-%m-%d_%H-%M'), dt_end_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label))
     logger.info('total_time %s %05.1f minutes, %s - %s [%s]  ' % (process_name, time_delta_minutes, dt_start_lt.strftime('%Y-%m-%d_%H-%M'), dt_end_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label))
     print      ('###############################################################################') 
@@ -196,6 +195,8 @@ def define_expected_forecast_available_from_wallclock(logger, model_name, update
     #else: 
     #    print      ('  ERROR: get_expected_most_recent_forecast not defined for %s ' % (model_name))
     #    logger.info('  ERROR: get_expected_most_recent_forecast not defined for %s ' % (model_name))
+
+    dt_init_expected -= td(hours=12)
 
     print      ('  expecting %s %s Z to be available ' % (model_name, dt_init_expected.strftime('%Y-%m-%d %H')))
     logger.info('  expecting %s %s Z to be available ' % (model_name, dt_init_expected.strftime('%Y-%m-%d %H')))
@@ -373,7 +374,9 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
                     # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_hrrr_2d.pl?file='+file_name_remote+'&lev_10_m_above_ground=on&lev_2_m_above_ground=on&lev_surface=on&var_HGT=on&var_PRES=on&var_RH=on&var_TMP=on&var_UGRD=on&var_VGRD=on&var_APCP=on&var_DPT=on&var_FRICV=on&var_GUST=on&var_LAND=on&var_WIND=on&var_HGT=on&var_PRES=on&var_RH=on&var_TMP=on&var_UGRD=on&var_VGRD=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fhrrr.'+url_folder_str+'%2Fconus" -o '+file_name_ingest
                     # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_hrrr_2d.pl?file='+file_name_remote+'&lev_2_m_above_ground=on&lev_mean_sea_level=on&lev_surface=on&var_HGT=on&var_MSLMA=on&var_PRES=on&var_APCP=on&var_UGRD=on&var_VGRD=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fhrrr.'+url_folder_str+'%2Fconus" -o '+file_name_ingest
                     # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_hrrr_2d.pl?file='+file_name_remote+'&lev_mean_sea_level=on&lev_surface=on&var_HGT=on&var_MSLMA=on&var_PRES=on&var_UGRD=on&var_VGRD=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fhrrr.'+url_folder_str+'%2Fconus" -o '+file_name_ingest
+                    # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_hrrr_2d.pl?file='+file_name_remote+'&lev_mean_sea_level=on&lev_surface=on&var_HGT=on&var_MSLMA=on&var_PRES=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fhrrr.'+url_folder_str+'%2Fconus" -o '+file_name_ingest
                     curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_hrrr_2d.pl?file='+file_name_remote+'&lev_mean_sea_level=on&lev_surface=on&var_HGT=on&var_MSLMA=on&var_PRES=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fhrrr.'+url_folder_str+'%2Fconus" -o '+file_name_ingest
+                
                 
                 elif (model_name == 'nam'):
                     # previous
@@ -393,14 +396,35 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
   
                 elif (model_name == 'gfs'):       
                     # gfs 
+                    # prev curl command does not work
+                    # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)+'&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F12" -o '+file_name_ingest
+                    # now trying 
+                    curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)+'&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F'+url_folder_str2+'" -o '+file_name_ingest
+                    # works 
+                    # curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t18z.pgrb2.0p25.f000&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fgfs.20200918%2F18" -o data/ingest/2020-09-18/gfs_2020-09-18_18_t_00.grib2
+                    # filter_gfs_0p25_1hr.pl
+                    # filter_gfs_0p25.pl                    
+
+
+                    #temp_command = 'wget '+url_temp+' -O '+file_name_ingest
+                    #print      ('    temp_command is %s ' % (temp_command)) 
+                    #logger.info('    temp_command is %s ' % (temp_command)) 
+                    #os.system(temp_command)
+                    #print      ('    wget success ' ) 
+                    #logger.info('    wget success ' ) 
+                    
+                    #                     https://nomads.ncep.noaa.gov/cgi-bin/?file=                                          gfs.t00z.pgrb2.0p25.f000                 &lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on           &leftlon=0&rightlon=360&toplat=90&bottomlat=-90   &dir=%2Fgfs.20200918%2F00
+                    #                     https://nomads.ncep.noaa.gov/cgi-bin/?file    =                                      gfs.t00z.pgrb2.0p25.f000                 &lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on           &leftlon=0&rightlon=360&toplat=90&bottomlat=-90   &dir=%2Fgfs.20200918%2F00
                     # works
                     # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t12z.pgrb2.0p25.f000&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fgfs.20200810%2F12" -o '+file_name_ingest
                     # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t12z.pgrb2.0p25.f000&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F12" -o '+file_name_ingest
                     # use this one 
-                    curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)+'&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F12" -o '+file_name_ingest
+                    # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)+'&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F12" -o '+file_name_ingest
                     # https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25_1hr.pl?file=gfs.t12z.pgrb2.0p25.anl&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&dir=%2Fgfs.20200811%2F12
                     # https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t12z.pgrb2.0p25.anl&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&dir=%2Fgfs.20200811%2F12
                  
+                 
+                #if model_name != 'gfs':
                 print      ('    curl_command is %s ' % (curl_command))
                 logger.info('    curl_command is %s ' % (curl_command))
                 process_check = subprocess.Popen(curl_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -438,7 +462,7 @@ def process_grib_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
     logger.info('process_grib_data begin ')
     # read station data 
     use_stn = 'all'
-    print_stn_info = 1
+    print_stn_info = False
     #read_stn_metadata_type = 'csv' # 'db' or 'csv'
     project_name = 'pgrad'
     stn_metadata_file_name = os.path.join(os.environ['HOME'], project_name, 'station_list_'+project_name+'.csv') 
@@ -462,6 +486,7 @@ def process_grib_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
         
     initial_read = False
 
+    n = 0
     file_temp = file_list[0]
     for n, file_temp in enumerate(file_list): 
         
@@ -480,6 +505,7 @@ def process_grib_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
         #       backend_kwargs={'filter_by_keys': {'typeOfLevel': 'heightAboveGround', 'level': 2}})
         # ds_10m = xr.open_dataset(file_temp, engine='cfgrib',
         #      backend_kwargs={'filter_by_keys': {'typeOfLevel': 'heightAboveGround', 'level': 10}})
+        #sorted(ds_sfc.variables)
         
         # hrrr
         # sp
@@ -504,6 +530,8 @@ def process_grib_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
                     lon_2d[j,:] = lon_1d
             # hgt_2d = np.array(ds_sfc['orog'])
             # hgt_2d = hgt_2d*3.28084 # m to ft
+            print('    lon_2d min max is %5.2f %5.2f ' %(np.nanmin(lon_2d), np.nanmax(lon_2d)))
+            print('    lat_2d min max is %5.2f %5.2f ' %(np.nanmin(lat_2d), np.nanmax(lat_2d)))
             print_flag = True
             (j_loc_s, i_loc_s) = map_stn_locations_to_grid_locations(logger, dict_stn_metadata, lon_2d, lat_2d, print_flag)
             initial_read = True
@@ -522,12 +550,13 @@ def process_grib_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
             p1_sfc_2d = ds_read['prmsl']
             p2_sfc_2d = np.array(ds_read['sp'])
             #p2_sfc_2d = np.array(ds_read['meanSea'])
-        
-        print('lon_2d min max is %5.2f %5.2f ' %(np.nanmin(lon_2d), np.nanmax(lon_2d)))
-        print('lat_2d min max is %5.2f %5.2f ' %(np.nanmin(lat_2d), np.nanmax(lat_2d)))
-        
-        print('p1_sfc_2d min max is %5.2f %5.2f ' %(np.nanmin(p1_sfc_2d), np.nanmax(p1_sfc_2d)))
-        print('p2_sfc_2d min max is %5.2f %5.2f ' %(np.nanmin(p2_sfc_2d), np.nanmax(p2_sfc_2d)))
+         
+        # units conversion hpa -> mb
+        p1_sfc_2d = 0.01*p1_sfc_2d
+        p2_sfc_2d = 0.01*p2_sfc_2d
+         
+        print('    p1_sfc_2d min max is %5.2f %5.2f ' %(np.nanmin(p1_sfc_2d), np.nanmax(p1_sfc_2d)))
+        print('    p2_sfc_2d min max is %5.2f %5.2f ' %(np.nanmin(p2_sfc_2d), np.nanmax(p2_sfc_2d)))
 
         ds_read.close()
         del ds_read        
@@ -551,8 +580,8 @@ def process_grib_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
         print      ('    stn_file_name %s ' % (stn_file_name)) 
         logger.info('    stn_file_name %s ' % (stn_file_name)) 
 
-        print      ('write p_sfc begin ')
-        logger.info('write p_sfc begin ')
+        print      ('    write p_sfc begin ')
+        logger.info('    write p_sfc begin ')
         column_str = ['stn_id', 'p1', 'p2']
         p_sfc_data = [dict_stn_metadata['stn_id'], p1_sfc_stn, p2_sfc_stn]
         #stn_info_transpose = numpy.transpose(stn_info) 
@@ -587,7 +616,7 @@ def process_csv_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
     logger.info('process_csv begin ')
     # read station data 
     use_stn = 'all'
-    print_stn_info = 1
+    print_stn_info = False
     #read_stn_metadata_type = 'csv' # 'db' or 'csv'
     project_name = 'pgrad'
     stn_metadata_file_name = os.path.join(os.environ['HOME'], project_name, 'station_list_'+project_name+'.csv') 
@@ -609,8 +638,8 @@ def process_csv_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
         # sys.exit() 
 
     # read or create master p_sfc file     
-    p_sfc1_master_file = os.path.join(dir_name_processed, model_name+'_p_sfc1_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
-    p_sfc2_master_file = os.path.join(dir_name_processed, model_name+'_p_sfc2_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+    p_sfc1_master_file = os.path.join(dir_name_processed, 'p_sfc1_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+    p_sfc2_master_file = os.path.join(dir_name_processed, 'p_sfc2_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
     if os.path.isfile(p_sfc1_master_file): # read master
         p_sfc1_hr_s_df = pd.read_csv(p_sfc1_master_file, index_col=0)
         p_sfc1_hr_s = p_sfc1_hr_s_df.values
@@ -628,8 +657,8 @@ def process_csv_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
 
     file_temp = file_list[0]
     for n, file_temp in enumerate(file_list): 
-        print      ('  processing file %s of %s' %(n, n_files))
-        logger.info('  processing file %s of %s' %(n, n_files))
+        print      ('  processing file %s of %s, %s' %(n, n_files, file_temp))
+        logger.info('  processing file %s of %s, %s' %(n, n_files, file_temp))
         #file_name = os.path.dirname(file_temp)
         file_name = os.path.basename(file_temp)
         file_name_processed = os.path.join(dir_name_processed, file_name)
@@ -688,7 +717,7 @@ def calc_pgrad(model_name_list, dt_init, bucket_name):
 
     # read station data 
     use_stn = 'all'
-    print_stn_info = 0
+    print_stn_info = False
     #read_stn_metadata_type = 'csv' # 'db' or 'csv'
     project_name = 'pgrad'
     stn_metadata_file_name = os.path.join(os.environ['HOME'], project_name, 'station_list_'+project_name+'.csv') 
@@ -703,10 +732,10 @@ def calc_pgrad(model_name_list, dt_init, bucket_name):
         print      ('  processing %s ' %(model_name))
         logger.info('  processing %s ' %(model_name))
         # read p_sfc file     
-        p_sfc1_master_file = os.path.join(dir_name_processed, model_name+'_p_sfc1_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
-        p_sfc2_master_file = os.path.join(dir_name_processed, model_name+'_p_sfc2_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
-        p_sfc1_diff_master_file = os.path.join(dir_name_processed, model_name+'_p_sfc1_diff_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
-        p_sfc2_diff_master_file = os.path.join(dir_name_processed, model_name+'_p_sfc2_diff_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+        p_sfc1_master_file = os.path.join(dir_name_processed, 'p_sfc1_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+        p_sfc2_master_file = os.path.join(dir_name_processed, 'p_sfc2_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+        p_sfc1_diff_master_file = os.path.join(dir_name_processed, 'p_sfc1_diff_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+        p_sfc2_diff_master_file = os.path.join(dir_name_processed, 'p_sfc2_diff_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
         if not os.path.isfile(p_sfc1_master_file): 
             print      ('  ERROR - input file not found %s ' %(p_sfc1_master_file))
             logger.info('  ERROR - input file not found %s ' %(p_sfc1_master_file))
@@ -718,12 +747,13 @@ def calc_pgrad(model_name_list, dt_init, bucket_name):
             #p_sfc2_hr_s = p_sfc2_hr_s_df.values
             dt_axis = p_sfc1_hr_s_df.index.values
             forecast_horizon_hr = len(dt_axis)
-
             p_sfc1_diff_hr_s = np.full([forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
             p_sfc2_diff_hr_s = np.full([forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
             column_str = [None]*dict_stn_metadata['n_stn']**2
             s1 = 3
             s2 = 5
+            print      ('calculating pressure difference station pairs')
+            logger.info('calculating pressure difference station pairs')
             for s1 in range(0, dict_stn_metadata['n_stn']):
                 for s2 in range(0, dict_stn_metadata['n_stn']):
                     p_sfc1_diff_hr_s[:,s1*dict_stn_metadata['n_stn']+s2] = p_sfc1_hr_s_df[dict_stn_metadata['stn_id'][s1]] - p_sfc1_hr_s_df[dict_stn_metadata['stn_id'][s2]]
@@ -733,9 +763,10 @@ def calc_pgrad(model_name_list, dt_init, bucket_name):
             # write to master csv
             print      ('    write p_sfc_diff master begin ')
             logger.info('    write p_sfc_diff master begin ')
-            p_sfc1_diff_hr_s_df = pd.DataFrame(p_sfc1_diff_hr_s, index=dt_axis, columns=column_str) 
+            p_sfc1_diff_hr_s_df = pd.DataFrame(p_sfc1_diff_hr_s, index=dt_axis, columns=column_str).round(2) 
+            #p_sfc1_diff_hr_s_df = p_sfc1_diff_hr_s_df.round(2)
             p_sfc1_diff_hr_s_df.to_csv(p_sfc1_diff_master_file) 
-            p_sfc2_diff_hr_s_df = pd.DataFrame(p_sfc2_diff_hr_s, index=dt_axis, columns=column_str) 
+            p_sfc2_diff_hr_s_df = pd.DataFrame(p_sfc2_diff_hr_s, index=dt_axis, columns=column_str).round(2) 
             p_sfc2_diff_hr_s_df.to_csv(p_sfc2_diff_master_file) 
             print      ('    write p_sfc_diff master end ')   
             logger.info('    write p_sfc_diff master end ')   
@@ -746,6 +777,148 @@ def calc_pgrad(model_name_list, dt_init, bucket_name):
             logger.info('    p_sfc2_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc2_diff_hr_s), np.nanmax(p_sfc2_diff_hr_s)))
     print      ('calc_pgrad end ')
     logger.info('calc_pgrad end ')
+
+###############################################################################
+def plot_data(model_name_list, dt_init_expected, forecast_horizon_hr, bucket_name):
+
+    print      ('plot_data begin ')
+    logger.info('plot_data begin ')
+
+    # read station data 
+    use_stn = 'all'
+    print_stn_info = False
+    #read_stn_metadata_type = 'csv' # 'db' or 'csv'
+    project_name = 'pgrad'
+    stn_metadata_file_name = os.path.join(os.environ['HOME'], project_name, 'station_list_'+project_name+'.csv') 
+    (dict_stn_metadata) = read_stn_metadata_from_csv(stn_metadata_file_name, use_stn, print_stn_info)
+ 
+    p_sfc1_diff_init_m_hr_s = np.full([5, 3, forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
+    p_sfc2_diff_init_m_hr_s = np.full([5, 3, forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
+    dt_axis_init = np.full([5, forecast_horizon_hr], np.nan, dtype=object)
+    dt_init_count = 0
+    dt_init = dt_init_expected - td(hours=24)
+    dt_init_list = []
+    # dt_init = dt_init_expected
+    while dt_init <= dt_init_expected:
+        print      ('  processing %s dt_init %s ' %(dt_init_count, dt_init.strftime('%Y-%m-%d_%H')))
+        logger.info('  processing %s dt_init %s ' %(dt_init_count, dt_init.strftime('%Y-%m-%d_%H')))
+        dt_init_list.append(dt_init)
+        #dt_init += td(hours=update_frequency_hrs)
+        # dt_init_count += 1        
+        dir_init_temp = dt_init.strftime('%Y-%m-%d')
+        dir_name_ingest    = os.path.join('data', 'ingest',    dir_init_temp)
+        dir_name_processed = os.path.join('data', 'processed', dir_init_temp)
+
+        model_name = 'gfs'
+        m = 0
+        for m, model_name in enumerate(model_name_list):
+            print      ('    processing %s %s ' %(m, model_name))
+            logger.info('    processing %s %s ' %(m, model_name))
+            # read p_sfc_diff file     
+            p_sfc1_diff_master_file = os.path.join(dir_name_processed, 'p_sfc1_diff_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+            p_sfc2_diff_master_file = os.path.join(dir_name_processed, 'p_sfc2_diff_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+            if not os.path.isfile(p_sfc1_diff_master_file): 
+                print      ('    ERROR - input file not found %s ' %(p_sfc1_diff_master_file))
+                logger.info('    ERROR - input file not found %s ' %(p_sfc1_diff_master_file))
+            else:
+                print      ('    input file exists ')
+                logger.info('    input file exists ')
+                # read master
+                p_sfc1_diff_hr_s_df = pd.read_csv(p_sfc1_diff_master_file, index_col=0)
+                p_sfc1_diff_hr_s = p_sfc1_diff_hr_s_df.values
+                p_sfc2_diff_hr_s_df = pd.read_csv(p_sfc2_diff_master_file, index_col=0)
+                p_sfc2_diff_hr_s = p_sfc2_diff_hr_s_df.values
+                dt_axis = p_sfc1_diff_hr_s_df.index.values
+                forecast_horizon_hr = len(dt_axis)
+                stn_id_pair_list = list(p_sfc1_diff_hr_s_df)
+                # np.shape(p_sfc1_diff_hr_s_df)
+                # np.shape(p_sfc1_diff_init_hr_s)
+                p_sfc1_diff_init_m_hr_s[dt_init_count, m, 0:len(dt_axis), :] = p_sfc1_diff_hr_s
+                p_sfc2_diff_init_m_hr_s[dt_init_count, m, 0:len(dt_axis), :] = p_sfc2_diff_hr_s
+                if (model_name == 'gfs'):
+                    dt_axis_init[dt_init_count,:] = dt_axis
+
+        dt_init += td(hours=update_frequency_hrs)
+        dt_init_count += 1        
+
+
+    print      ('plot_data end ')
+    logger.info('plot_data end ')
+
+stn_id_pair_list
+
+n_stn_pair = len(stn_id_pair_list)
+
+for s,stn_id_pair in enumerate(stn_id_pair_list):
+    if stn_id_pair == 'KWMC-KSAC':
+        print      ('  processing %s %s ' %(s, stn_id_pair))
+        logger.info('  processing %s %s ' %(s, stn_id_pair))
+
+
+s = 254        
+stn_id_pair_list[s]
+
+i = 4
+dt_init_list
+dt_init_list[i]
+
+for i, dt_init in enumerate(dt_init_list):
+
+dt_axis_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s]
+dt_axis_init[i,:], p_sfc2_diff_init_m_hr_s[i,m,:,s]
+
+
+model_name = 'gfs'
+m = 0
+for m, model_name in enumerate(model_name_list):
+    print      ('    processing %s %s ' %(m, model_name))
+    logger.info('    processing %s %s ' %(m, model_name))
+
+
+
+#dt_init_count = 4
+#m = 0
+
+
+#KDAG-KRDD
+
+#dt_axis_init[4,:]
+
+#[n_init, n_dt, n_stn_pair] = np.shape(p_sfc1_diff_init_hr_s)
+
+
+#[4,0:len(dt_axis),:]
+
+
+
+# 4hr  units conversion
+#      calc p_sfc from which variable
+# 4hr  single plot of pgrad for KWMC - KSAC
+# 1d   static png plots
+#      latest init, all models
+#      single model, last 4 inits
+#      3d, 5d, 10d, calc dt_plot_axis and round down etc  
+#      add nightime shading 
+#      station pairs 
+
+
+
+############################################
+# check data for lastest most recent dt_init_avail 
+
+############################################
+# plot all model, most recent dt_init only
+
+############################################
+# plot single model only, all dt_init 
+
+#print      ('    p_sfc1_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc1_diff_hr_s), np.nanmax(p_sfc1_diff_hr_s)))
+#ogger.info('    p_sfc1_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc1_diff_hr_s), np.nanmax(p_sfc1_diff_hr_s)))
+#print      ('    p_sfc2_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc2_diff_hr_s), np.nanmax(p_sfc2_diff_hr_s)))
+#logger.info('    p_sfc2_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc2_diff_hr_s), np.nanmax(p_sfc2_diff_hr_s)))
+# here find index corresponding to KRDD to KSAC or Winnemucca to KSFO 
+# p_sfc1_diff_init_hr_s[dt_init_count,:,:] 
+# dt_axis_init[dt_init_count,:]
 
 
 
@@ -774,9 +947,9 @@ if __name__ == "__main__":
         batch_mode = 'operational'
         #batch_mode = 'backfill'
         #process_name = 'download'
-        process_name = 'process_grib'
+        #process_name = 'process_grib'
         #process_name = 'process_csv'
-        #process_name = 'plot'
+        process_name = 'plot_data'
         bucket_name = 'data'
  
     # sanitize inputs
@@ -784,7 +957,7 @@ if __name__ == "__main__":
     if model_name not in model_name_list:
         print('ERROR model_name %s not supported' %(model_name))
         sys.exit()
-    if process_name not in ['download', 'process_grib', 'process_csv', 'calc_pgrad', 'plot']:
+    if process_name not in ['download', 'process_grib', 'process_csv', 'calc_pgrad', 'plot_data']:
         print('ERROR model_name %s not supported' %(process_name))
         sys.exit()
     if batch_mode not in ['operational','backfill']:
@@ -810,7 +983,10 @@ if __name__ == "__main__":
     
     # create_log_file
     print      ('create_log_file' ) 
-    log_file_name = 'log_'+process_name+'_'+dt_start_lt.strftime('%Y-%m-%d_%H-%M')+'.txt' 
+    if  process_name in ['download', 'process_grib', 'process_csv', 'calc_pgrad']:
+        log_file_name = 'log_'+process_name+'_'+model_name+'_'+dt_start_lt.strftime('%Y-%m-%d_%H-%M')+'.txt' 
+    else:
+        log_file_name = 'log_'+process_name+'_'+dt_start_lt.strftime('%Y-%m-%d_%H-%M')+'.txt' 
     log_name_full_file_path = os.path.join('logs', log_file_name) 
     logger = create_log_file(log_name_full_file_path, dt_start_utc, time_zone_label) 
 
@@ -823,21 +999,25 @@ if __name__ == "__main__":
         hours_to_backfill = 24
 
     dt_init = dt_init_expected
-    while dt_init >= dt_init_expected - td(hours=hours_to_backfill): 
-        print      ('  processing init %s ' % (dt_init.strftime('%Y-%m-%d_%H-%M')))
-        logger.info('  processing init %s ' % (dt_init.strftime('%Y-%m-%d_%H-%M')))
-        print('executing process %s' %(process_name))
-        if   process_name == 'download':
-            download_data(model_name, dt_init, forecast_horizon_hr, bucket_name)
-        elif process_name == 'process_grib':
-            process_grib_data(model_name, dt_init, forecast_horizon_hr, bucket_name)
-        elif process_name == 'process_csv':
-            process_csv_data(model_name, dt_init, forecast_horizon_hr, bucket_name)
-        elif process_name == 'calc_pgrad':
-            calc_pgrad(model_name_list, dt_init, bucket_name)
-        elif process_name == 'plot':
-            plot_data(model_name, dt_init, forecast_horizon_hr, bucket_name)
-        dt_init = dt_init - td(hours=update_frequency_hrs)
+    if  process_name in ['download', 'process_grib', 'process_csv', 'calc_pgrad']:
+        while dt_init >= dt_init_expected - td(hours=hours_to_backfill): 
+            print      ('  processing init %s ' % (dt_init.strftime('%Y-%m-%d_%H-%M')))
+            logger.info('  processing init %s ' % (dt_init.strftime('%Y-%m-%d_%H-%M')))
+            print('executing process %s' %(process_name))
+            if   process_name == 'download':
+                download_data(model_name, dt_init, forecast_horizon_hr, bucket_name)
+            elif process_name == 'process_grib':
+                process_grib_data(model_name, dt_init, forecast_horizon_hr, bucket_name)
+            elif process_name == 'process_csv':
+                process_csv_data(model_name, dt_init, forecast_horizon_hr, bucket_name)
+            elif process_name == 'calc_pgrad':
+                calc_pgrad(model_name_list, dt_init_expected, bucket_name)
+            dt_init = dt_init - td(hours=update_frequency_hrs)
+
+    dt_init = dt_init_expected
+    if process_name == 'plot_data':
+        #plot_data(model_name_list, dt_init, forecast_horizon_hr=120+1, bucket_name)
+        plot_data(model_name_list, dt_init, 241, bucket_name)
         
     # close log file
     print      ('close_logger begin ')
