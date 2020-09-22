@@ -10,18 +10,22 @@ repo: https://github.com/weathertrader/battery_charge
 ######################################
 # mvp pgrad - 10 full days
 
+# 10/01 new billing month 
 # 1hr  mesowest account and data dl 
+#      https://myaccount.synopticdata.com/#usage
+#      https://developers.synopticdata.com/about/station-variables/
+#      https://developers.synopticdata.com/mesonet/v2/station-selectors/
+#      https://developers.synopticdata.com/mesonet/pricing/
+#      used 129M SU, 5M per month is free
+#      pricing is $0.015 per 1 M SU  
 # 1hr  download all back to 2020 for all stations
-# 1hr  process all historical data 
-# 1    heapify, take top 20 events
-# 1    write tables of top historical events 
-# 1    read tables of top historical events 
+# 1hr  process all historical data and write events 
 # 2hr  compare values to forecasts
 
 # units conversion
 # calc p_sfc from which variable
 
-# normalize stn_id_pair_list_to_plot  to one place only 
+# normalize stn_id_pair_list_to_plot to one place only 
 
 # 1/2d update forecasts avail csv 
 
@@ -31,7 +35,7 @@ repo: https://github.com/weathertrader/battery_charge
 
 # 1d   website from local to www
 
-# 2d   stn obs operational  
+# 2d   stn obs operational calc cost  
 #      download local
 #      download static
 
@@ -50,7 +54,7 @@ repo: https://github.com/weathertrader/battery_charge
 # 1/2d redo stn list
 # 1/2d redo all historical obs dl and process
 # 1/2d environment, requirements.txt, clean up repo add readme 
-
+# 1 d  alert/notifications for upcoming very strong events 
 
 
 
@@ -527,17 +531,24 @@ def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_h
         dt_valid = ds_read['valid_time']
         
         if model_name == 'hrrr':
-            p1_sfc_2d = ds_read['mslma']  
+            p1_sfc_2d = ds_read['mslma']  # MSLP (MAPS System Reduction)
             p2_sfc_2d = ds_read['sp']  
             # mslma 
-        elif model_name == 'nam':
+        elif model_name == 'nam' or model_name == 'gfs':
             p1_sfc_2d = ds_read['prmsl']
-            p2_sfc_2d = np.array(ds_read['sp'])
-        elif model_name == 'gfs':
-            p1_sfc_2d = ds_read['prmsl']
-            p2_sfc_2d = np.array(ds_read['sp'])
-            #p2_sfc_2d = np.array(ds_read['meanSea'])
-         
+            p2_sfc_2d = ds_read['sp']
+            #p2_sfc_2d = np.array(ds_read['sp'])
+
+        # hrrr
+        # mslma - Pressure reduced to MSL, # MSLP (MAPS System Reduction)
+        # sp - surface pressure
+        # meanSea - nothing
+        
+        # gfs and nam
+        # prmsl - Pressure reduced to MSL
+        # sp - surface pressure
+        # meanSea - nothing            
+
         # units conversion hpa -> mb
         p1_sfc_2d = 0.01*p1_sfc_2d
         p2_sfc_2d = 0.01*p2_sfc_2d
@@ -1070,6 +1081,11 @@ def obs_historical_download(dict_stn_metadata, utc_conversion, time_zone_label, 
             logger.info('    processing yy %s ' % (yy))
             #url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_temp.strftime('%Y%m%d0000')+'&end='+dt_temp.strftime('%Y%m%d2359')+'&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
             url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_start.strftime('%Y%m%d0000')+'&end='+dt_end.strftime('%Y%m%d2359')+'&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
+            
+            # NOTE CSMITH - need to filter to only variables needed - alt and slp yes, pres no
+            # &vars=air_temp,volt&token=YOUR_TOKEN_HERE
+            
+            
             print      ('    url_temp is %s ' % (url_temp))
             logger.info('    url_temp is %s ' % (url_temp))
             web_temp = requests.get(url_temp)
@@ -1504,6 +1520,29 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, b
 # slp_diff_day_s_df['KWMC-KSAC']['2017-10-06':'2017-10-12']
 # slp_diff_day_s_df['KWMC-KSAC']['2018-11-05':'2018-11-12']
 
+###############################################################################
+def cleanup(bucket_name):
+
+    print      ('cleanup begin ')
+    logger.info('cleanup begin ')
+    dt_now = dt.utcnow()
+    dir_init_temp = dt_init.strftime('%Y-%m-%d')
+    dir_list_ingest    = glob.glob(os.path.join('data', 'ingest', '*'))
+    dir_list_processed = glob.glob(os.path.join('data', 'processed', '*'))
+    dir_temp = dir_list_ingest[0]
+    for dir_temp in dir_list_ingest+dir_list_processed:
+        dt_temp = dt.strptime(dir_temp.split('/')[2],'%Y-%m-%d')
+        days_diff = (dt_now - dt_temp).days
+        #print(days_diff)
+        if days_diff >= 2:
+            temp_command = 'rm -rf '+dir_temp    
+            print      ('  removing %s ' %(dir_temp)) 
+            logger.info('  removing %s ' %(dir_temp)) 
+            os.system(temp_command)
+    print      ('cleanup end ')
+    logger.info('cleanup end ')
+    
+
 ###############################################################################    
 if __name__ == "__main__":
 
@@ -1536,13 +1575,14 @@ if __name__ == "__main__":
         #process_name = 'obs_dl_operational'
         process_name = 'obs_historical_download'
         process_name = 'obs_historical_process'
- 
+        process_name = 'cleanup'
+        
     # sanitize inputs
     model_name_list = ['gfs', 'nam', 'hrrr']
     if model_name not in model_name_list:
         print('ERROR model_name %s not supported' %(model_name))
         sys.exit()
-    if process_name not in ['download', 'process_grib', 'process_csv', 'calc_pgrad', 'plot_data', 'obs_historical_download', 'obs_historical_process']:
+    if process_name not in ['cleanup', 'download', 'process_grib', 'process_csv', 'calc_pgrad', 'plot_data', 'obs_historical_download', 'obs_historical_process']:
         print('ERROR model_name %s not supported' %(process_name))
         sys.exit()
     if batch_mode not in ['operational','backfill']:
@@ -1617,6 +1657,8 @@ if __name__ == "__main__":
         obs_historical_download(dict_stn_metadata, utc_conversion, time_zone_label, bucket_name)
     if process_name == 'obs_historical_process':
         obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, bucket_name)
+    if process_name == 'cleanup':
+        cleanup(bucket_name)
   
     # close log file
     print      ('close_logger begin ')
