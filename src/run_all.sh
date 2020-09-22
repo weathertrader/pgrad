@@ -7,8 +7,8 @@ sleep_interval=5
 #python3 src/update_db.py s3://gps-data-processed/gps_batch_0.csv start
 #sleep $sleep_interval
 
-#mode=operational
-mode=backfill
+mode=operational
+#mode=backfill
 #anothervar=Fred
 echo $mode 
 #echo $myvariable $anothervar
@@ -31,8 +31,10 @@ python ./src/pgrad.py --model_name=nam --process_name=download --bucket_name=dat
 python ./src/pgrad.py --model_name=nam --process_name=process_grib --bucket_name=data --batch_mode=$mode
 python ./src/pgrad.py --model_name=nam --process_name=process_csv --bucket_name=data --batch_mode=$mode
 
+# calc_pgrad
 python ./src/pgrad.py --process_name=calc_pgrad --bucket_name=data --batch_mode=$mode
-python ./src/pgrad.py --process_name=plot_data --bucket_name=data --batch_mode=$mode
+# plot
+python ./src/pgrad.py --process_name=plot_data --bucket_name=data 
 
 # cleanup
 # python ./src/pgrad.py --process_name=cleanup --bucket_name=data

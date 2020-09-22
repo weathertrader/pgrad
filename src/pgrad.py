@@ -10,6 +10,8 @@ repo: https://github.com/weathertrader/battery_charge
 ######################################
 # mvp pgrad - 10 full days
 
+# 2d   website static jquery
+
 # 10/01 new billing month 
 # 1hr  mesowest account and data dl 
 #      https://myaccount.synopticdata.com/#usage
@@ -28,8 +30,6 @@ repo: https://github.com/weathertrader/battery_charge
 # normalize stn_id_pair_list_to_plot to one place only 
 
 # 1/2d update forecasts avail csv 
-
-# 2d   website static jquery
 
 # 2d   deploy to ec2 or gcp 
 
@@ -770,7 +770,7 @@ def calc_pgrad(dict_stn_metadata, model_name_list, dt_init, bucket_name):
     logger.info('calc_pgrad end ')
 
 ###############################################################################
-def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_horizon_hr, utc_conversion, time_zone_label, bucket_name):
+def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_horizon_hr,  dt_start_lt, utc_conversion, time_zone_label, bucket_name):
 
     print      ('plot_data begin ')
     logger.info('plot_data begin ')
@@ -915,7 +915,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                     dt_format = '%d %H'
                 elif n_days == 4:
                     delta_ticks = td(hours=24)
-                    dt_format = '%d %H'    
+                    dt_format = '%m/%d %H'    
                 elif n_days == 10:
                     delta_ticks = td(hours=24)
                     dt_format = '%m/%d'
@@ -942,7 +942,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                 model_name = 'gfs'
                 for m, model_name in enumerate(model_name_list):
                     mask = ~np.isnan(p_sfc1_diff_init_m_hr_s[i,m,:,s])
-                    plt.plot(dt_axis_lt_init[i,mask], p_sfc1_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
+                    plt.plot(dt_axis_lt_init[i,mask], p_sfc1_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name.upper(), linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
                     #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
                 #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
                 plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
@@ -962,14 +962,18 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                 plt.yticks(y_ticks, fontsize=size_font)
                 plt.ylim([y_min, y_max])
                 plt.xlabel('date time ['+time_zone_label+']',fontsize=size_font,labelpad=00)
-                plt.ylabel('$\Delta$ slp [mb]',fontsize=size_font,labelpad=20)                      
-                plt.title('$\Delta$ slp %s, %s Z initalization' % (stn_id_pair, dt_init_list[i].strftime('%Y-%m-%d_%H')), \
+                plt.ylabel('$\Delta$ slp [mb]',fontsize=size_font,labelpad=20)
+                plt.title('$\Delta$ slp %s, %s Z init, updated: %s %s ' % (stn_id_pair, dt_init_list[i].strftime('%Y-%m-%d_%H'), dt_start_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label), \
                   fontsize=size_font+2, x=0.5, y=1.01)                     
                 plt.show() 
-                filename = 'del_slp_all_model_'+stn_id_pair+'_'+dt_init_list[i].strftime('%Y-%m-%d_%H')+'_'+str(n_days)+'.png' 
-                plot_name = os.path.join('images',filename)
+                #filename = 'del_slp_all_model_'+stn_id_pair+'_'+dt_init_list[i].strftime('%Y-%m-%d_%H')+'_'+str(n_days)+'.png' 
+                filename = 'del_slp_all_model_'+stn_id_pair+'_current_'+str(n_days)+'.png' 
+                plot_name = os.path.join('images', filename)
                 plt.savefig(plot_name) 
-
+                filename = 'del_slp_all_model_'+stn_id_pair+'_'+dt_init_list[i].strftime('%Y-%m-%d_%H')+'_'+str(n_days)+'_'+dt_start_lt.strftime('%Y-%m-%d_%H')+'_'+time_zone_label+'.png' 
+                plot_name = os.path.join('images', 'archive', filename)
+                plt.savefig(plot_name) 
+                 
     ######################################
     # single model, last 4 inits
     
@@ -990,7 +994,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                         dt_format = '%d %H'
                     elif n_days == 4:
                         delta_ticks = td(hours=24)
-                        dt_format = '%d %H'    
+                        dt_format = '%m/%d %H'    
                     elif n_days == 10:
                         delta_ticks = td(hours=24)
                         dt_format = '%m/%d'
@@ -1040,11 +1044,14 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                     plt.ylim([y_min, y_max])
                     plt.xlabel('date time ['+time_zone_label+']',fontsize=size_font,labelpad=00)
                     plt.ylabel('$\Delta$ slp [mb]',fontsize=size_font,labelpad=20)                      
-                    plt.title('$\Delta$ slp %s, %s model' % (stn_id_pair, model_name), \
+                    plt.title('$\Delta$ slp %s, %s model, updated: %s %s' % (stn_id_pair, model_name.upper(), dt_start_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label), \
                       fontsize=size_font+2, x=0.5, y=1.01)                     
                     plt.show() 
                     filename = 'del_slp_all_init_'+stn_id_pair+'_'+model_name+'_'+str(n_days)+'.png' 
                     plot_name = os.path.join('images',filename)
+                    plt.savefig(plot_name) 
+                    filename = 'del_slp_all_init_'+stn_id_pair+'_'+model_name+'_'+str(n_days)+'_'+dt_start_lt.strftime('%Y-%m-%d_%H')+'_'+time_zone_label+'.png' 
+                    plot_name = os.path.join('images', 'archive', filename)
                     plt.savefig(plot_name) 
     
     print      ('plot_data end ')
@@ -1652,7 +1659,7 @@ if __name__ == "__main__":
     dt_init = dt_init_expected
     if process_name == 'plot_data':
         #plot_data(model_name_list, dt_init, forecast_horizon_hr=120+1, bucket_name)
-        plot_data(dict_stn_metadata, model_name_list, dt_init, 241, utc_conversion, time_zone_label, bucket_name)
+        plot_data(dict_stn_metadata, model_name_list, dt_init, 241, dt_start_lt, utc_conversion, time_zone_label, bucket_name)
     if process_name == 'obs_historical_download':
         obs_historical_download(dict_stn_metadata, utc_conversion, time_zone_label, bucket_name)
     if process_name == 'obs_historical_process':

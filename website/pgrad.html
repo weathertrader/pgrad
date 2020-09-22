@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>SundownerWatch</title>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>  
+    <script src="js/pgrad.js"></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-98177923-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+<body>
+
+<!-- comment begin
+<nav class="navbar sticky-top navbar-inverse bg-primary">
+<li><a class="nav-item nav-link" href="faq.html" style="background-color:#cdced0; color:red">FAQ</a></li>
+ navbar-inverse
+ commmend end -->
+
+<nav class="navbar navbar-sticky-top navbar-inverse">
+  <div class="container">
+    <button type="button" class="pull-center navbar-toggle justify-content-center" data-toggle="collapse" data-target="#myNavbar">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span> 
+    </button>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav justify-content-left">
+        <li><a class="nav-item nav-link" href="pgrad.html">Home</a></li>      
+        <li><a class="nav-item nav-link" href="faq.html">FAQ</a></li>
+        <li><a class="nav-item nav-link" href="status.html">Status</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- comment begin
+<div class="container">
+  <div class="col-md-12" align="left">
+    <h2>Banner text</h2>
+  </div>
+</div>
+commmend end -->
+
+<!-- comment begin
+commmend end -->
+
+<!-- comment begin
+# dropdowns - stn1, stn2, 2 4 or 10 day forecast horizon 
+# model_name -> all init
+# most recent -> all models
+# add table of recent values
+# read table, format table 
+commmend end -->
+
+
+<div class="container">
+  <div class="col-md-12" align="middle">
+    <div class="btn-group btn-group-justified">
+      <div class="btn-group">
+        <button type="button" class="btn btn-group btn-default">Station1</button>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn btn-group btn-default">Station2</button>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn btn-group btn-default">Model</button>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn btn-group btn-default">Days</button>
+      </div>
+    </div>
+  </div>
+  
+  
+  <div class="col-md-12" align="middle">
+    <div class="btn-group btn-group-justified">
+    
+<!-- comment begin
+commmend end -->
+
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Winnemucca <span class="caret"></span></button>
+        <ul class="dropdown-menu" role="menu" id="stn1-pills">
+          <li><a href="#plot_selected" data-toggle="pill" data-stn1="KWMC" data-text1="Winnemucca">Winnemucca </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn1="KSAC" data-text1="Sacramento">Sacramento </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn1="KSFO" data-text1="San Francisco">San Francisco </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn1="KVBG" data-text1="Vandenburg">Vandenburg </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn1="KSBA" data-text1="Santa Barbara">Santa Barbara </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn1="KSMX" data-text1="Santa Maria">Santa Maria </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn1="KBFL" data-text1="Bakersfield">Bakersfield </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn1="KRDD" data-text1="Redding">Redding </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn2="KACV" data-text2="Arcata">Arcata </a></li>
+        </ul>
+      </div>
+      
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Sacramento <span class="caret"></span></button>
+        <ul class="dropdown-menu" role="menu" id="stn2-pills">
+          <li><a href="#plot_selected" data-toggle="pill" data-stn2="KWMC" data-text2="Winnemucca">Winnemucca </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn2="KSAC" data-text2="Sacramento">Sacramento </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn2="KSFO" data-text2="San Francisco">San Francisco </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn2="KVBG" data-text2="Vandenburg">Vandenburg </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn2="KSBA" data-text2="Santa Barbara">Santa Barbara </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn2="KSMX" data-text2="Santa Maria">Santa Maria </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn2="KBFL" data-text2="Bakersfield">Bakersfield </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn2="KRDD" data-text2="Redding">Redding </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-stn2="KACV" data-text2="Arcata">Arcata </a></li>
+        </ul>
+      </div>
+
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">GFS  <span class="caret"></span></button>
+        <ul class="dropdown-menu" role="menu" id="model-pills">
+          <li><a href="#plot_selected" data-toggle="pill" data-model="all_model" data-text="All models">All models</a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-model="gfs" data-text="GFS">GFS </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-model="nam" data-text="NAM">NAM  </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-model="hrrr" data-text="HRRR">HRRR </a></li>
+        </ul>
+      </div>
+
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">10 days<span class="caret"></span></button>
+        <ul class="dropdown-menu" role="menu" id="timeframe-pills">
+          <li><a href="#plot_selected" data-toggle="pill" data-timeframe="2" data-text="2 days">2 days</a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-timeframe="4" data-text="4 days">4 Days </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-timeframe="10" data-text="10 days">10 Days </a></li>
+        </ul>
+      </div>
+      
+    </div>
+  </div>
+  
+  
+</div>
+
+<br>
+
+<div class="container">
+  <div class="col-md-12" align="middle">
+    <div class="tab-pane active" id="plot_selected_text">
+      <h3 id="plot_text">Forecast pressure difference, Winnemucca - Sacramento</h3>
+    </div>
+    <br>
+    <div class="tab-pane active" id="plot_selected">
+        <img src="../images/del_slp_all_init_KWMC-KSAC_gfs_10.png" class="center-block img-responsive">
+    </div>
+  </div>
+</div>
+
+<br>
+
+<div class="container">
+  <div class="col-md-12" align="middle">
+    <button type="button" class="btn btn-info  btn-group-justified" data-toggle="collapse" data-target="#stationMapToggle">Toggle Station Map</button>
+    <div id="stationMapToggle" class="collapse">
+      <img src="../images/station_map.png" class="center-block img-responsive">
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
