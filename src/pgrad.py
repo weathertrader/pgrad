@@ -10,13 +10,18 @@ repo: https://github.com/weathertrader/battery_charge
 ######################################
 # mvp pgrad - 10 full days
 
-# 2d   station observations historical
-#      download
-#      roll-up to daily
-#      tables of top historical events 
+# 1hr  mesowest account and data dl 
+# 1hr  download all back to 2020 for all stations
+# 1hr  process all historical data 
+# 1    heapify, take top 20 events
+# 1    write tables of top historical events 
+# 1    read tables of top historical events 
+# 2hr  compare values to forecasts
 
 # units conversion
 # calc p_sfc from which variable
+
+# normalize stn_id_pair_list_to_plot  to one place only 
 
 # 1/2d update forecasts avail csv 
 
@@ -69,6 +74,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.dates import drange, DateFormatter
 from matplotlib.ticker import MultipleLocator 
+import warnings
 
 
 import logging 
@@ -105,6 +111,7 @@ def close_logger(logger, process_name, dt_start_lt, utc_conversion, time_zone_la
     dt_end_lt = dt.utcnow() - td(hours=utc_conversion)
     #time_delta_minutes = (dt_start_lt - dt_end_lt).seconds/3600.0
     time_delta_minutes = (dt_start_lt - dt_end_lt).seconds/(3600.0*24)
+    #time_delta_minutes = (dt_start_lt - dt_end_lt).seconds
     print      ('total_time %s %05.1f minutes, %s - %s [%s]  ' % (process_name, time_delta_minutes, dt_start_lt.strftime('%Y-%m-%d_%H-%M'), dt_end_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label))
     logger.info('total_time %s %05.1f minutes, %s - %s [%s]  ' % (process_name, time_delta_minutes, dt_start_lt.strftime('%Y-%m-%d_%H-%M'), dt_end_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label))
     print      ('###############################################################################') 
@@ -182,7 +189,7 @@ def define_expected_forecast_available_from_wallclock(logger, model_name, update
     #    print      ('  ERROR: get_expected_most_recent_forecast not defined for %s ' % (model_name))
     #    logger.info('  ERROR: get_expected_most_recent_forecast not defined for %s ' % (model_name))
 
-    #dt_init_expected -= td(hours=6)
+    dt_init_expected -= td(hours=6)
 
     print      ('  expecting %s %s Z to be available ' % (model_name, dt_init_expected.strftime('%Y-%m-%d %H')))
     logger.info('  expecting %s %s Z to be available ' % (model_name, dt_init_expected.strftime('%Y-%m-%d %H')))
@@ -442,25 +449,19 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
 
             
 ###############################################################################
-def process_grib_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
+def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr, bucket_name):
 
     print      ('process_grib_data begin ')
     logger.info('process_grib_data begin ')
-    # read station data 
-    use_stn = 'all'
-    print_stn_info = False
-    #read_stn_metadata_type = 'csv' # 'db' or 'csv'
-    project_name = 'pgrad'
-    stn_metadata_file_name = os.path.join(os.environ['HOME'], project_name, 'station_list_'+project_name+'.csv') 
-    (dict_stn_metadata) = read_stn_metadata_from_csv(stn_metadata_file_name, use_stn, print_stn_info)
-
 
     dir_init_temp = dt_init.strftime('%Y-%m-%d')
     dir_name_ingest    = os.path.join('data', 'ingest',    dir_init_temp)
     dir_name_processed = os.path.join('data', 'processed', dir_init_temp)
     
     # get list of files in ingest dir
-    file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*.grib2'))
+    #file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*.grib2'))
+    file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*'+dt_init.strftime('%Y-%m-%d_%H')+'*.grib2'))
+
     n_files = len(file_list)
     print      ('  found %s files to process' %(n_files))
     logger.info('  found %s files to process' %(n_files))
@@ -570,7 +571,7 @@ def process_grib_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
         logger.info('    write p_sfc begin ')
         column_str = ['stn_id', 'p1', 'p2']
         p_sfc_data = [dict_stn_metadata['stn_id'], p1_sfc_stn, p2_sfc_stn]
-        #stn_info_transpose = numpy.transpose(stn_info) 
+        #stn_info_transpose = np.transpose(stn_info) 
         p_sfc_df = pd.DataFrame(np.transpose(p_sfc_data), columns=column_str) 
         #stn_info_df = stn_info_df.sort_values(by='stn_mnet_id') 
         # stn_info_df = stn_info_df.sort_values(by='stn_name') 
@@ -596,24 +597,19 @@ def process_grib_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
 
 
 ###############################################################################
-def process_csv_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
+def process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr, bucket_name):
 
     print      ('process_csv begin ')
     logger.info('process_csv begin ')
-    # read station data 
-    use_stn = 'all'
-    print_stn_info = False
-    #read_stn_metadata_type = 'csv' # 'db' or 'csv'
-    project_name = 'pgrad'
-    stn_metadata_file_name = os.path.join(os.environ['HOME'], project_name, 'station_list_'+project_name+'.csv') 
-    (dict_stn_metadata) = read_stn_metadata_from_csv(stn_metadata_file_name, use_stn, print_stn_info)
+
 
     dir_init_temp = dt_init.strftime('%Y-%m-%d')
     dir_name_ingest    = os.path.join('data', 'ingest',    dir_init_temp)
     dir_name_processed = os.path.join('data', 'processed', dir_init_temp)
     
     # get list of files in ingest dir
-    file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*.csv'))
+    #file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*.csv'))
+    file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*'+dt_init.strftime('%Y-%m-%d_%H')+'*.csv'))
     n_files = len(file_list)
     print      ('  found %s files to process' %(n_files))
     logger.info('  found %s files to process' %(n_files))
@@ -643,8 +639,8 @@ def process_csv_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
 
     file_temp = file_list[0]
     for n, file_temp in enumerate(file_list): 
-        print      ('    processing file %s of %s, %s' %(n, n_files, file_temp))
-        logger.info('    processing file %s of %s, %s' %(n, n_files, file_temp))
+        #print      ('    processing file %s of %s, %s' %(n, n_files, file_temp))
+        #logger.info('    processing file %s of %s, %s' %(n, n_files, file_temp))
         #file_name = os.path.dirname(file_temp)
         file_name = os.path.basename(file_temp)
         file_name_processed = os.path.join(dir_name_processed, file_name)
@@ -681,33 +677,27 @@ def process_csv_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
     logger.info('  p_sfc2_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc2_hr_s), np.nanmax(p_sfc2_hr_s)))
 
     # archive csv ingest file to processed
+    print      ('  archive output begin' ) 
+    logger.info('  archive_output begin' ) 
     for file_temp in file_list: 
         #file_name = os.path.dirname(file_temp)
         file_name = os.path.basename(file_temp)
         file_name_processed = os.path.join(dir_name_processed, file_name)
         temp_command = 'mv -f '+file_temp+' '+file_name_processed
-        print      ('    archive output %s ' % (temp_command)) 
-        logger.info('    archive output %s ' % (temp_command)) 
+        #print      ('    archive output %s ' % (temp_command)) 
+        #logger.info('    archive output %s ' % (temp_command)) 
         os.system(temp_command)
-        print      ('    archive output: success ' ) 
-        logger.info('    archive_output: success ' ) 
+        #print      ('    archive output: success ' ) 
+        #logger.info('    archive_output: success ' ) 
     print      ('process_csv end ')
     logger.info('process_csv end ')
 
 
 ###############################################################################
-def calc_pgrad(model_name_list, dt_init, bucket_name):
+def calc_pgrad(dict_stn_metadata, model_name_list, dt_init, bucket_name):
 
     print      ('calc_pgrad begin ')
     logger.info('calc_pgrad begin ')
-
-    # read station data 
-    use_stn = 'all'
-    print_stn_info = False
-    #read_stn_metadata_type = 'csv' # 'db' or 'csv'
-    project_name = 'pgrad'
-    stn_metadata_file_name = os.path.join(os.environ['HOME'], project_name, 'station_list_'+project_name+'.csv') 
-    (dict_stn_metadata) = read_stn_metadata_from_csv(stn_metadata_file_name, use_stn, print_stn_info)
 
     dir_init_temp = dt_init.strftime('%Y-%m-%d')
     dir_name_ingest    = os.path.join('data', 'ingest',    dir_init_temp)
@@ -722,6 +712,10 @@ def calc_pgrad(model_name_list, dt_init, bucket_name):
         p_sfc2_master_file = os.path.join(dir_name_processed, 'p_sfc2_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
         p_sfc1_diff_master_file = os.path.join(dir_name_processed, 'p_sfc1_diff_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
         p_sfc2_diff_master_file = os.path.join(dir_name_processed, 'p_sfc2_diff_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+        print      ('    input  file is %s ' %(p_sfc1_master_file))
+        logger.info('    input  file is %s ' %(p_sfc1_master_file))
+        print      ('    output file is %s ' %(p_sfc1_diff_master_file))
+        logger.info('    output file is %s ' %(p_sfc1_diff_master_file))
         if not os.path.isfile(p_sfc1_master_file): 
             print      ('    ERROR - input file not found %s ' %(p_sfc1_master_file))
             logger.info('    ERROR - input file not found %s ' %(p_sfc1_master_file))
@@ -765,19 +759,10 @@ def calc_pgrad(model_name_list, dt_init, bucket_name):
     logger.info('calc_pgrad end ')
 
 ###############################################################################
-def plot_data(model_name_list, dt_init_expected, forecast_horizon_hr, utc_conversion, time_zone_label, bucket_name):
+def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_horizon_hr, utc_conversion, time_zone_label, bucket_name):
 
     print      ('plot_data begin ')
     logger.info('plot_data begin ')
-
-    # read station data 
-    use_stn = 'all'
-    print_stn_info = False
-    #read_stn_metadata_type = 'csv' # 'db' or 'csv'
-    project_name = 'pgrad'
-    stn_metadata_file_name = os.path.join(os.environ['HOME'], project_name, 'station_list_'+project_name+'.csv') 
-    (dict_stn_metadata) = read_stn_metadata_from_csv(stn_metadata_file_name, use_stn, print_stn_info)
- 
  
     p_sfc1_diff_init_m_hr_s = np.full([5, 3, forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
     np.shape(p_sfc1_diff_init_m_hr_s)   
@@ -856,7 +841,7 @@ def plot_data(model_name_list, dt_init_expected, forecast_horizon_hr, utc_conver
     
     color_list = ['r', 'b', 'g', 'c', 'm', 'y', 'k']    
     #n_days_list = [2, 4, 10]
-    n_days_list = [10]
+    n_days_list = [4, 10]
     figsize_x, figsize_y = 10, 5
     size_font = 14
     
@@ -882,6 +867,7 @@ def plot_data(model_name_list, dt_init_expected, forecast_horizon_hr, utc_conver
              i_most_recent = i
              max_hrs_found = hrs_found
              #print(i, hrs_found)
+    # i_most_recent -= 1
     print      ('  using most recent full init %s %s ' %(i, dt_init_list[i_most_recent].strftime('%Y-%m-%d_%H-%M')))
     logger.info('  using most recent full init %s %s ' %(i, dt_init_list[i_most_recent].strftime('%Y-%m-%d_%H-%M')))
  
@@ -893,13 +879,11 @@ def plot_data(model_name_list, dt_init_expected, forecast_horizon_hr, utc_conver
 
     # np.shape(p_sfc1_diff_init_m_hr_s)
 
-   
- 
- 
     ######################################
     # latest init, all models
     stn_id_pair = 'KWMC-KSAC'
     s = 254
+    # note csmith - i_most_recent is off by one ? 
     i = i_most_recent
     dt_init_list[i]
     model_name = 'gfs'
@@ -980,82 +964,546 @@ def plot_data(model_name_list, dt_init_expected, forecast_horizon_hr, utc_conver
     
     model_name = 'gfs'
     m = 0
-    #for m, model_name in enumerate(model_name_list):
-    for s,stn_id_pair in enumerate(stn_id_pair_list):
-        #if stn_id_pair == 'KWMC-KSAC':
-        if stn_id_pair in stn_id_pair_list_to_plot:
-            print      ('    plotting %s %s ' %(s, stn_id_pair))
-            logger.info('    plotting %s %s ' %(s, stn_id_pair))
-            for d, n_days in enumerate(n_days_list):
-
-                dt_min_plot = dt(dt_axis_lt_init[4,0].year, dt_axis_lt_init[4,0].month, dt_axis_lt_init[i,0].day, 0, 0, 0)
-                dt_max_plot = dt_min_plot + td(days=n_days+1)
-                if   n_days == 2:
-                    delta_ticks = td(hours=12)
-                    dt_format = '%d %H'
-                elif n_days == 4:
-                    delta_ticks = td(hours=24)
-                    dt_format = '%d %H'    
-                elif n_days == 10:
-                    delta_ticks = td(hours=24)
-                    dt_format = '%m/%d'
-                delta_lines = td(hours=24)
-                # dt_max_plot = datetime_min_plot + datetime.timedelta(hours=24*8) # 14, 24  
-                #datetick_format = '%H'    
-                dt_ticks = drange(dt_min_plot, dt_max_plot+delta_ticks, delta_ticks)
-                n_date_ticks = len(dt_ticks) 
-                
-                dt_newday_ticks = drange(dt_min_plot, dt_max_plot+td(hours=24), td(hours=24))
-                dt_nighttime_ticks = drange(dt_min_plot-td(hours=6), dt_max_plot+td(hours=24), td(hours=24))
-                alpha_night = 0.5
-                
-                [y_min, y_max, y_int] = y_axis_cache[stn_id_pair]
-                # [y_min, y_max, y_int] = [-20, 20, 5]
-                y_ticks = list(range(y_min, y_max+y_int, y_int))
-                # n_days_plot = (dt_max_plot - dt_min_plot).days 
-                
-                
-                fig_num = 134
-                fig = plt.figure(num=fig_num,figsize=(figsize_x, figsize_y)) 
-                plt.clf()
-                i = n_init-1
-                #for i, dt_init in enumerate(dt_init_list[::-1]):
-                while i >= 0:
-                    print(dt_init_list[i])
-                    mask = ~np.isnan(p_sfc1_diff_init_m_hr_s[i,m,:,s])
-                    plt.plot(dt_axis_lt_init[i,mask], p_sfc1_diff_init_m_hr_s[i,m,mask,s], color_list[i], linestyle='-', label=dt_init_list[i].strftime('%Y-%m-%d_%H'), linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
-                    i -=1 
-                    #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
-                #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
-                plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
-                plt.plot([dt_ticks[0], dt_ticks[-1]], [0.0, 0.0], 'k', linestyle='-', linewidth=2.0, marker='o', markersize=0, markeredgecolor='k') 
-                for y_tick in y_ticks:
-                    plt.plot([dt_ticks[0], dt_ticks[-1]], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
-                for dt_tick in dt_ticks:
-                    plt.plot([dt_tick, dt_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
-                for dt_tick in dt_newday_ticks:
-                    plt.plot([dt_tick, dt_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=1.0, marker='o', markersize=0) 
-                if n_days < 10:
-                    for dt_tick in dt_nighttime_ticks:
-                        plt.axvspan(dt_tick, dt_tick+0.5, color='grey', alpha=alpha_night, linewidth=0)    
-                plt.xlim([dt_ticks[0], dt_ticks[-1]])
-                plt.gca().xaxis.set_major_formatter(DateFormatter(dt_format))
-                plt.xticks(dt_ticks, visible=True, fontsize=size_font) 
-                plt.yticks(y_ticks, fontsize=size_font)
-                plt.ylim([y_min, y_max])
-                plt.xlabel('date time ['+time_zone_label+']',fontsize=size_font,labelpad=00)
-                plt.ylabel('$\Delta$ slp [mb]',fontsize=size_font,labelpad=20)                      
-                plt.title('$\Delta$ slp %s, %s model' % (stn_id_pair, model_name), \
-                  fontsize=size_font+2, x=0.5, y=1.01)                     
-                plt.show() 
-                filename = 'del_slp_all_init_'+stn_id_pair+'_'+model_name+'_'+str(n_days)+'.png' 
-                plot_name = os.path.join('images',filename)
-                plt.savefig(plot_name) 
+    for m, model_name in enumerate(model_name_list):
+        for s,stn_id_pair in enumerate(stn_id_pair_list):
+            #if stn_id_pair == 'KWMC-KSAC':
+            if stn_id_pair in stn_id_pair_list_to_plot:
+                print      ('    plotting %s %s ' %(s, stn_id_pair))
+                logger.info('    plotting %s %s ' %(s, stn_id_pair))
+                for d, n_days in enumerate(n_days_list):
+    
+                    dt_min_plot = dt(dt_axis_lt_init[4,0].year, dt_axis_lt_init[4,0].month, dt_axis_lt_init[i,0].day, 0, 0, 0)
+                    dt_max_plot = dt_min_plot + td(days=n_days+1)
+                    if   n_days == 2:
+                        delta_ticks = td(hours=12)
+                        dt_format = '%d %H'
+                    elif n_days == 4:
+                        delta_ticks = td(hours=24)
+                        dt_format = '%d %H'    
+                    elif n_days == 10:
+                        delta_ticks = td(hours=24)
+                        dt_format = '%m/%d'
+                    delta_lines = td(hours=24)
+                    # dt_max_plot = datetime_min_plot + datetime.timedelta(hours=24*8) # 14, 24  
+                    #datetick_format = '%H'    
+                    dt_ticks = drange(dt_min_plot, dt_max_plot+delta_ticks, delta_ticks)
+                    n_date_ticks = len(dt_ticks) 
+                    
+                    dt_newday_ticks = drange(dt_min_plot, dt_max_plot+td(hours=24), td(hours=24))
+                    dt_nighttime_ticks = drange(dt_min_plot-td(hours=6), dt_max_plot+td(hours=24), td(hours=24))
+                    alpha_night = 0.5
+                    
+                    [y_min, y_max, y_int] = y_axis_cache[stn_id_pair]
+                    # [y_min, y_max, y_int] = [-20, 20, 5]
+                    y_ticks = list(range(y_min, y_max+y_int, y_int))
+                    # n_days_plot = (dt_max_plot - dt_min_plot).days 
+                    
+                    
+                    fig_num = 134
+                    fig = plt.figure(num=fig_num,figsize=(figsize_x, figsize_y)) 
+                    plt.clf()
+                    i = n_init-1
+                    #for i, dt_init in enumerate(dt_init_list[::-1]):
+                    while i >= 0:
+                        print(dt_init_list[i])
+                        mask = ~np.isnan(p_sfc1_diff_init_m_hr_s[i,m,:,s])
+                        plt.plot(dt_axis_lt_init[i,mask], p_sfc1_diff_init_m_hr_s[i,m,mask,s], color_list[i], linestyle='-', label=dt_init_list[i].strftime('%Y-%m-%d_%H'), linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
+                        i -=1 
+                        #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
+                    #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
+                    plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
+                    plt.plot([dt_ticks[0], dt_ticks[-1]], [0.0, 0.0], 'k', linestyle='-', linewidth=2.0, marker='o', markersize=0, markeredgecolor='k') 
+                    for y_tick in y_ticks:
+                        plt.plot([dt_ticks[0], dt_ticks[-1]], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
+                    for dt_tick in dt_ticks:
+                        plt.plot([dt_tick, dt_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
+                    for dt_tick in dt_newday_ticks:
+                        plt.plot([dt_tick, dt_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=1.0, marker='o', markersize=0) 
+                    if n_days < 10:
+                        for dt_tick in dt_nighttime_ticks:
+                            plt.axvspan(dt_tick, dt_tick+0.5, color='grey', alpha=alpha_night, linewidth=0)    
+                    plt.xlim([dt_ticks[0], dt_ticks[-1]])
+                    plt.gca().xaxis.set_major_formatter(DateFormatter(dt_format))
+                    plt.xticks(dt_ticks, visible=True, fontsize=size_font) 
+                    plt.yticks(y_ticks, fontsize=size_font)
+                    plt.ylim([y_min, y_max])
+                    plt.xlabel('date time ['+time_zone_label+']',fontsize=size_font,labelpad=00)
+                    plt.ylabel('$\Delta$ slp [mb]',fontsize=size_font,labelpad=20)                      
+                    plt.title('$\Delta$ slp %s, %s model' % (stn_id_pair, model_name), \
+                      fontsize=size_font+2, x=0.5, y=1.01)                     
+                    plt.show() 
+                    filename = 'del_slp_all_init_'+stn_id_pair+'_'+model_name+'_'+str(n_days)+'.png' 
+                    plot_name = os.path.join('images',filename)
+                    plt.savefig(plot_name) 
     
     print      ('plot_data end ')
     logger.info('plot_data end ')
 
+
+###############################################################################
+def obs_historical_download(dict_stn_metadata, utc_conversion, time_zone_label, bucket_name):
+
+    print      ('obs_historical_download begin ')
+    logger.info('obs_historical_download begin ')
+
+    dir_sfc_obs_historical = os.path.join('data', 'sfc_obs_historical')
+    if not os.path.isdir(dir_sfc_obs_historical):
+        os.system('mkdir -p '+dir_sfc_obs_historical)
+
+    mesowest_token = os.environ['mesowest_token']
+    url_base = 'http://api.mesowest.net/v2/stations/timeseries?stid='
+        
+    s = 2 # KSAC
+    s = 9 # KWMC
+    #for s in range(6,8,1): 
+    for s in range(0, dict_stn_metadata['n_stn']): 
+        #if ('SJS' in dict_stn_metadata['stn_name'][s]):
+        #if ('JBG' in dict_stn_metadata['stn_id'][s]):
+        print      ('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
+        logger.info('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
+        #for d in range(0, n_days, 1):
+        yy = 2018
+        while yy <= dt.utcnow().year:
+            dt_start = dt(yy, 1, 1)
+            dt_end   = dt(yy, 12, 31, 23, 59)
+            print      ('    processing yy %s ' % (yy))
+            logger.info('    processing yy %s ' % (yy))
+            #url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_temp.strftime('%Y%m%d0000')+'&end='+dt_temp.strftime('%Y%m%d2359')+'&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
+            url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_start.strftime('%Y%m%d0000')+'&end='+dt_end.strftime('%Y%m%d2359')+'&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
+            print      ('    url_temp is %s ' % (url_temp))
+            logger.info('    url_temp is %s ' % (url_temp))
+            web_temp = requests.get(url_temp)
+            response  = web_temp.json() 
+            data_parse = response['STATION']
+            if (len(data_parse) == 0): # station contains no data 
+                print      ('    sensor_list empty')
+                logger.info('    sensor_list empty')
+            else: # (len(data_parse) > 0)
     
+                dt_read = np.array(response['STATION'][0]['OBSERVATIONS']['date_time']) # e.g. [u'2015-11-18T00:53:00Z', u'2015-11-18T01:53:00Z', ... u'2015-11-18T23:53:00Z'],
+                n_time_read = len(dt_read)
+                dt_obs_temp = []
+                n = 0 
+                for n in range(0,n_time_read,1): 
+                    # dt_read_temp = dt.strptime(str(dt_read[n]),'%Y-%m-%dT%H:%M:%SZ')
+                    dt_read_temp = dt.strptime(str(dt_read[n]),'%Y-%m-%d_%H-%M')
+                    dt_obs_temp.append(dt_read_temp)
+                    del dt_read_temp 
+                sensor_list = response['STATION'][0]['SENSOR_VARIABLES'] 
+                #print (sensor_list)
+        
+                # temp 
+                if   ('air_temp' in sensor_list): 
+                    temp_read = np.array(response['STATION'][0]['OBSERVATIONS']['air_temp_set_1'],dtype='float') 
+                else: 
+                    temp_read = np.zeros([n_time_read])
+                # ws 
+                if   ('wind_speed' in sensor_list): 
+                    ws_read = np.array(response['STATION'][0]['OBSERVATIONS']['wind_speed_set_1'],dtype='float') 
+                else: 
+                    ws_read = np.zeros([n_time_read])
+                # wsg 
+                if   ('wind_gust' in sensor_list): 
+                    wsg_read = np.array(response['STATION'][0]['OBSERVATIONS']['wind_gust_set_1'],dtype='float') 
+                else: 
+                    wsg_read = np.zeros([n_time_read])
+                # wd             
+                if   ('wind_direction' in sensor_list): 
+                    wd_read = np.array(response['STATION'][0]['OBSERVATIONS']['wind_direction_set_1'],dtype='float') 
+                else: 
+                    wd_read = np.zeros([n_time_read])
+                if   ('relative_humidity' in sensor_list): 
+                    rh_read = np.array(response['STATION'][0]['OBSERVATIONS']['relative_humidity_set_1'],dtype='float') 
+                else: 
+                    rh_read = np.zeros([n_time_read])
+        
+                if   ('sea_level_pressure' in sensor_list): 
+                    slp_read = np.array(response['STATION'][0]['OBSERVATIONS']['sea_level_pressure_set_1d'],dtype='float')            
+                else: 
+                    slp_read = np.zeros([n_time_read])
+        
+                if   ('pressure' in sensor_list): 
+                    pres_read = np.array(response['STATION'][0]['OBSERVATIONS']['pressure_set_1d'],dtype='float') 
+                else: 
+                    pres_read = np.zeros([n_time_read])
+        
+                if   ('altimeter' in sensor_list): 
+                    alt_read = np.array(response['STATION'][0]['OBSERVATIONS']['altimeter_set_1'],dtype='float') 
+                else: 
+                    alt_read = np.zeros([n_time_read])
+        
+                # units conversion hpa -> mb
+                pres_read = 0.01*pres_read
+                alt_read  = 0.01*alt_read
+                slp_read  = 0.01*slp_read
+        
+                #alt_read  = np.zeros([n_time_read])
+                #slp_read  = np.zeros([n_time_read])
+                u_ws_read = np.zeros([n_time_read])
+                v_ws_read = np.zeros([n_time_read])
+                            
+                # write the csv file - yes rh
+                stn_data = [temp_read, ws_read, wsg_read, wd_read, rh_read, slp_read, pres_read, alt_read]
+                stn_data = np.transpose(stn_data) 
+                stn_data_df = pd.DataFrame(stn_data, index=dt_obs_temp, columns=['temp','ws', 'wsg', 'wd', 'rh', 'slp', 'pres', 'alt']).round(2) 
+                #file_name_stn_write = os.path.join(dir_data_ingest, 'stn_obs_'+dict_stn_metadata['stn_id'][s]+'_'+dt_temp.strftime('%Y-%m-%d')+'.csv') 
+                file_name_stn_write = os.path.join(dir_sfc_obs_historical, 'stn_obs_'+dict_stn_metadata['stn_id'][s]+'_'+str(yy)+'.csv') 
+                stn_data_df.to_csv(file_name_stn_write) 
+          
+                ## change nan to NULL for compatability with postgres
+                ## temp 
+                #index_nan = ([np.isnan(temp_read)]) 
+                #temp_read = temp_read.astype(object)
+                #temp_read[index_nan] = 'NULL'
+                #del index_nan 
+            
+            yy += 1
+
+    print      ('obs_historical_download end ')
+    logger.info('obs_historical_download end ')
+
+###############################################################################
+def datematch_to_hourly(var_raw, dt_axis_raw, dt_axis_hr_lst, obs_window_minutes):
+    # debugging    
+    # var_raw = stn_read_df_f['slp'].values
+    # dt_axis_raw = stn_read_df_f.index
+
+    warnings.simplefilter('ignore', RuntimeWarning) # nanmean of all nan
+
+    n_hrs = len(dt_axis_hr_lst)
+    dummy_axis = np.arange(0, n_hrs) 
+    dt_axis_hr_lst_df = pd.DataFrame(dummy_axis, index=dt_axis_hr_lst)
+    nt = len(dt_axis_raw) 
+
+    n_dims = np.ndim(var_raw) 
+    if   (n_dims == 1): 
+        [n_dim1] = np.shape(var_raw) 
+        var_raw_df = pd.DataFrame(var_raw[:], index=dt_axis_raw)
+        var_hr = np.full([n_hrs], np.nan, dtype='float')
+    elif (n_dims == 2): 
+        [n_dim1, n_dim2] = np.shape(var_raw) 
+        var_raw_df = pd.DataFrame(var_raw[:,0], index=dt_axis_raw)
+        var_hr = np.full([n_hrs, n_dim2], np.nan, dtype='float')
+    elif (n_dims == 3): 
+        [n_dim1, n_dim2, n_dim3] = np.shape(var_raw) 
+        var_raw_df = pd.DataFrame(var_raw[:,0,0], index=dt_axis_raw)
+        var_hr = np.full([n_hrs, n_dim2, n_dim3], np.nan, dtype='float')
+    elif (n_dims == 4): 
+        [n_dim1, n_dim2, n_dim3, n_dim4] = np.shape(var_raw) 
+        var_raw_df = pd.DataFrame(var_raw[:,0,0,0], index=dt_axis_raw)
+        var_hr = np.full([n_hrs, n_dim2, n_dim3, n_dim4], np.nan, dtype='float')
+        
+    # n = 100812
+    for n in range(0, n_hrs, 1):  
+        if (n%10000 == 0):
+            print      ('      processing %s of %s' %(str(n).zfill(6), n_hrs))
+            logger.info('      processing %s of %s' %(str(n).zfill(6), n_hrs))
+        index_min = (var_raw_df.index <= dt_axis_hr_lst_df.index[n]-td(minutes=30)).argmin() 
+        index_max = (var_raw_df.index <  dt_axis_hr_lst_df.index[n]+td(minutes=30)).argmin() 
+        if (index_min < nt and index_max > 0):
+            if (index_min != index_max):      
+                index_diff = index_max-index_min
+                #if (index_diff != 1 or (index_diff == 1 and not np.isnan(var_raw[index_min,0,0,0]))):                     
+                if   (index_diff == 1): # only 1 data point found                 
+                    if   (n_dims == 1): 
+                        var_hr[n]       = var_raw[index_min] 
+                    elif (n_dims == 2): 
+                        var_hr[n,:]     = var_raw[index_min,:] 
+                    elif (n_dims == 3): 
+                        var_hr[n,:,:]   = var_raw[index_min,:,:] 
+                    elif (n_dims == 4): 
+                        var_hr[n,:,:,:] = var_raw[index_min,:,:,:]                
+                elif (index_diff != 1): # more than one data point found 
+                    if   (n_dims == 1): 
+                        var_hr[n]       = np.nanmean(var_raw[index_min:index_max]) 
+                    elif (n_dims == 2): 
+                        #var_hr[n,:]     = np.nanmean(var_raw[index_min:index_max,:]) 
+                        for n2 in range(0, n_dim2, 1):   
+                            var_hr[n,n2] = np.nanmean(var_raw[index_min:index_max,n2]) 
+                    elif (n_dims == 3): 
+                        #var_hr[n,:,:]   = np.nanmean(var_raw[index_min:index_max,:,:]) 
+                        for n2 in range(0, n_dim2, 1):   
+                            for n3 in range(0, n_dim3, 1):   
+                                  var_hr[n,n2,n3] = np.nanmean(var_raw[index_min:index_max,n2,n3]) 
+                    elif (n_dims == 4): 
+                        #var_hr[n,:,:,:] = np.nanmean(var_raw[index_min:index_max,:,:,:]) 
+                        for n2 in range(0, n_dim2, 1):   
+                            for n3 in range(0, n_dim3, 1):   
+                                for n4 in range(0, n_dim4, 1):   
+                                  var_hr[n,n2,n3,n4] = np.nanmean(var_raw[index_min:index_max,n2,n3,n4]) 
+                del index_diff       
+        # note csmith 2016/04/26 - add these two lines of code below for most recent data point 
+        elif (index_min == nt-1 and index_max == 0): # right most data point 
+            if   (n_dims == 1): 
+                var_hr[n]       = np.nanmean(var_raw[index_min]) 
+            elif (n_dims == 2): 
+                #var_hr[n,:]     = np.nanmean(var_raw[index_min,:]) 
+                for n2 in range(0, n_dim2, 1):   
+                    var_hr[n,n2] = np.nanmean(var_raw[index_min,n2]) 
+            elif (n_dims == 3): 
+                #var_hr[n,:,:]   = np.nanmean(var_raw[index_min,:,:]) 
+                for n2 in range(0, n_dim2, 1):   
+                    for n3 in range(0, n_dim3, 1):   
+                        var_hr[n,n2,n3] = np.nanmean(var_raw[index_min,n2,n3]) 
+            elif (n_dims == 4): 
+                #var_hr[n,:,:,:] = np.nanmean(var_raw[index_min,:,:,:]) 
+                for n2 in range(0, n_dim2, 1):   
+                    for n3 in range(0, n_dim3, 1):   
+                        for n4 in range(0, n_dim4, 1):   
+                          var_hr[n,n2,n3,n4] = np.nanmean(var_raw[index_min,n2,n3,n4])
+        del index_min, index_max  
+
+    return var_hr  
+
+
+###############################################################################
+def read_sfc_obs_csv_data(file_name_full_path, replace_nan_with_null): 
+    
+    np.warnings.filterwarnings('ignore')    
+    #import warnings
+    #warnings.simplefilter('ignore', RuntimeWarning) # nanmean of all nan
+    
+    stn_read_df = pd.read_csv(file_name_full_path,index_col=0)
+    #temp_read  = np.array(stn_read_df['temp'])
+    #ws_read    = np.array(stn_read_df['ws'])
+    #wsg_read   = np.array(stn_read_df['wsg'])
+    #wd_read    = np.array(stn_read_df['wd'])
+    #rh_read    = np.array(stn_read_df['rh'])
+    #alt_read   = np.array(stn_read_df['alt'])
+    #slp_read   = np.array(stn_read_df['slp'])
+
+    # datetime_obs_temp = stn_read_df.index # object 
+    # nt_obs = len(datetime_obs_temp)
+    # datetime_str = ["%s" % x for x in datetime_obs_temp] 
+    # datetime_obs_read_utc = np.full([nt_obs], np.nan, dtype=object)
+    # for n in range(0, nt_obs, 1):
+    #     try: 
+    #         datetime_obs_read_utc[n] = datetime.datetime.strptime(datetime_str[n],'%Y-%m-%d %H:%M:00')
+    #     except: 
+    #         try:
+    #             datetime_obs_read_utc[n] = datetime.datetime.strptime(datetime_str[n],'%Y-%m-%d')
+    #         except:
+    #             datetime_obs_read_utc[n] = datetime.datetime.strptime(datetime_str[n],'%m/%d/%Y %H:%M')
+                
+    #datetime_obs_read_utc = []
+    #for n in range(0, nt_obs, 1):
+    #    datetime_obs_read_utc.append(datetime.datetime.strptime(datetime_str[n],'%Y-%m-%d %H:%M:00') - datetime.timedelta(hours=utc_conversion)) # UTC to LST 
+
+    #del stn_read_df_matrix 
+    #del datetime_str, nt_obs 
+
+    #stn_data = [temp_read, ws_read, wd_read, rh_read, alt_read, slp_read, swrad_read]
+    #stn_data = np.transpose(stn_data) 
+    #stn_read_df = pd.DataFrame(stn_data, index=datetime_obs_read_utc, columns=['temp','ws','wd', 'rh', 'alt', 'slp', 'swrad']) 
+    #stn_data = [temp_read, ws_read, wsg_read, wd_read, rh_read, alt_read, slp_read, swrad_read]
+    #stn_data = np.transpose(stn_data) 
+    #stn_read_df = pd.DataFrame(stn_data, index=datetime_obs_read_utc, columns=['temp','ws','wsg','wd', 'rh', 'alt', 'slp', 'swrad']) 
+
+    # replace nan will NULL, required for postgres, this should my to function 
+    #if (replace_nan_with_null):
+    #    var_temp = temp_read
+    #    index_nan = ([np.isnan(var_temp)]) 
+    #    var_temp = var_temp.astype(object)
+    #    var_temp[index_nan] = 'NULL'
+    #    temp_read = var_temp
+    #    del index_nan 
+            
+    return stn_read_df
+   
+    
+###############################################################################
+def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, bucket_name):
+
+    print      ('obs_historical_process begin ')
+    logger.info('obs_historical_process begin ')
+
+    dir_sfc_obs_historical = os.path.join('data', 'sfc_obs_historical')
+    utc_conversion = 8
+    dt_start = dt(2017, 1, 1)
+    #dt_start = dt(2000, 1, 1)
+    dt_end = dt.utcnow()
+    n_days = (dt_end - dt_start).days 
+    n_hrs = n_days*24
+    #dt_axis_hr_utc = []
+    dt_axis_hr_lst = []
+    for n in range(0, n_hrs): 
+        dt_axis_hr_lst.append(dt_start + td(hours=n))
+        #datetime_axis_master_1hr_lst.append(datetime_start + datetime.timedelta(hours=n) - datetime.timedelta(hours=utc_conversion))
+    
+    print      ('dt_axis_hr_lst is %s - %s ' % (dt_axis_hr_lst[0].strftime('%Y-%m-%d %H:%M'), dt_axis_hr_lst[-1].strftime('%Y-%m-%d %H:%M'))) 
+    logger.info('dt_axis_hr_lst is %s - %s ' % (dt_axis_hr_lst[0].strftime('%Y-%m-%d %H:%M'), dt_axis_hr_lst[-1].strftime('%Y-%m-%d %H:%M'))) 
+    
+    dummy_axis = np.arange(0, n_hrs)
+    axis_hr_lst_df = pd.DataFrame(dummy_axis, index=dt_axis_hr_lst)
+    
+    obs_window_minutes = 29 
+    
+    pres_obs_hr_s = np.full([n_hrs, dict_stn_metadata['n_stn']], np.nan, dtype='float') 
+    slp_obs_hr_s  = np.full([n_hrs, dict_stn_metadata['n_stn']], np.nan, dtype='float') 
+    alt_obs_hr_s  = np.full([n_hrs, dict_stn_metadata['n_stn']], np.nan, dtype='float') 
+    
+    replace_nan_with_null = False
+    
+    s = 2 # KSAC
+    s = 9 # KWMC
+    for s in range(0, dict_stn_metadata['n_stn']):
+        if (s == 2 or s == 9):
+            print      ('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
+            logger.info('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
+            file_name_list = glob.glob(os.path.join(dir_sfc_obs_historical,'stn_obs*'+dict_stn_metadata['stn_id'][s]+'*csv'))    
+            file_name_list.sort()
+            n_files = len(file_name_list)
+            print      ('  stn_id %s, n_files %s ' % (dict_stn_metadata['stn_id'][s], n_files)) 
+            logger.info('  stn_id %s, n_files %s ' % (dict_stn_metadata['stn_id'][s], n_files)) 
+            f_count = 0
+            if (n_files > 0): 
+                for f in range(0, n_files, 1): 
+                    file_name_full_path = file_name_list[f] 
+                    #if ('2014' in file_name_full_path or '2015' in file_name_full_path):
+                    #if ('2016' in file_name_full_path):
+                    #if ('20' in file_name_full_path):
+                    print      ('    file %s of %s ' % (f, n_files))
+        
+                    stn_read_df = read_sfc_obs_csv_data(file_name_full_path, replace_nan_with_null)
+                    # convert dt string to dt type and convert to lst     
+                    #dt_read_utc = pd.to_datetime(stn_read_df.index) 
+                    dt_read_lst  = pd.to_datetime(stn_read_df.index) - td(hours=8)
+                    stn_read_df = stn_read_df.set_index(dt_read_lst)
+                    #stn_read_df.index    
+                    if (f_count == 0):
+                        stn_read_df_f = stn_read_df
+                    else: 
+                        stn_read_df_f = pd.concat([stn_read_df_f, stn_read_df])
+                    del stn_read_df
+                    f_count += 1
+    
+                print      ('    datematch start ' ) 
+                logger.info('    datematch start ' ) 
+                var_raw = np.vstack((stn_read_df_f['pres'].values, stn_read_df_f['alt'].values, stn_read_df_f['slp'].values)).T
+                # np.shape(stn_read_df_f['pres'].values)
+                # np.shape(var_raw)
+                #var_hr = datematch_to_hourly(stn_read_df_f['slp'].values, stn_read_df_f.index, dt_axis_hr_lst, obs_window_minutes)
+                # 4 min each # 20 station
+                var_hr = datematch_to_hourly(var_raw, stn_read_df_f.index, dt_axis_hr_lst, obs_window_minutes)
+                pres_obs_hr_s[:,s] = var_hr[:,0]
+                alt_obs_hr_s [:,s] = var_hr[:,1]
+                slp_obs_hr_s [:,s] = var_hr[:,2]
+                del var_hr, stn_read_df_f 
+ 
+    pres_diff_hr_s = np.full([n_hrs, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
+    alt_diff_hr_s  = np.full([n_hrs, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
+    slp_diff_hr_s  = np.full([n_hrs, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
+    stn_id_pair_list = [None]*dict_stn_metadata['n_stn']**2
+    s1, s2 = 9, 2
+    s1, s2 = 2, 9
+    print      ('  calculating pressure difference station pairs')
+    logger.info('  calculating pressure difference station pairs')
+    for s1 in range(0, dict_stn_metadata['n_stn']):
+        print      ('      processing s1 %s ' %(s1))
+        logger.info('      processing s1 %s ' %(s1))
+        for s2 in range(0, dict_stn_metadata['n_stn']):
+            if (s1 == 2 and s2 == 9) or (s1 == 9 and s2 == 2):
+                pres_diff_hr_s[:,s1*dict_stn_metadata['n_stn']+s2] = pres_obs_hr_s[:,s1] - pres_obs_hr_s[:,s2] 
+                alt_diff_hr_s [:,s1*dict_stn_metadata['n_stn']+s2] =  alt_obs_hr_s[:,s1] -  alt_obs_hr_s[:,s2] 
+                slp_diff_hr_s [:,s1*dict_stn_metadata['n_stn']+s2] =  slp_obs_hr_s[:,s1] -  slp_obs_hr_s[:,s2] 
+                stn_id_pair_list[s1*dict_stn_metadata['n_stn']+s2] = dict_stn_metadata['stn_id'][s1]+'-'+dict_stn_metadata['stn_id'][s2]
+    del pres_obs_hr_s, alt_obs_hr_s, slp_obs_hr_s
+            
+    # create df of the arrays        
+    pres_diff_hr_s_df = pd.DataFrame(pres_diff_hr_s, index=dt_axis_hr_lst, columns=stn_id_pair_list).round(2)
+    del pres_diff_hr_s
+    alt_diff_hr_s_df  = pd.DataFrame( alt_diff_hr_s, index=dt_axis_hr_lst, columns=stn_id_pair_list).round(2)
+    del alt_diff_hr_s
+    slp_diff_hr_s_df  = pd.DataFrame( slp_diff_hr_s, index=dt_axis_hr_lst, columns=stn_id_pair_list).round(2)
+    del slp_diff_hr_s
+
+    # roll up to daily daily max
+    print      ('  calculating daily roll-ups') 
+    logger.info('  calculating daily roll-ups') 
+    
+    pres_diff_day_s_df = pres_diff_hr_s_df.resample('D').max()
+    slp_diff_day_s_df  =  slp_diff_hr_s_df.resample('D').max()
+    alt_diff_day_s_df  =  alt_diff_hr_s_df.resample('D').max()
+    #pres_diff_day_s_df['KWMC-KSAC'].head()
+    #slp_diff_day_s_df['KWMC-KSAC'].head()
+    #alt_diff_day_s_df['KWMC-KSAC'].head()
+
+    # stn_id_pair_list
+    # dict_stn_metadata['stn_id']
+    # stn_id_pair_list_to_plot = [
+    #     'KWMC-KSAC',
+    #     'KWMC-KSFO',
+    #     'KVBG-KSBA', 
+    #     'KSMX-KSBA', 
+    #     'KBFL-KSBA', 
+    #     'KRDD-KSAC',
+    #     'KRDD-KBFL',
+    #     'KSAC-KBFL',
+    #     'KACV-KSAC']
+    
+    stn_id_pair_list_to_plot = [
+        'KWMC-KSAC']
+        
+    print      ('  find top events ') 
+    logger.info('  find top events ') 
+    
+    # find top events and write to file
+    n_top_events = 20
+    stn_id_pair = 'KWMC-KSAC'
+    s = 254 # s_diff 65, 254
+    for s,stn_id_pair in enumerate(stn_id_pair_list):
+        #if stn_id_pair == 'KWMC-KSAC':
+        if stn_id_pair in stn_id_pair_list_to_plot:
+            slp_top_events_df  =  slp_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
+            alt_top_events_df  =  alt_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
+            pres_top_events_df = pres_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
+            file_name_stn_write = os.path.join('top_events', 'slp_diff_'+stn_id_pair+'.csv') 
+            slp_top_events_df.to_csv(file_name_stn_write) 
+            file_name_stn_write = os.path.join('top_events', 'alt_diff_'+stn_id_pair+'.csv') 
+            alt_top_events_df.to_csv(file_name_stn_write) 
+            file_name_stn_write = os.path.join('top_events', 'pres_diff_'+stn_id_pair+'.csv') 
+            pres_top_events_df.to_csv(file_name_stn_write) 
+            print      ('%s top events ' %(stn_id_pair)) 
+            logger.info('%s top events ' %(stn_id_pair)) 
+            i = 8
+            #for i, row in enumerate(slp_top_events_df):
+            print      ('  slp')
+            logger.info('  slp')
+            for i in range(0, n_top_events):
+                print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
+                logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
+            print      ('  alt')
+            logger.info('  alt')
+            for i in range(0, n_top_events):
+                print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
+                logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
+            print      ('  pres')
+            logger.info('  pres')
+            for i in range(0, n_top_events):
+                print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), pres_top_events_df.index[i].strftime('%Y-%m-%d'), pres_top_events_df[i]))
+                logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), pres_top_events_df.index[i].strftime('%Y-%m-%d'), pres_top_events_df[i]))
+
+    print      ('obs_historical_process end ')
+    logger.info('obs_historical_process end ')
+
+# top expected events 
+# 2011_12_01
+
+# 2017_10_08
+
+# 2018_10_14
+# 2018_11_08
+
+# 2019_06_08
+# 2019_09_24
+# 2019_10_05
+# 2019_10_09
+# 2019_10_23
+# 2019_10_27
+
+# slp_diff_day_s_df['KWMC-KSAC']['2017-10-06':'2017-10-12']
+# slp_diff_day_s_df['KWMC-KSAC']['2018-11-05':'2018-11-12']
+
 ###############################################################################    
 if __name__ == "__main__":
 
@@ -1064,7 +1512,7 @@ if __name__ == "__main__":
     if not debug_mode: 
         # parse inputs 
         parser = argparse.ArgumentParser(description='argparse')
-        parser.add_argument('--batch_mode',    type=str, help='operational or backfill', required=True, default='operational')
+        parser.add_argument('--batch_mode',    type=str, help='operational or backfill', required=False, default='operational')
         parser.add_argument('--model_name',    type=str, help='gfs/nam/hrrr', required=False, default='hrrr')
         parser.add_argument('--process_name',  type=str, help='download/process_grib/process_csv/plot', required=True, default='download')    
         parser.add_argument('--bucket_name',   type=str, help='bucket_name', required=True, default='data')
@@ -1075,6 +1523,7 @@ if __name__ == "__main__":
         bucket_name   = args.bucket_name    
     else:
         os.chdir('/home/csmith/pgrad')
+        bucket_name = 'data'
         #model_name = 'hrrr'    
         #model_name = 'nam'    
         model_name = 'gfs'    
@@ -1083,15 +1532,17 @@ if __name__ == "__main__":
         #process_name = 'download'
         #process_name = 'process_grib'
         #process_name = 'process_csv'
-        process_name = 'plot_data'
-        bucket_name = 'data'
+        #process_name = 'plot_data'
+        #process_name = 'obs_dl_operational'
+        process_name = 'obs_historical_download'
+        process_name = 'obs_historical_process'
  
     # sanitize inputs
     model_name_list = ['gfs', 'nam', 'hrrr']
     if model_name not in model_name_list:
         print('ERROR model_name %s not supported' %(model_name))
         sys.exit()
-    if process_name not in ['download', 'process_grib', 'process_csv', 'calc_pgrad', 'plot_data']:
+    if process_name not in ['download', 'process_grib', 'process_csv', 'calc_pgrad', 'plot_data', 'obs_historical_download', 'obs_historical_process']:
         print('ERROR model_name %s not supported' %(process_name))
         sys.exit()
     if batch_mode not in ['operational','backfill']:
@@ -1132,9 +1583,17 @@ if __name__ == "__main__":
     elif batch_mode == 'backfill':
         hours_to_backfill = 24
 
-    dt_init = dt_init_expected
+    # read station data 
+    use_stn = 'all'
+    print_stn_info = False
+    #read_stn_metadata_type = 'csv' # 'db' or 'csv'
+    project_name = 'pgrad'
+    stn_metadata_file_name = os.path.join(os.environ['HOME'], project_name, 'station_list_'+project_name+'.csv') 
+    (dict_stn_metadata) = read_stn_metadata_from_csv(stn_metadata_file_name, use_stn, print_stn_info)
+
+    dt_init = dt_init_expected - td(hours=hours_to_backfill)
     if  process_name in ['download', 'process_grib', 'process_csv', 'calc_pgrad']:
-        while dt_init >= dt_init_expected - td(hours=hours_to_backfill): 
+        while dt_init <= dt_init_expected: 
             print      ('***************************')
             logger.info('***************************')
             print      ('processing init %s ' % (dt_init.strftime('%Y-%m-%d_%H-%M')))
@@ -1143,18 +1602,22 @@ if __name__ == "__main__":
             if   process_name == 'download':
                 download_data(model_name, dt_init, forecast_horizon_hr, bucket_name)
             elif process_name == 'process_grib':
-                process_grib_data(model_name, dt_init, forecast_horizon_hr, bucket_name)
+                process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr, bucket_name)
             elif process_name == 'process_csv':
-                process_csv_data(model_name, dt_init, forecast_horizon_hr, bucket_name)
-            elif process_name == 'calc_pgrad':
-                calc_pgrad(model_name_list, dt_init_expected, bucket_name)
-            dt_init = dt_init - td(hours=update_frequency_hrs)
+                process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr, bucket_name)
+            elif process_name == 'calc_pgrad':                
+                calc_pgrad(dict_stn_metadata, model_name_list, dt_init, bucket_name)
+            dt_init += td(hours=update_frequency_hrs)
 
     dt_init = dt_init_expected
     if process_name == 'plot_data':
         #plot_data(model_name_list, dt_init, forecast_horizon_hr=120+1, bucket_name)
-        plot_data(model_name_list, dt_init, 241, utc_conversion, time_zone_label, bucket_name)
-        
+        plot_data(dict_stn_metadata, model_name_list, dt_init, 241, utc_conversion, time_zone_label, bucket_name)
+    if process_name == 'obs_historical_download':
+        obs_historical_download(dict_stn_metadata, utc_conversion, time_zone_label, bucket_name)
+    if process_name == 'obs_historical_process':
+        obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, bucket_name)
+  
     # close log file
     print      ('close_logger begin ')
     logger.info('close_logger begin ')
