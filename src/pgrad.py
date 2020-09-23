@@ -11,6 +11,11 @@ repo: https://github.com/weathertrader/battery_charge
 # mvp pgrad - 10 full days
 
 # 2d   website static jquery
+#      top events table -> .png read top events js
+#      add png to js 
+
+# 2d   deploy to ec2 or gcp 
+# 1d   website from local to www
 
 # 10/01 new billing month 
 # 1hr  mesowest account and data dl 
@@ -30,10 +35,6 @@ repo: https://github.com/weathertrader/battery_charge
 # normalize stn_id_pair_list_to_plot to one place only 
 
 # 1/2d update forecasts avail csv 
-
-# 2d   deploy to ec2 or gcp 
-
-# 1d   website from local to www
 
 # 2d   stn obs operational calc cost  
 #      download local
@@ -79,7 +80,7 @@ import matplotlib.pyplot as plt
 from matplotlib.dates import drange, DateFormatter
 from matplotlib.ticker import MultipleLocator 
 import warnings
-
+import math
 
 import logging 
 #import xarray
@@ -1506,8 +1507,101 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, b
                 print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), pres_top_events_df.index[i].strftime('%Y-%m-%d'), pres_top_events_df[i]))
                 logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), pres_top_events_df.index[i].strftime('%Y-%m-%d'), pres_top_events_df[i]))
 
+            ################################################
+            # plot cdf 
+            mask = ~np.isnan(slp_diff_day_s_df[stn_id_pair])
+            var_temp = slp_diff_day_s_df[stn_id_pair][mask]
+            #np.min(var_temp)
+            #np.max(var_temp)
+            [x_min, x_max, x_int] = [float(math.floor(np.min(var_temp))), float(math.ceil(np.max(var_temp))), 2.0]
+            hist, var_bins = np.histogram(var_temp, bins=100, range=[x_min, x_max])
+            cdf = 100.0*np.cumsum(hist)/len(var_temp)
+            [y_min, y_max, y_int] = [80, 100, 2]
+            
+            
+            index = (cdf < 80.0).argmin()
+            [x_min, x_max, x_int] = [float(math.floor(var_bins[index])), float(math.ceil(np.max(var_temp))), 1.0]
+            y_ticks = list(np.arange(y_min, y_max+y_int, y_int))
+            x_ticks = list(np.arange(x_min, x_max+x_int, x_int))
+            # n_days_plot = (dt_max_plot - dt_min_plot).days 
+            
+            figsize_x, figsize_y = 9, 8
+            size_font = 14
+            
+            fig_num = 141
+            fig = plt.figure(num=fig_num,figsize=(figsize_x, figsize_y)) 
+            plt.clf()
+            plt.plot(var_bins[1:], cdf, 'r', linestyle='-', label=model_name.upper(), linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
+            #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
+            #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
+            #plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
+            for y_tick in y_ticks:
+                plt.plot([x_min, x_max], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
+            for x_tick in x_ticks:
+                plt.plot([x_tick, x_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
+            
+            #plt.gca().xaxis.set_major_formatter(DateFormatter(dt_format))
+            plt.xticks(x_ticks, visible=True, fontsize=size_font) 
+            plt.xlim([x_ticks[0], x_ticks[-1]])
+            plt.yticks(y_ticks, fontsize=size_font)
+            plt.ylim([y_min, y_max])
+            plt.ylabel('CDF [%]',fontsize=size_font,labelpad=00)
+            plt.xlabel('$\Delta$ slp [mb]',fontsize=size_font,labelpad=20)
+            plt.title('$\Delta$ slp %s, Observed CDF ' % (stn_id_pair), \
+              fontsize=size_font+2, x=0.5, y=1.01)                     
+            plt.show() 
+            #filename = 'del_slp_all_model_'+stn_id_pair+'_'+dt_init_list[i].strftime('%Y-%m-%d_%H')+'_'+str(n_days)+'.png' 
+            filename = 'del_slp_cdf_'+stn_id_pair+'.png' 
+            plot_name = os.path.join('top_events', filename)
+            plt.savefig(plot_name) 
+            
+            width_line = 2.0
+            [x_line1, x_line2, x_line3] = [0.5, 1.5, 2.5]  # 1.0, 2.0, 3.0
+             
+            line_spacing = 1.0  
+            y_line_offset = 0.5 # was 0.2
+            n_lines = 20 
+            y_top = 21.0 # was 11.0
+            
+            fig_num = 151 
+            fig = plt.figure(num=fig_num,figsize=(8,7)) # was 11,9
+            plt.clf() 
+            
+            for l in range(0, n_lines+1, 1): 
+                #print (l)
+                #print (l*line_spacing)
+                plt.plot([ 0, x_line3], [l*line_spacing, l*line_spacing], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+            plt.plot([             0,              0], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+            plt.plot([x_line1, x_line1], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+            plt.plot([x_line2, x_line2], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+            plt.plot([x_line3, x_line3], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+            
+            plt.axis('off')
+            
+            [x_offset, y_offset] = [0.2, 0.5]
+            for l in range(0, n_lines, 1): 
+                plt.text(               x_offset, l*line_spacing+y_offset, str(n_lines-l).zfill(2), fontsize=size_font,                               ha='left', va='center', color='k')  
+                plt.text(x_line1+x_offset, l*line_spacing+y_offset, slp_top_events_df.index[n_lines-l-1].strftime('%Y-%m-%d'), fontsize=size_font, ha='left', va='center', color='k')  
+                plt.text(x_line2+x_offset, l*line_spacing+y_offset, slp_top_events_df[n_lines-l-1], fontsize=size_font,                            ha='left', va='center', color='k')  
+            # headers
+            plt.text(               x_offset, 20.0+y_offset, 'rank', fontsize=size_font,                               ha='left', va='center', color='k')  
+            plt.text(x_line1+x_offset, 20.0+y_offset, 'date', fontsize=size_font,                               ha='left', va='center', color='k')  
+            plt.text(x_line2+x_offset, 20.0+y_offset, '$\Delta$ slp [mb]', fontsize=size_font,                               ha='left', va='center', color='k')  
+            plt.title('$\Delta$ slp %s, Top events ' % (stn_id_pair), \
+              fontsize=size_font+2, x=0.5, y=1.01)                     
+                
+            #plt.xlim([-0.2, 11.2])
+            #plt.ylim([-4.2, 12.0])
+            
+            plt.show() 
+            plt.tight_layout()
+            filename = 'del_slp_top_events_'+stn_id_pair+'.png' 
+            plot_name = os.path.join('top_events', filename)
+            plt.savefig(plot_name) 
+
     print      ('obs_historical_process end ')
     logger.info('obs_historical_process end ')
+
 
 # top expected events 
 # 2011_12_01

@@ -1,5 +1,15 @@
 $(function() {
 
+
+//var results = $.csv.toObjects("../top_events/slp_diff_KWMC-KSAC.csv");
+//var results = $.csv.toArrays("../top_events/slp_diff_KWMC-KSAC.csv");
+
+//config = {header:true}
+//var results = Papa.parse("../top_events/slp_diff_KWMC-KSAC.csv", header=True);
+//var results = Papa.parse("../top_events/slp_diff_KWMC-KSAC.csv", config);
+//var results = Papa.parse("../top_events/temp1.csv");
+//console.log(results);
+
   $("#stationMapToggle").click(function(){
         $("img").toggle(50);
     });
