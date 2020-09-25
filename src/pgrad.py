@@ -76,6 +76,7 @@ import subprocess
 import matplotlib
 # plotting from cli
 matplotlib.use('Agg') 
+#matplotlib.use('Agg',warn=False) 
 import matplotlib.pyplot as plt
 from matplotlib.dates import drange, DateFormatter
 from matplotlib.ticker import MultipleLocator 
@@ -489,7 +490,15 @@ def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_h
         file_name = os.path.basename(file_temp)
         file_name_processed = os.path.join(dir_name_processed, file_name)
 
-        ds_read = xr.open_dataset(file_temp, engine='cfgrib')        
+        try:
+            ds_read = xr.open_dataset(file_temp, engine='cfgrib')        
+        except:
+            temp_command = 'rm -f '+file_temp    
+            print      ('  ERROR reading %s ' %(file_temp))
+            logger.info('  ERROR reading %s ' %(file_temp))
+            os.system(temp_command)
+            continue
+            
         #sorted(ds_read.variables)
         # ds_sfc = xr.open_dataset(file_temp, engine='cfgrib',
         #      backend_kwargs={'filter_by_keys': {'typeOfLevel': 'surface'}})
@@ -771,11 +780,12 @@ def calc_pgrad(dict_stn_metadata, model_name_list, dt_init, bucket_name):
     logger.info('calc_pgrad end ')
 
 ###############################################################################
-def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_horizon_hr,  dt_start_lt, utc_conversion, time_zone_label, bucket_name):
+def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_horizon_hr,  dt_start_lt, utc_conversion, time_zone_label, stn_id_pair_list_to_plot, bucket_name):
 
     print      ('plot_data begin ')
     logger.info('plot_data begin ')
- 
+    warnings.filterwarnings("ignore") 
+    
     p_sfc1_diff_init_m_hr_s = np.full([5, 3, forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
     np.shape(p_sfc1_diff_init_m_hr_s)   
     p_sfc2_diff_init_m_hr_s = np.full([5, 3, forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
@@ -833,37 +843,20 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
 
     print      ('  read data end, begin plot data ')
     logger.info('  read data end, begin plot data ')
-
-    # stn_id_pair_list
-    # dict_stn_metadata['stn_id']
-    # stn_id_pair_list_to_plot = [
-    #     'KWMC-KSAC',
-    #     'KWMC-KSFO',
-    #     'KVBG-KSBA', 
-    #     'KSMX-KSBA', 
-    #     'KBFL-KSBA', 
-    #     'KRDD-KSAC',
-    #     'KRDD-KBFL',
-    #     'KSAC-KBFL',
-    #     'KACV-KSAC']
-
-    stn_id_pair_list_to_plot = [
-        'KWMC-KSAC']
-    
     
     color_list = ['r', 'b', 'g', 'c', 'm', 'y', 'k']    
     #n_days_list = [2, 4, 10]
-    n_days_list = [4, 10]
+    n_days_list = [2, 3, 10]
     figsize_x, figsize_y = 10, 5
     size_font = 14
     
+    print      ('  set y-axis limits')
+    logger.info('  set y-axis limits')
     y_axis_cache = {}
     n_stn_pair = len(stn_id_pair_list)
     for s,stn_id_pair in enumerate(stn_id_pair_list):
         #if stn_id_pair == 'KWMC-KSAC':
         if stn_id_pair in stn_id_pair_list_to_plot:
-            print      ('    plotting %s %s ' %(s, stn_id_pair))
-            logger.info('    plotting %s %s ' %(s, stn_id_pair))
             y_axis_cache[stn_id_pair] = [-20, 20, 5]
     # y_axis_cache['KRDD-KSAC'] = [-10, 10, 2]
              
@@ -893,6 +886,8 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
 
     ######################################
     # latest init, all models
+    print      ('  plot latest init, all models ')
+    logger.info('  plot latest init, all models ')
     stn_id_pair = 'KWMC-KSAC'
     s = 254
     # note csmith - i_most_recent is off by one ? 
@@ -977,6 +972,8 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                  
     ######################################
     # single model, last 4 inits
+    print      ('  plot single model, all inits ')
+    logger.info('  plot single model, all inits ')
     
     model_name = 'gfs'
     m = 0
@@ -987,74 +984,74 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                 print      ('    plotting %s %s ' %(s, stn_id_pair))
                 logger.info('    plotting %s %s ' %(s, stn_id_pair))
                 for d, n_days in enumerate(n_days_list):
-    
-                    dt_min_plot = dt(dt_axis_lt_init[4,0].year, dt_axis_lt_init[4,0].month, dt_axis_lt_init[i,0].day, 0, 0, 0)
-                    dt_max_plot = dt_min_plot + td(days=n_days+1)
-                    if   n_days == 2:
-                        delta_ticks = td(hours=12)
-                        dt_format = '%d %H'
-                    elif n_days == 4:
-                        delta_ticks = td(hours=24)
-                        dt_format = '%m/%d %H'    
-                    elif n_days == 10:
-                        delta_ticks = td(hours=24)
-                        dt_format = '%m/%d'
-                    delta_lines = td(hours=24)
-                    # dt_max_plot = datetime_min_plot + datetime.timedelta(hours=24*8) # 14, 24  
-                    #datetick_format = '%H'    
-                    dt_ticks = drange(dt_min_plot, dt_max_plot+delta_ticks, delta_ticks)
-                    n_date_ticks = len(dt_ticks) 
-                    
-                    dt_newday_ticks = drange(dt_min_plot, dt_max_plot+td(hours=24), td(hours=24))
-                    dt_nighttime_ticks = drange(dt_min_plot-td(hours=6), dt_max_plot+td(hours=24), td(hours=24))
-                    alpha_night = 0.5
-                    
-                    [y_min, y_max, y_int] = y_axis_cache[stn_id_pair]
-                    # [y_min, y_max, y_int] = [-20, 20, 5]
-                    y_ticks = list(range(y_min, y_max+y_int, y_int))
-                    # n_days_plot = (dt_max_plot - dt_min_plot).days 
-                    
-                    
-                    fig_num = 134
-                    fig = plt.figure(num=fig_num,figsize=(figsize_x, figsize_y)) 
-                    plt.clf()
-                    i = n_init-1
-                    #for i, dt_init in enumerate(dt_init_list[::-1]):
-                    while i >= 0:
-                        print(dt_init_list[i])
-                        mask = ~np.isnan(p_sfc1_diff_init_m_hr_s[i,m,:,s])
-                        plt.plot(dt_axis_lt_init[i,mask], p_sfc1_diff_init_m_hr_s[i,m,mask,s], color_list[i], linestyle='-', label=dt_init_list[i].strftime('%Y-%m-%d_%H'), linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
-                        i -=1 
-                        #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
-                    #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
-                    plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
-                    plt.plot([dt_ticks[0], dt_ticks[-1]], [0.0, 0.0], 'k', linestyle='-', linewidth=2.0, marker='o', markersize=0, markeredgecolor='k') 
-                    for y_tick in y_ticks:
-                        plt.plot([dt_ticks[0], dt_ticks[-1]], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
-                    for dt_tick in dt_ticks:
-                        plt.plot([dt_tick, dt_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
-                    for dt_tick in dt_newday_ticks:
-                        plt.plot([dt_tick, dt_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=1.0, marker='o', markersize=0) 
-                    if n_days < 10:
-                        for dt_tick in dt_nighttime_ticks:
-                            plt.axvspan(dt_tick, dt_tick+0.5, color='grey', alpha=alpha_night, linewidth=0)    
-                    plt.xlim([dt_ticks[0], dt_ticks[-1]])
-                    plt.gca().xaxis.set_major_formatter(DateFormatter(dt_format))
-                    plt.xticks(dt_ticks, visible=True, fontsize=size_font) 
-                    plt.yticks(y_ticks, fontsize=size_font)
-                    plt.ylim([y_min, y_max])
-                    plt.xlabel('date time ['+time_zone_label+']',fontsize=size_font,labelpad=00)
-                    plt.ylabel('$\Delta$ slp [mb]',fontsize=size_font,labelpad=20)                      
-                    plt.title('$\Delta$ slp %s, %s model, updated: %s %s' % (stn_id_pair, model_name.upper(), dt_start_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label), \
-                      fontsize=size_font+2, x=0.5, y=1.01)                     
-                    plt.show() 
-                    filename = 'del_slp_all_init_'+stn_id_pair+'_'+model_name+'_'+str(n_days)+'.png' 
-                    plot_name = os.path.join('images',filename)
-                    plt.savefig(plot_name) 
-                    filename = 'del_slp_all_init_'+stn_id_pair+'_'+model_name+'_'+str(n_days)+'_'+dt_start_lt.strftime('%Y-%m-%d_%H')+'_'+time_zone_label+'.png' 
-                    plot_name = os.path.join('images', 'archive', filename)
-                    plt.savefig(plot_name) 
-    
+                    if (model_name == 'hrrr' and n_days == 2) or (model_name == 'nam' and n_days == 3) or (model_name == 'gfs' and n_days == 10):
+                        dt_min_plot = dt(dt_axis_lt_init[4,0].year, dt_axis_lt_init[4,0].month, dt_axis_lt_init[i,0].day, 0, 0, 0)
+                        dt_max_plot = dt_min_plot + td(days=n_days+1)
+                        if   n_days == 2:
+                            delta_ticks = td(hours=12)
+                            dt_format = '%d %H'
+                        elif n_days == 4:
+                            delta_ticks = td(hours=24)
+                            dt_format = '%m/%d %H'    
+                        elif n_days == 10:
+                            delta_ticks = td(hours=24)
+                            dt_format = '%m/%d'
+                        delta_lines = td(hours=24)
+                        # dt_max_plot = datetime_min_plot + datetime.timedelta(hours=24*8) # 14, 24  
+                        #datetick_format = '%H'    
+                        dt_ticks = drange(dt_min_plot, dt_max_plot+delta_ticks, delta_ticks)
+                        n_date_ticks = len(dt_ticks) 
+                        
+                        dt_newday_ticks = drange(dt_min_plot, dt_max_plot+td(hours=24), td(hours=24))
+                        dt_nighttime_ticks = drange(dt_min_plot-td(hours=6), dt_max_plot+td(hours=24), td(hours=24))
+                        alpha_night = 0.5
+                        
+                        [y_min, y_max, y_int] = y_axis_cache[stn_id_pair]
+                        # [y_min, y_max, y_int] = [-20, 20, 5]
+                        y_ticks = list(range(y_min, y_max+y_int, y_int))
+                        # n_days_plot = (dt_max_plot - dt_min_plot).days 
+                        
+                        
+                        fig_num = 134
+                        fig = plt.figure(num=fig_num,figsize=(figsize_x, figsize_y)) 
+                        plt.clf()
+                        i = n_init-1
+                        #for i, dt_init in enumerate(dt_init_list[::-1]):
+                        while i >= 0:
+                            #print(dt_init_list[i])
+                            mask = ~np.isnan(p_sfc1_diff_init_m_hr_s[i,m,:,s])
+                            plt.plot(dt_axis_lt_init[i,mask], p_sfc1_diff_init_m_hr_s[i,m,mask,s], color_list[i], linestyle='-', label=dt_init_list[i].strftime('%Y-%m-%d_%H'), linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
+                            i -=1 
+                            #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
+                        #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
+                        plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
+                        plt.plot([dt_ticks[0], dt_ticks[-1]], [0.0, 0.0], 'k', linestyle='-', linewidth=2.0, marker='o', markersize=0, markeredgecolor='k') 
+                        for y_tick in y_ticks:
+                            plt.plot([dt_ticks[0], dt_ticks[-1]], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
+                        for dt_tick in dt_ticks:
+                            plt.plot([dt_tick, dt_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
+                        for dt_tick in dt_newday_ticks:
+                            plt.plot([dt_tick, dt_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=1.0, marker='o', markersize=0) 
+                        if n_days < 10:
+                            for dt_tick in dt_nighttime_ticks:
+                                plt.axvspan(dt_tick, dt_tick+0.5, color='grey', alpha=alpha_night, linewidth=0)    
+                        plt.xlim([dt_ticks[0], dt_ticks[-1]])
+                        plt.gca().xaxis.set_major_formatter(DateFormatter(dt_format))
+                        plt.xticks(dt_ticks, visible=True, fontsize=size_font) 
+                        plt.yticks(y_ticks, fontsize=size_font)
+                        plt.ylim([y_min, y_max])
+                        plt.xlabel('date time ['+time_zone_label+']',fontsize=size_font,labelpad=00)
+                        plt.ylabel('$\Delta$ slp [mb]',fontsize=size_font,labelpad=20)                      
+                        plt.title('$\Delta$ slp %s, %s model, updated: %s %s' % (stn_id_pair, model_name.upper(), dt_start_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label), \
+                          fontsize=size_font+2, x=0.5, y=1.01)                     
+                        plt.show() 
+                        filename = 'del_slp_all_init_'+stn_id_pair+'_'+model_name+'_'+str(n_days)+'.png' 
+                        plot_name = os.path.join('images',filename)
+                        plt.savefig(plot_name) 
+                        filename = 'del_slp_all_init_'+stn_id_pair+'_'+model_name+'_'+str(n_days)+'_'+dt_start_lt.strftime('%Y-%m-%d_%H')+'_'+time_zone_label+'.png' 
+                        plot_name = os.path.join('images', 'archive', filename)
+                        plt.savefig(plot_name) 
+        
     print      ('plot_data end ')
     logger.info('plot_data end ')
 
@@ -1336,7 +1333,7 @@ def read_sfc_obs_csv_data(file_name_full_path, replace_nan_with_null):
    
     
 ###############################################################################
-def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, bucket_name):
+def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, stn_id_pair_list_to_plot, bucket_name):
 
     print      ('obs_historical_process begin ')
     logger.info('obs_historical_process begin ')
@@ -1451,22 +1448,6 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, b
     #pres_diff_day_s_df['KWMC-KSAC'].head()
     #slp_diff_day_s_df['KWMC-KSAC'].head()
     #alt_diff_day_s_df['KWMC-KSAC'].head()
-
-    # stn_id_pair_list
-    # dict_stn_metadata['stn_id']
-    # stn_id_pair_list_to_plot = [
-    #     'KWMC-KSAC',
-    #     'KWMC-KSFO',
-    #     'KVBG-KSBA', 
-    #     'KSMX-KSBA', 
-    #     'KBFL-KSBA', 
-    #     'KRDD-KSAC',
-    #     'KRDD-KBFL',
-    #     'KSAC-KBFL',
-    #     'KACV-KSAC']
-    
-    stn_id_pair_list_to_plot = [
-        'KWMC-KSAC']
         
     print      ('  find top events ') 
     logger.info('  find top events ') 
@@ -1665,18 +1646,18 @@ if __name__ == "__main__":
         os.chdir('/home/csmith/pgrad')
         bucket_name = 'data'
         #model_name = 'hrrr'    
-        #model_name = 'nam'    
-        model_name = 'gfs'    
-        batch_mode = 'operational'
-        #batch_mode = 'backfill'
+        model_name = 'nam'    
+        #model_name = 'gfs'    
+        #batch_mode = 'operational'
+        batch_mode = 'backfill'
         #process_name = 'download'
-        #process_name = 'process_grib'
+        process_name = 'process_grib'
         #process_name = 'process_csv'
         #process_name = 'plot_data'
         #process_name = 'obs_dl_operational'
-        process_name = 'obs_historical_download'
-        process_name = 'obs_historical_process'
-        process_name = 'cleanup'
+        #process_name = 'obs_historical_download'
+        #process_name = 'obs_historical_process'
+        #process_name = 'cleanup'
         
     # sanitize inputs
     model_name_list = ['gfs', 'nam', 'hrrr']
@@ -1732,6 +1713,30 @@ if __name__ == "__main__":
     stn_metadata_file_name = os.path.join(os.environ['HOME'], project_name, 'station_list_'+project_name+'.csv') 
     (dict_stn_metadata) = read_stn_metadata_from_csv(stn_metadata_file_name, use_stn, print_stn_info)
 
+    # stn_id_pair_list
+    # dict_stn_metadata['stn_id']
+    # stn_id_pair_list_to_plot = [
+    #     'KWMC-KSAC',
+    #     'KWMC-KSFO',
+    #     'KVBG-KSBA', 
+    #     'KSMX-KSBA', 
+    #     'KBFL-KSBA', 
+    #     'KRDD-KSAC',
+    #     'KRDD-KBFL',
+    #     'KSAC-KBFL',
+    #     'KACV-KSAC']
+
+    # 10-11 mb pressure gradient from MFR to SAC
+
+    stn_id_pair_list_to_plot = [
+        'KDAG-KLAX',
+        'KWMC-KSAC',
+        'KWMC-KSFO',
+        'KRDD-KSAC',
+        'KMFR-KSAC']
+    #stn_id_pair_list_to_plot = [
+    #    'KMFR-KSAC']
+ 
     dt_init = dt_init_expected - td(hours=hours_to_backfill)
     if  process_name in ['download', 'process_grib', 'process_csv', 'calc_pgrad']:
         while dt_init <= dt_init_expected: 
@@ -1753,11 +1758,11 @@ if __name__ == "__main__":
     dt_init = dt_init_expected
     if process_name == 'plot_data':
         #plot_data(model_name_list, dt_init, forecast_horizon_hr=120+1, bucket_name)
-        plot_data(dict_stn_metadata, model_name_list, dt_init, 241, dt_start_lt, utc_conversion, time_zone_label, bucket_name)
+        plot_data(dict_stn_metadata, model_name_list, dt_init, 241, dt_start_lt, utc_conversion, time_zone_label, stn_id_pair_list_to_plot, bucket_name)
     if process_name == 'obs_historical_download':
         obs_historical_download(dict_stn_metadata, utc_conversion, time_zone_label, bucket_name)
     if process_name == 'obs_historical_process':
-        obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, bucket_name)
+        obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, stn_id_pair_list_to_plot, bucket_name)
     if process_name == 'cleanup':
         cleanup(bucket_name)
   

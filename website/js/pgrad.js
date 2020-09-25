@@ -59,12 +59,27 @@ $(function() {
     return (plotText);
   }
 
+  function createPlotCdfName(plotStn1, plotStn2) {
+    var plotPlotCdfName = "del_slp_cdf_"+plotStn1+"-"+plotStn2+".png"
+    console.log(plotPlotCdfName);
+    return (plotPlotCdfName);
+  }
+
+  function createTableName(plotStn1, plotStn2) {
+    var tableName = "del_slp_top_events_"+plotStn1+"-"+plotStn2+".png"
+    console.log(tableName);
+    return (tableName);
+  }
+
   function replaceImageAndText(plotStn1, plotStn2, plotModel, plotTimeframe, plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText) {
-    plotName = createPlotName(plotStn1, plotStn2, plotModel, plotTimeframe);
-    plotText = createPlotText(plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText);
-    $("#plot_selected").find('img').attr("src", "../images/"+plotName);
-    //$("#plot_selected_text").text(plotText);
+    plotText    = createPlotText(plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText);
+    plotName    = createPlotName(plotStn1, plotStn2, plotModel, plotTimeframe);
+    plotCdfName = createPlotCdfName(plotStn1, plotStn2);
+    tableName   = createTableName(plotStn1, plotStn2);    
     $("#plot_text").text(plotText);
+    $("#plot_selected").find('img').attr("src", "../images/"+plotName);
+    $("#plot_cdf").find('img').attr("src", "../top_events/"+plotCdfName);
+    $("#plot_table").find('img').attr("src", "../top_events/"+tableName);
   }
 
   var plotStn1 = "KWMC";
@@ -79,6 +94,8 @@ $(function() {
      
   plotName = createPlotName(plotStn1, plotStn2, plotModel, plotTimeframe);
   plotText = createPlotText(plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText);
+  plotCdfName = createPlotCdfName(plotStn1, plotStn2);
+  tableName   = createTableName(plotStn1, plotStn2);
 
   $("#stn1-pills a").on('click', function (event) {
     $(this).parent().toggleClass('open');
