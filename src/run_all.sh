@@ -7,8 +7,8 @@ sleep_interval=5
 #python3 src/update_db.py s3://gps-data-processed/gps_batch_0.csv start
 #sleep $sleep_interval
 
-#mode=operational
-mode=backfill
+mode=operational
+#mode=backfill
 #anothervar=Fred
 echo $mode 
 #echo $myvariable $anothervar

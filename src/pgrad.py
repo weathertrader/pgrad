@@ -7,57 +7,22 @@ usage: ./src/run.sh n  where n is the number of batteries to analyze [1-5]
 repo: https://github.com/weathertrader/battery_charge
 '''
 
-######################################
-# mvp pgrad - 10 full days
-
-# 2d   website static jquery
-#      top events table -> .png read top events js
-#      add png to js 
-
-# 2d   deploy to ec2 or gcp 
-# 1d   website from local to www
-
-# 10/01 new billing month 
-# 1hr  mesowest account and data dl 
+#############################################
+# to do 
+#
+# 10/01 new billing month - redo sfc obs, see comments in code 
+# 1hr  mesowest account and data dl
 #      https://myaccount.synopticdata.com/#usage
 #      https://developers.synopticdata.com/about/station-variables/
 #      https://developers.synopticdata.com/mesonet/v2/station-selectors/
 #      https://developers.synopticdata.com/mesonet/pricing/
 #      used 129M SU, 5M per month is free
-#      pricing is $0.015 per 1 M SU  
+#      pricing is $0.015 per 1 M SU 
 # 1hr  download all back to 2020 for all stations
-# 1hr  process all historical data and write events 
+# 1hr  process all historical data and write events
 # 2hr  compare values to forecasts
-
-# units conversion
-# calc p_sfc from which variable
-
-# normalize stn_id_pair_list_to_plot to one place only 
-
-# 1/2d update forecasts avail csv 
-
-# 2d   stn obs operational calc cost  
-#      download local
-#      download static
-
-
-
-######################################
-# after deployment of mvp 
-# code -> lambda, operationalize - 1d  
-#     front end dynamic 
-# url deploy, infra, recovery - 2d 
-# 1 d local -> s3
-#     download 
-#     process 
-#     log 
-#     plots
-# 1/2d redo stn list
-# 1/2d redo all historical obs dl and process
-# 1/2d environment, requirements.txt, clean up repo add readme 
-# 1 d  alert/notifications for upcoming very strong events 
-
-
+#      units conversion
+#      calc p_sfc from which variable
 
 import os
 import sys
@@ -195,7 +160,7 @@ def define_expected_forecast_available_from_wallclock(logger, model_name, update
     #    print      ('  ERROR: get_expected_most_recent_forecast not defined for %s ' % (model_name))
     #    logger.info('  ERROR: get_expected_most_recent_forecast not defined for %s ' % (model_name))
 
-    dt_init_expected -= td(hours=6)
+    # dt_init_expected -= td(hours=6)
 
     print      ('  expecting %s %s Z to be available ' % (model_name, dt_init_expected.strftime('%Y-%m-%d %H')))
     logger.info('  expecting %s %s Z to be available ' % (model_name, dt_init_expected.strftime('%Y-%m-%d %H')))
@@ -858,8 +823,12 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
         #if stn_id_pair == 'KWMC-KSAC':
         if stn_id_pair in stn_id_pair_list_to_plot:
             y_axis_cache[stn_id_pair] = [-20, 20, 5]
-    # y_axis_cache['KRDD-KSAC'] = [-10, 10, 2]
-             
+    y_axis_cache['KRDD-KSAC'] = [-10, 10, 2]
+    y_axis_cache['KDAG-KLAX'] = [-10, 10, 2]
+    y_axis_cache['KMFR-KSAC'] = [-4, 20, 4]
+    y_axis_cache['KWMC-KSAC'] = [-4, 20, 4]
+    y_axis_cache['KWMC-KSFO'] = [-4, 20, 4]
+     
     # find most recent full forecast 
     max_hrs_found = 0
     i_most_recent = 0
@@ -941,7 +910,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                     plt.plot(dt_axis_lt_init[i,mask], p_sfc1_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name.upper(), linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
                     #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
                 #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
-                plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
+                plt.legend(loc=4,fontsize=size_font-2,ncol=1) 
                 plt.plot([dt_ticks[0], dt_ticks[-1]], [0.0, 0.0], 'k', linestyle='-', linewidth=2.0, marker='o', markersize=0, markeredgecolor='k') 
                 for y_tick in y_ticks:
                     plt.plot([dt_ticks[0], dt_ticks[-1]], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
@@ -1024,7 +993,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                             i -=1 
                             #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
                         #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
-                        plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
+                        plt.legend(loc=4,fontsize=size_font-2,ncol=1) 
                         plt.plot([dt_ticks[0], dt_ticks[-1]], [0.0, 0.0], 'k', linestyle='-', linewidth=2.0, marker='o', markersize=0, markeredgecolor='k') 
                         for y_tick in y_ticks:
                             plt.plot([dt_ticks[0], dt_ticks[-1]], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
