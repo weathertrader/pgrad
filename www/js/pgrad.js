@@ -35,20 +35,30 @@ $(function() {
 //    return (plotName);
 //  }
 
+//images/del_slp_all_init_KWMC-KSFO_gfs_10.png
+//images/del_slp_all_init_KWMC-KSFO_nam_3.png   
+//images/del_slp_all_init_KWMC-KSFO_hrrr_2.png  
+//images/del_slp_all_model_KWMC-KSFO_current_10.png
+//images/del_slp_all_model_KWMC-KSFO_current_3.png
+//images/del_slp_all_model_KWMC-KSFO_current_2.png
 
   function createPlotName(plotStn1, plotStn2, plotModel, plotTimeframe) {
     //var plotName = plotVariable+"_"+plotRegion+"_stn_day_of_vs_time_"+plotTimeframe+".png"
     //ws_foothill_region_day_of_vs_time_current.png
     if (plotModel == "all_model") {
+        var plotTimeframe = "10" // can be 2, 3 or 10 here
         var plotName = "del_slp_all_model_"+plotStn1+"-"+plotStn2+"_current_"+plotTimeframe+".png"
     } else {
+        if (plotModel == "gfs") {var plotTimeframe = "10"}
+        else if (plotModel == "nam") {var plotTimeframe = "3"}
+        else if (plotModel == "hrrr") {var plotTimeframe = "2"}    
         var plotName = "del_slp_all_init_"+plotStn1+"-"+plotStn2+"_"+plotModel+"_"+plotTimeframe+".png"   
     }
     console.log(plotName);
     return (plotName);
   }
 
-  function createPlotText(plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText) {
+  function createPlotText(plotStn1Text, plotStn2Text, plotModelText) {
     //var plotText = "Forecast "+plotVariableText+" at "+plotRegionText+" for "+plotTimeframeText
     if (plotModel == "all_model") {
         var plotText = "Forecast pressure difference, "+plotStn1Text+" - "+plotStn2Text+", all models most recent init"
@@ -71,9 +81,9 @@ $(function() {
     return (tableName);
   }
 
-  function replaceImageAndText(plotStn1, plotStn2, plotModel, plotTimeframe, plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText) {
-    plotText    = createPlotText(plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText);
-    plotName    = createPlotName(plotStn1, plotStn2, plotModel, plotTimeframe);
+  function replaceImageAndText(plotStn1, plotStn2, plotModel, plotStn1Text, plotStn2Text, plotModelText) {
+    plotText    = createPlotText(plotStn1Text, plotStn2Text, plotModelText);
+    plotName    = createPlotName(plotStn1, plotStn2, plotModel);
     plotCdfName = createPlotCdfName(plotStn1, plotStn2);
     tableName   = createTableName(plotStn1, plotStn2);    
     $("#plot_text").text(plotText);
@@ -95,8 +105,10 @@ $(function() {
   var plotModelText = "GFS";
   var plotTimeframeText = "10 days";
      
-  plotName = createPlotName(plotStn1, plotStn2, plotModel, plotTimeframe);
-  plotText = createPlotText(plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText);
+     
+     
+  plotName = createPlotName(plotStn1, plotStn2, plotModel);
+  plotText = createPlotText(plotStn1Text, plotStn2Text, plotModelText);
   plotCdfName = createPlotCdfName(plotStn1, plotStn2);
   tableName   = createTableName(plotStn1, plotStn2);
 
@@ -105,7 +117,7 @@ $(function() {
     $(this).parent().parent().find(".active").removeClass("active");
     plotStn1     = $(this).data("value");
     plotStn1Text = $(this).data("text");
-    replaceImageAndText(plotStn1, plotStn2, plotModel, plotTimeframe, plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText);
+    replaceImageAndText(plotStn1, plotStn2, plotModel, plotStn1Text, plotStn2Text, plotModelText);
   });
 
   $("#stn2-pills a").on('click', function (event) {
@@ -113,7 +125,7 @@ $(function() {
     $(this).parent().parent().find(".active").removeClass("active");
     plotStn2     = $(this).data("value");
     plotStn2Text = $(this).data("text");
-    replaceImageAndText(plotStn1, plotStn2, plotModel, plotTimeframe, plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText);
+    replaceImageAndText(plotStn1, plotStn2, plotModel, plotStn1Text, plotStn2Text, plotModelText);
   });
 
   $("#model-pills a").on('click', function (event) {
@@ -121,15 +133,15 @@ $(function() {
     $(this).parent().parent().find(".active").removeClass("active");
     plotModel = $(this).data("value");
     plotModelText = $(this).data("text");
-    replaceImageAndText(plotStn1, plotStn2, plotModel, plotTimeframe, plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText);
+    replaceImageAndText(plotStn1, plotStn2, plotModel, plotStn1Text, plotStn2Text, plotModelText);
   });
 
-  $("#timeframe-pills a").on('click', function (event) {
-    $(this).parent().toggleClass('open');
-    $(this).parent().parent().find(".active").removeClass("active");
-    plotTimeframe = $(this).data("value");
-    plotTimeframeText = $(this).data("text");
-    replaceImageAndText(plotStn1, plotStn2, plotModel, plotTimeframe, plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText);
-  });
+//  $("#timeframe-pills a").on('click', function (event) {
+//    $(this).parent().toggleClass('open');
+//    $(this).parent().parent().find(".active").removeClass("active");
+//    plotTimeframe = $(this).data("value");
+//    plotTimeframeText = $(this).data("text");
+//    replaceImageAndText(plotStn1, plotStn2, plotModel, plotTimeframe, plotStn1Text, plotStn2Text, plotModelText, plotTimeframeText);
+//  });
 
 });

@@ -1711,15 +1711,15 @@ if __name__ == "__main__":
 
     # 10-11 mb pressure gradient from MFR to SAC
 
-    #stn_id_pair_list_to_plot = [
-    #    'KDAG-KLAX',
-    #    'KWMC-KSAC',
-    #    'KWMC-KSFO',
-    #    'KACV-KSFO',
-    #    'KRDD-KSAC',
-    #    'KMFR-KSAC']
     stn_id_pair_list_to_plot = [
-        'KWMC-KSFO']
+        'KDAG-KLAX',
+        'KWMC-KSAC',
+        'KWMC-KSFO',
+        'KACV-KSFO',
+        'KRDD-KSAC',
+        'KMFR-KSAC']
+    #stn_id_pair_list_to_plot = [
+    #    'KWMC-KSFO']
  
     dt_init = dt_init_expected - td(hours=hours_to_backfill)
     if  process_name in ['download', 'process_grib', 'process_csv', 'calc_pgrad']:
