@@ -1,6 +1,21 @@
 SHELL=/bin/bash
 BASH_ENV=/home/ubuntu/.bashrc
-*/1  * * * * bash -l -c '~/pgrad/src/cron_scripts/plot_data.bsh'
+56  * * * * bash -l -c '~/pgrad/src/cron_scripts/plot_data.bsh'
+51  * * * * bash -l -c '~/pgrad/src/cron_scripts/calc_pgrad.bsh'
+46  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_csv_gfs.bsh'
+41  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_csv_nam.bsh'
+36  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_csv_hrrr.bsh'
+31  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_grib_gfs.bsh'
+26  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_grib_nam.bsh'
+21  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_grib_hrrr.bsh'
+16  * * * * bash -l -c '~/pgrad/src/cron_scripts/download_gfs.bsh'
+11  * * * * bash -l -c '~/pgrad/src/cron_scripts/download_nam.bsh'
+6  * * * * bash -l -c '~/pgrad/src/cron_scripts/download_hrrr.bsh'
+1  * * * * bash -l -c '~/pgrad/src/cron_scripts/cleanup.bsh'
+#
+#
+#
+# */1  * * * * bash -l -c '~/pgrad/src/cron_scripts/plot_data.bsh'
 # */1  * * * * bash -l -c '/home/ubuntu/pgrad/src/cron_scripts/plot_data.bsh'
 # xyz
 # 1  * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_delete_old_model_data_flat_files.bsh'

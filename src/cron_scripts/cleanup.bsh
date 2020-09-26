@@ -1,0 +1,6 @@
+#!/bin/bash
+# source /etc/profile
+# source /etc/bashrc
+# source /home/ubuntu/.bashrc
+# clean_up
+~/miniconda3/bin/python ~/pgrad/src/pgrad.py --process_name=cleanup --bucket_name=data

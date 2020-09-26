@@ -20,4 +20,3 @@ python ./src/pgrad.py --model_name=nam --process_name=process_csv --bucket_name=
 python ./src/pgrad.py --process_name=calc_pgrad --bucket_name=data --batch_mode=$mode
 # plot
 python ./src/pgrad.py --process_name=plot_data --bucket_name=data 
-
