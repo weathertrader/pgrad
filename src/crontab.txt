@@ -1,0 +1,25 @@
+SHELL=/bin/bash
+BASH_ENV=/home/ubuntu/.bashrc
+
+*/1  * * * * bash -l -c '/home/ubuntu/pgrad/src/cron_scripts/plot_data.bsh'
+
+# xyz
+# 1  * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_delete_old_model_data_flat_files.bsh'
+# 6  * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_delete_old_model_data_flat_files.bsh'
+# 11  * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_delete_old_model_data_flat_files.bsh'
+
+# xyz
+# */60 * * * * bash -l -c '/home/csmith/common/python_scripts/obs/download_sfc_obs_mesowest_raws.bsh'
+
+# check space 
+# */10 * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_check_space_calc.bsh'
+# */10 * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_check_space_plot.bsh'
+
+# delete/archive old model data 
+# 6  * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_delete_old_model_data_from_db.bsh'
+
+#####################################
+# monitors
+# master monitor
+#*/20  * * * * source /etc/profile; source /etc/bashrc; source /home/ubuntu/.bashrc; /home/csmith/python_scripts/wrf_run/wrf_operatio
+nal_kill_jobs_and_processes_archer.bsh

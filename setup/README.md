@@ -78,6 +78,9 @@ navigate to the webpage and view the initial website at ip:/pgrad.html
 
 ```
 
+ln -s /var/www/* /ZFSRaidz/XBMC/Multimedia/Anime/Naruto_Shippuuden-2/
+ln -s ~/code/notes/notes ~/bin/notes
+
 sudo ln -s /home/ubuntu/pgrad/www/html/pgrad.html /var/www/html/
 sudo ln -s /home/ubuntu/pgrad/www/css /var/www/
 sudo ln -s /home/ubuntu/pgrad/www/js /var/www/
