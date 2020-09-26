@@ -1639,7 +1639,7 @@ if __name__ == "__main__":
         #process_name = 'cleanup'
         
     # os.getcwd()
-    os.chdir('~/pgrad')
+    os.chdir(os.path.join(os.getenv('HOME'), 'pgrad'))
             
     # sanitize inputs
     model_name_list = ['gfs', 'nam', 'hrrr']
