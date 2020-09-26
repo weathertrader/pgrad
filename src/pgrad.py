@@ -54,10 +54,6 @@ import logging
 #import xarray
 #from netCDF4 import Dataset 
 
-#os.getcwd()
-#os.chdir('/home/csmith/battery_charge')
-#n_files = 5
-
 ###############################################################################    
 def create_log_file(log_name_full_file_path, dt_start_utc, time_zone_label):
     if not (os.path.isdir(os.path.dirname(log_name_full_file_path))):
@@ -1626,7 +1622,7 @@ if __name__ == "__main__":
         batch_mode = args.batch_mode 
         bucket_name   = args.bucket_name    
     else:
-        os.chdir('/home/csmith/pgrad')
+        #os.chdir('/home/csmith/pgrad')
         bucket_name = 'data'
         #model_name = 'hrrr'    
         model_name = 'nam'    
@@ -1642,6 +1638,9 @@ if __name__ == "__main__":
         #process_name = 'obs_historical_process'
         #process_name = 'cleanup'
         
+    # os.getcwd()
+    os.chdir('~/pgrad')
+            
     # sanitize inputs
     model_name_list = ['gfs', 'nam', 'hrrr']
     if model_name not in model_name_list:
