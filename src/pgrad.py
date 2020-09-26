@@ -160,7 +160,7 @@ def define_expected_forecast_available_from_wallclock(logger, model_name, update
     #    print      ('  ERROR: get_expected_most_recent_forecast not defined for %s ' % (model_name))
     #    logger.info('  ERROR: get_expected_most_recent_forecast not defined for %s ' % (model_name))
 
-    dt_init_expected -= td(hours=6)
+    #dt_init_expected -= td(hours=6)
 
     print      ('  expecting %s %s Z to be available ' % (model_name, dt_init_expected.strftime('%Y-%m-%d %H')))
     logger.info('  expecting %s %s Z to be available ' % (model_name, dt_init_expected.strftime('%Y-%m-%d %H')))
