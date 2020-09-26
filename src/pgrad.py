@@ -1,4 +1,6 @@
 
+# LAX-DAG surface gradient has trended down to -3.9 MB at 5 AM Monday morning. 
+# but northerly gradients  from SFO to Arcata are now up to 4 mb,
 '''
 name: pgrad.py 
 purpose: process and analyze pressure gradient forcing from NWP models 
@@ -796,7 +798,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                 dt_axis_utc = pd.to_datetime(p_sfc1_diff_hr_s_df.index) 
                 dt_axis_lt  = pd.to_datetime(p_sfc1_diff_hr_s_df.index) - td(hours=utc_conversion)
                                 
-                forecast_horizon_hr = len(dt_axis_utc)
+                #forecast_horizon_hr_temp = len(dt_axis_utc)
                 stn_id_pair_list = list(p_sfc1_diff_hr_s_df)
                 # np.shape(p_sfc1_diff_hr_s_df)
                 # np.shape(p_sfc1_diff_init_hr_s)
@@ -831,7 +833,12 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     y_axis_cache['KMFR-KSAC'] = [-4, 20, 4]
     y_axis_cache['KWMC-KSAC'] = [-4, 20, 4]
     y_axis_cache['KWMC-KSFO'] = [-4, 20, 4]
+    y_axis_cache['KACV-KSFO'] = [-10, 10, 2]
      
+    
+    print      ('  dt_init_list is ' )
+    logger.info('  dt_init_list is ' )
+    
     # find most recent full forecast 
     max_hrs_found = 0
     i_most_recent = 0
@@ -839,7 +846,9 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     s = 254
     for i, dt_init in enumerate(dt_init_list):
          mask = ~np.isnan(p_sfc1_diff_init_m_hr_s[i,m,:,s])
-         hrs_found = len(p_sfc1_diff_init_m_hr_s[i,m,:,s])
+         hrs_found = len(p_sfc1_diff_init_m_hr_s[i,m,mask,s])
+         print      ('    %s, hrs found %s ' %(dt_init, hrs_found))
+         logger.info('    %s, hrs found %s ' %(dt_init, hrs_found))
          if hrs_found >= max_hrs_found:
              i_most_recent = i
              max_hrs_found = hrs_found
@@ -852,6 +861,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     p_sfc1_diff_init_m_hr_s = p_sfc1_diff_init_m_hr_s[0:i_most_recent+1,:,:,:]
     p_sfc2_diff_init_m_hr_s = p_sfc2_diff_init_m_hr_s[0:i_most_recent+1,:,:,:]
     dt_init_list = dt_init_list[0:i_most_recent+1]
+    dt_axis_lt_init = dt_axis_lt_init[0:i_most_recent+1,:]
     n_init = len(dt_init_list)
 
     # np.shape(p_sfc1_diff_init_m_hr_s)
@@ -957,7 +967,8 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                 logger.info('    plotting %s %s ' %(s, stn_id_pair))
                 for d, n_days in enumerate(n_days_list):
                     if (model_name == 'hrrr' and n_days == 2) or (model_name == 'nam' and n_days == 3) or (model_name == 'gfs' and n_days == 10):
-                        dt_min_plot = dt(dt_axis_lt_init[4,0].year, dt_axis_lt_init[4,0].month, dt_axis_lt_init[i,0].day, 0, 0, 0)
+                        #dt_min_plot = dt(dt_axis_lt_init[4,0].year, dt_axis_lt_init[4,0].month, dt_axis_lt_init[i,0].day, 0, 0, 0)
+                        dt_min_plot = dt(dt_axis_lt_init[-1,0].year, dt_axis_lt_init[-1,0].month, dt_axis_lt_init[-1,0].day, 0, 0, 0)
                         dt_max_plot = dt_min_plot + td(days=n_days+1)
                         if   n_days == 2:
                             delta_ticks = td(hours=12)
@@ -1700,14 +1711,15 @@ if __name__ == "__main__":
 
     # 10-11 mb pressure gradient from MFR to SAC
 
-    stn_id_pair_list_to_plot = [
-        'KDAG-KLAX',
-        'KWMC-KSAC',
-        'KWMC-KSFO',
-        'KRDD-KSAC',
-        'KMFR-KSAC']
     #stn_id_pair_list_to_plot = [
+    #    'KDAG-KLAX',
+    #    'KWMC-KSAC',
+    #    'KWMC-KSFO',
+    #    'KACV-KSFO',
+    #    'KRDD-KSAC',
     #    'KMFR-KSAC']
+    stn_id_pair_list_to_plot = [
+        'KWMC-KSFO']
  
     dt_init = dt_init_expected - td(hours=hours_to_backfill)
     if  process_name in ['download', 'process_grib', 'process_csv', 'calc_pgrad']:
