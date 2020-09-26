@@ -34,6 +34,7 @@ import pandas as pd
 import numpy as np
 import xarray as xr
 # import cfgrib
+import time
 from datetime import datetime as dt 
 from datetime import timedelta as td 
 import glob
@@ -1586,6 +1587,11 @@ def cleanup(bucket_name):
 
     print      ('cleanup begin ')
     logger.info('cleanup begin ')
+
+    print      ('  cleanup data directories ')
+    logger.info('  cleanup data directories ')
+
+
     dt_now = dt.utcnow()
     dir_init_temp = dt_init.strftime('%Y-%m-%d')
     dir_list_ingest    = glob.glob(os.path.join('data', 'ingest', '*'))
@@ -1600,6 +1606,26 @@ def cleanup(bucket_name):
             print      ('  removing %s ' %(dir_temp)) 
             logger.info('  removing %s ' %(dir_temp)) 
             os.system(temp_command)
+
+    print      ('  cleanup logs ')
+    logger.info('  cleanup logs ')
+
+    n_days_to_retain = 7.0
+    time_now = time.time() 
+    log_list = glob.glob(os.path.join('logs', 'log_*'))
+    log_list.sort(key=os.path.getmtime)
+    log_temp = log_list[0]
+    for log_temp in log_list:
+        time_temp = os.path.getmtime(log_temp)
+        time_delta_days = (time_now - time_temp)/(24.*3600.)
+        if (time_delta_days > n_days_to_retain): 
+            #try: 
+            os.remove(log_temp)
+            #os.system('rm '+file_temp)
+            #except: 
+            #    pass 
+        del time_temp, time_delta_days
+        
     print      ('cleanup end ')
     logger.info('cleanup end ')
     
