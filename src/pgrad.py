@@ -750,7 +750,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     print      ('plot_data begin ')
     logger.info('plot_data begin ')
     warnings.filterwarnings("ignore") 
-    dir_images = os.path.join('images', 'archive)
+    dir_images = os.path.join('images', 'archive')
     if not os.path.isdir(dir_images):
         os.system('mkdir -p '+dir_images)
 
