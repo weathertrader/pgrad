@@ -77,7 +77,14 @@ Link the apache www directory to the repo www and
 navigate to the webpage and view the initial website at ip:/pgrad.html  
 
 ```
-ln -s /home/ubuntu/pgrad/www /var/www/html
+
+sudo ln -s /home/ubuntu/pgrad/www/html/pgrad.html /var/www/html/
+sudo ln -s /home/ubuntu/pgrad/www/css /var/www/
+sudo ln -s /home/ubuntu/pgrad/www/js /var/www/
+sudo ln -s /home/ubuntu/pgrad/images /var/www/
+
+sudo ln -s /home/ubuntu/pgrad/www/html/pgrad.html /var/www/html/
+
 /home/user/pgrad/www has permissions 775
 
 Check /home/user/www and /var/www/html owners

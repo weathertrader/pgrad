@@ -160,7 +160,7 @@ def define_expected_forecast_available_from_wallclock(logger, model_name, update
     #    print      ('  ERROR: get_expected_most_recent_forecast not defined for %s ' % (model_name))
     #    logger.info('  ERROR: get_expected_most_recent_forecast not defined for %s ' % (model_name))
 
-    # dt_init_expected -= td(hours=6)
+    dt_init_expected -= td(hours=6)
 
     print      ('  expecting %s %s Z to be available ' % (model_name, dt_init_expected.strftime('%Y-%m-%d %H')))
     logger.info('  expecting %s %s Z to be available ' % (model_name, dt_init_expected.strftime('%Y-%m-%d %H')))
@@ -750,7 +750,10 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     print      ('plot_data begin ')
     logger.info('plot_data begin ')
     warnings.filterwarnings("ignore") 
-    
+    dir_images = os.path.join('images', 'archive)
+    if not os.path.isdir(dir_images):
+        os.system('mkdir -p '+dir_images)
+
     p_sfc1_diff_init_m_hr_s = np.full([5, 3, forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
     np.shape(p_sfc1_diff_init_m_hr_s)   
     p_sfc2_diff_init_m_hr_s = np.full([5, 3, forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
@@ -1620,9 +1623,9 @@ if __name__ == "__main__":
         #batch_mode = 'operational'
         batch_mode = 'backfill'
         #process_name = 'download'
-        process_name = 'process_grib'
+        #process_name = 'process_grib'
         #process_name = 'process_csv'
-        #process_name = 'plot_data'
+        process_name = 'plot_data'
         #process_name = 'obs_dl_operational'
         #process_name = 'obs_historical_download'
         #process_name = 'obs_historical_process'
