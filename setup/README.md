@@ -16,7 +16,7 @@ Allow ports ssh from home IP, HTTP and HTTPS.
 Add the keypair from local to the instance.
 ssh into the instance and 
 
-Intall Postgres and Apache
+Intall Postgres and Apache webserver
 ```
 sudo apt-get update && sudo apt upgrade && sudo apt-get install postgresql postgresql-contrib libpq-dev python3-psycopg2 apache2
 
@@ -73,13 +73,34 @@ src/operational.sh
 ```
 
 
-install the crontab 
-execute the backfill and while this is running
-install apache webserver
-sim link the apache www directory to the repo www
-navigate to the webpage and view the initial website  
+Link the apache www directory to the repo www and 
+navigate to the webpage and view the initial website at ip:/pgrad.html  
+
+```
+ln -s /home/ubuntu/pgrad/www /var/www/html
+/home/user/pgrad/www has permissions 775
+
+Check /home/user/www and /var/www/html owners
+Apache user\group must have access to /home, /home/user and /home/user/www paths
+
+Check Apache configuration:
+look for FollowSymLinks option
+
+<Directory /var/www/html>
+    ...
+    Options FollowSymLinks
+</Directory>
+
+/home/user to 711 and see if that helps any. Keep in mind... localhost/www won't exist unless you have a folder called www inside of the DocumentRoot.
+
+Also, you're better off using ~/public_html over symlinking /var/www/html to something in your home directory. Bad practice/juju.
 
 
+```
+
+
+
+Install the crontab 
 
 
 

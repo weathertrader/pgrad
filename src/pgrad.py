@@ -782,8 +782,8 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                 print      ('      ERROR - input file not found %s ' %(p_sfc1_diff_master_file))
                 logger.info('      ERROR - input file not found %s ' %(p_sfc1_diff_master_file))
             else:
-                print      ('      input file exists ')
-                logger.info('      input file exists ')
+                print      ('        input file exists ')
+                logger.info('        input file exists ')
                 # read master
                 p_sfc1_diff_hr_s_df = pd.read_csv(p_sfc1_diff_master_file, index_col=0)
                 p_sfc1_diff_hr_s = p_sfc1_diff_hr_s_df.values
