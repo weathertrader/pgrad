@@ -1,5 +1,5 @@
 
-# RaceCast Infra Setup
+# pGrad setup readme
 
 ![alt text](../images/racecast_tech_stack.png "hover text")
 
@@ -8,35 +8,80 @@
 1. [Spark Cluster Setup](README.md#spark-cluster-setup)
 1. [Connect Spark to Postgres](README.md#Connect-Spark-to-Postgres)
 
-## Postgres Setup
+## Instance Setup
 
-Spin up an EC2 instance.  I chose a t2.medium.  Set up a keypair from local to the pg server, and from the Spark master to the pg instance.
-Check that you can ssh from master to pg, and from local to pg.  ssh into pg and install postgres, dash and the python ORM to postgres
+Spin up an EC2 instance.  I chose a Ubuntu t2.micro. Default 8 Gb of hard disk.
+Allow ports ssh from home IP, HTTP and HTTPS.  
+Add the keypair from local to the instance.
+ssh into the instance and 
+
+Intall Postgres and Apache
+```
+sudo apt-get update && sudo apt upgrade && sudo apt-get install postgresql postgresql-contrib libpq-dev python3-psycopg2 apache2
+
+```
+and navigate to the IP address to check that Apache is running
+
+
+NOT DONE YET 
+Clone the repo via https (not ssh)  
+
+```
+git clone https://github.com/weathertrader/pgrad.git
+```
+NOT DONE YET 
+
+
+
+
+Install Python from miniconda and packages for communicating the the db and to a Dash server
+```
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+chmod 755 Miniconda3-latest-Linux-x86_64.sh
+Install the executable 
+source ~/.bashrc
+conda update conda 
+conda config --add channels conda-forge
+conda install -c conda-forge psycopg2 numpy pandas dash 
+
+NOT DONE YET 
+pip install -r requirements.txt
+install the requirements.txt
+NOT DONE YET 
+
+```
+On the pg_server I install these into the system Python, 
+but on local you may want to put them in a conda environment
+
+```
+conda create -n pg_env
+conda activate pg_env
+```
+
+
+copy over a .bashrc with xyz environmental variables 
+install the crontab 
+execute the backfill and while this is running
+install apache webserver
+sim link the apache www directory to the repo www
+navigate to the webpage and view the initial website  
+
+
+
+
+
+
+edium.  Set up a keypair from local to the pg server, and from the Spark master to the pg instance.
+
+Check that you can ssh from master to pg, and from local to pg.  
+ssh into pg and install postgres, dash and the python ORM to postgres
 
 ```
 # check that master can ssh into pg 
 ssh ubuntu@ec2-34-222-54-126.us-west-2.compute.amazonaws.com
 ``` 
  
-```
-sudo apt-get update && sudo apt upgrade && sudo apt-get install postgresql postgresql-contrib libpq-dev python3-psycopg2
-```
 
-Install Python from miniconda and packages for communicating the the db and to a Dash server
-```
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-chmod 755 Miniconda3-latest-Linux-x86_64.sh
-source ~/.bashrc
-conda update conda 
-conda config --add channels conda-forge
-conda install -c conda-forge psycopg2 numpy pandas dash 
-```
-On the pg_server I install these into the system Python, but on local you may want to put them in a conda environment
-
-```
-conda create -n pg_env
-conda activate pg_env
-```
 
 
 Follow the directions in the main repo README.md to set up a PG user, database and edit your .bashrc with appropriate environmental variables.

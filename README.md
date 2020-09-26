@@ -1,5 +1,5 @@
 
-# RaceCast 
+# pGrad.io readme 
 
 Live broadcasts of athletes positions during races from gps streaming data using Spark mini-batch processing, Postgres and Dash.
 

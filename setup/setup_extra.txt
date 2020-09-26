@@ -1,4 +1,10 @@
 
+24.6.126.210/32
+
+http://54.70.6.52/
+ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-70-6-52.us-west-2.compute.amazonaws.com
+
+
 create test files on s3://to_process
 temp1.txt
 temp2.txt
@@ -141,7 +147,6 @@ t = BashOperator(task_id='Spark_datamodel',bash_command=cmd,dag=dag)
 # ssh
 
 # pg 
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-222-54-126.us-west-2.compute.amazonaws.com
 # master
 ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com
 # worker 1
