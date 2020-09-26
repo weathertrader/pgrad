@@ -80,6 +80,9 @@ $(function() {
     $("#plot_selected").find('img').attr("src", "../../images/"+plotName);
     $("#plot_cdf").find('img').attr("src", "../../top_events/"+plotCdfName);
     $("#plot_table").find('img').attr("src", "../../top_events/"+tableName);
+//    $("#plot_selected").find('img').attr("src", "../../images/"+plotName);
+//    $("#plot_cdf").find('img').attr("src", "../../top_events/"+plotCdfName);
+//    $("#plot_table").find('img').attr("src", "../../top_events/"+tableName);
   }
 
   var plotStn1 = "KWMC";

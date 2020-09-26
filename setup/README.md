@@ -82,6 +82,7 @@ sudo ln -s /home/ubuntu/pgrad/www/html/pgrad.html /var/www/html/
 sudo ln -s /home/ubuntu/pgrad/www/css /var/www/
 sudo ln -s /home/ubuntu/pgrad/www/js /var/www/
 sudo ln -s /home/ubuntu/pgrad/images /var/www/
+sudo ln -s /home/ubuntu/pgrad/top_events /var/www/
 
 sudo ln -s /home/ubuntu/pgrad/www/html/pgrad.html /var/www/html/
 
