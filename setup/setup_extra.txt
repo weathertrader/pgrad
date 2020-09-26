@@ -4,6 +4,7 @@
 http://54.70.6.52/
 ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-70-6-52.us-west-2.compute.amazonaws.com
 
+pip freeze > requirements.txt
 
 create test files on s3://to_process
 temp1.txt

@@ -4,13 +4,14 @@
 ![alt text](../images/racecast_tech_stack.png "hover text")
 
 ## Table of Contents
-1. [Postgres Setup](README.md#Postgres-Setup)
+1. [Instance Setup](README.md#Instance-Setup)
 1. [Spark Cluster Setup](README.md#spark-cluster-setup)
 1. [Connect Spark to Postgres](README.md#Connect-Spark-to-Postgres)
 
 ## Instance Setup
 
-Spin up an EC2 instance.  I chose a Ubuntu t2.micro. Default 8 Gb of hard disk.
+Spin up an EC2 instance.  I chose a Ubuntu t2.micro. 
+Default 8 Gb of hard disk.
 Allow ports ssh from home IP, HTTP and HTTPS.  
 Add the keypair from local to the instance.
 ssh into the instance and 
@@ -20,52 +21,84 @@ Intall Postgres and Apache
 sudo apt-get update && sudo apt upgrade && sudo apt-get install postgresql postgresql-contrib libpq-dev python3-psycopg2 apache2
 
 ```
-and navigate to the IP address to check that Apache is running
+and navigate to the IP address to check that Apache is running.
 
-
-NOT DONE YET 
 Clone the repo via https (not ssh)  
 
 ```
 git clone https://github.com/weathertrader/pgrad.git
 ```
-NOT DONE YET 
 
-
-
-
-Install Python from miniconda and packages for communicating the the db and to a Dash server
+Install Python from miniconda.
 ```
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 chmod 755 Miniconda3-latest-Linux-x86_64.sh
 Install the executable 
 source ~/.bashrc
+
+```
+
+Install the environment (requirements.txt doesn't work yet)
+
+```
 conda update conda 
 conda config --add channels conda-forge
-conda install -c conda-forge psycopg2 numpy pandas dash 
-
-NOT DONE YET 
-pip install -r requirements.txt
-install the requirements.txt
-NOT DONE YET 
-
-```
-On the pg_server I install these into the system Python, 
-but on local you may want to put them in a conda environment
-
-```
-conda create -n pg_env
-conda activate pg_env
+# does not work
+conda install -c conda-forge psycopg2 numpy pandas dask netCDF4 xarray spyder matplotlib
+# works 
+conda install -c conda-forge psycopg2 numpy pandas dask xarray matplotlib
+# works on ubuntu, does not work on chromebook 
+conda install -c conda-forge eccodes cfgrib
+# works on chromebook 
+sudo apt-get install libeccodes0
+pip install cfgrib
+python -m cfgrib selfcheck
+cd pgrad
+# pip install -r requirements.txt
 ```
 
+Copy over the /aws folder with the following files
+```
+mkdir ~/aws
+```
 
-copy over a .bashrc with xyz environmental variables 
+Backfill data from the last few forecast runs
+```
+src/backfill.sh
+```
+Once this done, go ahead and exectute an operational full ETL to make sure 
+you have the latest data
+```
+src/operational.sh
+```
+
+
 install the crontab 
 execute the backfill and while this is running
 install apache webserver
 sim link the apache www directory to the repo www
 navigate to the webpage and view the initial website  
 
+
+
+
+
+not needed
+copy over a .bashrc with xyz environmental variables 
+
+
+On the pg_server I install these into the system Python, 
+but on local you may want to put them in a conda environment
+
+NOT DONE YET 
+
+
+NOT DONE YET 
+
+conda create -n pg_env
+conda activate pg_env
+```
+```
 
 
 
