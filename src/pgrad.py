@@ -1712,6 +1712,9 @@ if __name__ == "__main__":
     # 10-11 mb pressure gradient from MFR to SAC
 
     stn_id_pair_list_to_plot = [
+        'KBFL-KSBA',
+        'KVBG-KSBA',
+        'KSMX-KSBA',
         'KDAG-KLAX',
         'KWMC-KSAC',
         'KWMC-KSFO',
