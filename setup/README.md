@@ -113,6 +113,9 @@ Also, you're better off using ~/public_html over symlinking /var/www/html to som
 
 Install the crontab 
 
+```
+crontab src/crontab.txt
+```
 
 
 not needed
