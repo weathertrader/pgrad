@@ -71,13 +71,10 @@ commmend end -->
   <div class="col-md-12" align="middle">
     <div class="btn-group btn-group-justified">
       <div class="btn-group">
-        <button type="button" class="btn btn-group btn-default">Station1</button>
+        <button type="button" class="btn btn-group btn-default">Station Pair</button>
       </div>
       <div class="btn-group">
-        <button type="button" class="btn btn-group btn-default">Station2</button>
-      </div>
-      <div class="btn-group">
-        <button type="button" class="btn btn-group btn-default">Model</button>
+        <button type="button" class="btn btn-group btn-default">Model and Horizon</button>
       </div>
 <!-- comment begin
       <div class="btn-group">
@@ -92,39 +89,26 @@ commmend end -->
     <div class="btn-group btn-group-justified">
     
       <div class="btn-group">
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Winnemucca <span class="caret"></span></button>
-        <ul class="dropdown-menu" role="menu" id="stn1-pills">
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KWMC" data-text="Winnemucca">Winnemucca </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KSAC" data-text="Sacramento">Sacramento </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KSFO" data-text="San Francisco">San Francisco </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KVBG" data-text="Vandenburg">Vandenburg </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KSBA" data-text="Santa Barbara">Santa Barbara </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KSMX" data-text="Santa Maria">Santa Maria </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KBFL" data-text="Bakersfield">Bakersfield </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KRDD" data-text="Redding">Redding </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KACV" data-text="Arcata">Arcata </a></li>
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">KWMC-KSAC <span class="caret"></span></button>
+        <ul class="dropdown-menu" role="menu" id="stn-pills">
+          <li><a href="#plot_selected" data-toggle="pill" data-value="KWMC-KSAC" data-text="Winnemucca - Sacramento">KWMC-KSAC </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-value="KWMC-KSFO" data-text="Winnemucca - San Francisco">KWMC-KSFO </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-value="KACV-KSFO" data-text="Arcate - San Francisco">KACV-KSFO </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-value="KRDD-KSAC" data-text="Redding - Sacramento">KRDD-KSAC </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-value="KMFR-KSAC" data-text="Medford - Sacramento">KMFR-KSAC </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-value="KBFL-KSBA" data-text="Bakersfield - Santa Barbara">KBFL-KSBA </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-value="KVBG-KSBA" data-text="Vandenburg - Santa Barbara">KVBG-KSBA </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-value="KSMX-KSBA" data-text="Santa Maria - Santa Barbara">KSMX-KSBA </a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-value="KDAG-KLAX" data-text="Daggett - Los Angeles">KDAG-KLAX </a></li>
         </ul>
       </div>
       
       <div class="btn-group">
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Sacramento <span class="caret"></span></button>
-        <ul class="dropdown-menu" role="menu" id="stn2-pills">
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KWMC" data-text="Winnemucca">Winnemucca </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KSAC" data-text="Sacramento">Sacramento </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KSFO" data-text="San Francisco">San Francisco </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KVBG" data-text="Vandenburg">Vandenburg </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KSBA" data-text="Santa Barbara">Santa Barbara </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KSMX" data-text="Santa Maria">Santa Maria </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KBFL" data-text="Bakersfield">Bakersfield </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KRDD" data-text="Redding">Redding </a></li>
-          <li><a href="#plot_selected" data-toggle="pill" data-value="KACV" data-text="Arcata">Arcata </a></li>
-        </ul>
-      </div>
-
-      <div class="btn-group">
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">GFS  <span class="caret"></span></button>
         <ul class="dropdown-menu" role="menu" id="model-pills">
-          <li><a href="#plot_selected" data-toggle="pill" data-value="all_model" data-text="All models">All models</a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-value="all_2d" data-text="all models">ALL 2d</a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-value="all_3d" data-text="all models">ALL 3d</a></li>
+          <li><a href="#plot_selected" data-toggle="pill" data-value="all_10d" data-text="all models">ALL 10d</a></li>
           <li><a href="#plot_selected" data-toggle="pill" data-value="gfs" data-text="GFS">GFS </a></li>
           <li><a href="#plot_selected" data-toggle="pill" data-value="nam" data-text="NAM">NAM  </a></li>
           <li><a href="#plot_selected" data-toggle="pill" data-value="hrrr" data-text="HRRR">HRRR </a></li>
@@ -204,11 +188,11 @@ commmend end -->
     <button type="button" class="btn btn-info  btn-group-justified" data-toggle="collapse" data-target="#stationMapToggle">Show Station Map</button>
     <br>
     <div id="stationMapToggle" class="collapse">
+      <img src="../top_events/stn_map.png" class="center-block img-responsive">
+<!--
     <div> 
       <link rel="import" href="/path/to/imports/stuff.html">
     </div>
-<!--
-      <img src="../top_events/stn_map.png" class="center-block img-responsive">
 -->
     </div>
   </div>

@@ -1,6 +1,16 @@
 
 # LAX-DAG surface gradient has trended down to -3.9 MB at 5 AM Monday morning. 
 # but northerly gradients  from SFO to Arcata are now up to 4 mb,
+# 09/27 
+# Since yesterday afternoon surface high pressure has been building 
+#  strongly to our north and northeast. The ACV-SFO surface pressure 
+#  gradient currently stands at an impressive 8.5 mb while the WMC- 
+#  SFO gradient has climbed quickly past 9 mb. 
+# 09/27 at 12;01 midnite the
+# gradients were +13.2 mb from Medford to Sacramento and +7.0 mb
+# from Winnemucca, Nevada to San Francisco.
+# 09/27 causing the  LAX-DAG gradient to strengthen to around -3.5MB by Monday morning. 
+
 '''
 name: pgrad.py 
 purpose: process and analyze pressure gradient forcing from NWP models 
