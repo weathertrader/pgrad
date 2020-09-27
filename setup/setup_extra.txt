@@ -24,102 +24,6 @@ temp1.txt
 temp2.txt
 etc
 
-airflow job
-moves test files from to_process bucket to processed bucket 
-
-bash script - copies file from local to s3
-
-#################################################
-# airflow 
-
-
-# airflow needs a home, ~/airflow is the default,
-# but you can lay foundation somewhere else if you prefer
-# (optional)
-export AIRFLOW_HOME=~/airflow
-
-# install from pypi using pip
-pip install apache-airflow
-
-# initialize the database
-airflow initdb
-
-# start the web server, default port is 8080
-airflow webserver -p 8080
-
-# start the scheduler
-airflow scheduler
-
-# visit localhost:8080 in the browser and enable the example dag in the home page
-
-pip install airflow 
-cd /path/to/my/airflow/workspace
-(venv) $ mkdir airflow_home
-(venv) $ export AIRFLOW_HOME=`pwd`/airflow_home
-
-airflow version
-airflow initdb
-airflow webserver
-http://localhost:8080/admin/
-mkdir AIRFLOW_HOME/dags
-
-dags/helloworld.py
-
-from datetime import datetime
-from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators.python_operator import PythonOperator
-
-def print_hello():
-    return 'Hello world!'
-
-dag = DAG('hello_world', description='Simple tutorial DAG',
-          schedule_interval='0 12 * * *',
-          start_date=datetime(2017, 3, 20), catchup=False)
-
-dummy_operator = DummyOperator(task_id='dummy_task', retries=3, dag=dag)
-
-hello_operator = PythonOperator(task_id='hello_task', python_callable=print_hello, dag=dag)
-
-dummy_operator >> hello_operator
-
-airflow scheduler
-
-
-
-# Create the folder containing your DAGs definition
-mkdir airflow_home/dags
-
-# Create your DAG definition file
-touch airflow_home/dags/upload_file_to_S3.py
-
-# then open this file with your favorite IDE
-
-from airflow import DAG
-from airflow.operators import DummyOperator, PythonOperator
-
-default_args = {
-    'owner': 'arnaud',
-    'start_date': datetime(2019, 1, 1),
-    'retry_delay': timedelta(minutes=5)
-}
-# Using the context manager alllows you not to duplicate the dag parameter in each operator
-with DAG('S3_dag_test', default_args=default_args, schedule_interval='@once') as dag:
-
-    start_task = DummyOperator(
-            task_id='dummy_start'
-    )
-
-    upload_to_S3_task = PythonOperator(
-            task_id='upload_file_to_S3',
-            python_callable=lambda _ : print("Uploading file to S3")
-    )
-
-    # Use arrows to set dependencies between tasks
-    start_task >> upload_to_S3_task
-
-s3_helpers.py
-
 import boto3
 
 s3 = boto3.resource('s3')
@@ -127,133 +31,19 @@ s3 = boto3.resource('s3')
 def upload_file_to_S3(filename, key, bucket_name):
     s3.Bucket(bucket_name).upload_file(filename, key)
 
-
-upload_file_to_s3.py 
-
-upload_to_S3_task = PythonOperator(
-    task_id='upload_to_S3',
-    python_callable=upload_file_to_S3,
-    op_kwargs={
-        'filename': 'path/to/my_file.csv',
-        'key': 'my_S3_file.csv',
-        'bucket_name': 'my-S3-bucket',
-    },
-    dag=my_dag)
-
-
-
-
-aws s3 mv file_name_old file_name_new 
-
-
-cmd = "ssh hadoop@10.70.1.35 spark-submit \
-   --master yarn \
-   --deploy-mode cluster \
-   --executor-memory 2g \
-   --executor-cores 2 \
-   /home/hadoop/pyspark_script/script.py"
-t = BashOperator(task_id='Spark_datamodel',bash_command=cmd,dag=dag)
-
-
 # General ssh and scp commands 
 
-#################################################
 # ssh
-
-# pg 
-# master
 ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com
-# worker 1
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-18-237-177-6.us-west-2.compute.amazonaws.com
-# worker 2
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-214-205-202.us-west-2.compute.amazonaws.com
-# worker 3 
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-215-182-26.us-west-2.compute.amazonaws.com
-# worker 4 
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-219-195-126.us-west-2.compute.amazonaws.com
-# worker 5 
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-214-104-123.us-west-2.compute.amazonaws.com
 
-
-
-#################################################
 # scp
-# copy src to master 
 scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem src/* ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com:/home/ubuntu/raceCast/src/.
-# copy dash app to pg
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem dash/* ubuntu@ec2-34-222-54-126.us-west-2.compute.amazonaws.com:/home/ubuntu/raceCast/dash/.
-# copy src to pg
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem src/* ubuntu@ec2-34-222-54-126.us-west-2.compute.amazonaws.com:/home/ubuntu/raceCast/src/.
 
-
-
-
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem src/create_db.py ec2-34-222-54-126.us-west-2.compute.amazonaws.com:/home/ubuntu/raceCast/src/.
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ec2-34-222-54-126.us-west-2.compute.amazonaws.com
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com
-
-# scp the create_db script to the spark master
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem src/*py ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com:/home/ubuntu/raceCast/src/.
-
-# ssh into the spark master 
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com
-
-
-# master  
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem data/gps_tracks_processed_0.csv ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com:/home/ubuntu/.
-# worker 1
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem data/gps_tracks_processed_0.csv ubuntu@ec2-18-237-177-6.us-west-2.compute.amazonaws.com:/home/ubuntu/.
-# worker 2
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem data/gps_tracks_processed_0.csv ubuntu@ec2-34-214-205-202.us-west-2.compute.amazonaws.com:/home/ubuntu/.
-# worker 3 
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem data/gps_tracks_processed_0.csv ubuntu@ec2-34-215-182-26.us-west-2.compute.amazonaws.com:/home/ubuntu/.
-# worker 4 
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem spark-2.4.5-bin-hadoop2.7.tgz ubuntu@ec2-34-219-195-126.us-west-2.compute.amazonaws.com:/home/ubuntu/.
-# worker 5
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem spark-2.4.5-bin-hadoop2.7.tgz ubuntu@ec2-34-214-104-123.us-west-2.compute.amazonaws.com:/home/ubuntu/.
-
-
-
-
-
-
-# pg server 
-ssh ec2-34-222-54-126.us-west-2.compute.amazonaws.com
-ubuntu@ec2-34-222-54-126.us-west-2.compute.amazonaws.com
 
 # set up a keypair from local to pg
 ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-222-54-126.us-west-2.compute.amazonaws.com
-# set up a keypair from master to pg
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com 'cat ~/.ssh/id_rsa.pub' | ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-222-54-126.us-west-2.compute.amazonaws.com 'cat >> ~/.ssh/authorized_keys'
 
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem src/* ubuntu@ec2-34-222-54-126.us-west-2.compute.amazonaws.com:/home/ubuntu/raceCast/src/.
 
-# worker 1
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com 'cat ~/.ssh/id_rsa.pub' | ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-18-237-177-6.us-west-2.compute.amazonaws.com 'cat >> ~/.ssh/authorized_keys'
-# worker 2
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com 'cat ~/.ssh/id_rsa.pub' | ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-214-205-202.us-west-2.compute.amazonaws.com 'cat >> ~/.ssh/authorized_keys'
-# worker 3 
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com 'cat ~/.ssh/id_rsa.pub' | ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-215-182-26.us-west-2.compute.amazonaws.com 'cat >> ~/.ssh/authorized_keys'
-# ssh keys master -> slave 4 
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com 'cat ~/.ssh/id_rsa.pub' | ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-219-195-126.us-west-2.compute.amazonaws.com 'cat >> ~/.ssh/authorized_keys'
-# ssh keys master -> slave5
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com 'cat ~/.ssh/id_rsa.pub' | ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-214-104-123.us-west-2.compute.amazonaws.com 'cat >> ~/.ssh/authorized_keys'
-# master -> pg
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-202-214-49.us-west-2.compute.amazonaws.com 'cat ~/.ssh/id_rsa.pub' | ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-222-54-126.us-west-2.compute.amazonaws.com 'cat >> ~/.ssh/authorized_keys'
-
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem src/create_db.py ubuntu@ec2-34-222-54-126.us-west-2.compute.amazonaws.com:/home/ubuntu/raceCast/src/.
-scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem src/*sh ubuntu@ec2-34-222-54-126.us-west-2.compute.amazonaws.com:/home/ubuntu/raceCast/src/.
-
-# now ssh into the server 
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-222-54-126.us-west-2.compute.amazonaws.com
-
-## Misc
-
-S3 bucket name is `gps-data-processed`
-
-If the Spark workers run out of space delete their working directories 
-```
-rm -rf /usr/local/spark/work/app*
 ```
 Sid not install python-dev but may be needed
 sudo apt-get install python3-dev
@@ -303,31 +93,5 @@ fs.ls('gps-data-processed')
 fs.touch('gps-data-processed/test.txt') 
 fs.put(file_path,s3_bucket + "/" + rel_path)
 fs = s3fs.S3FileSystem(anon=False, key='<Access Key>', secret='<Secret Key>')
-
-    
-what i was doing before under IPV4 connections
-dont do this, not needed
-host    all             all            98.33.42.216/32            md5
-host    all             all  ec2-54-202-214-49.us-west-2.compute.amazonaws.com/32  md5
-    
-  
-and
-mkdir -p raceCast/src raceCast/data
-
-sudo apt-get install python3-dev
-  
-  
-install miniconda 
-pip3 install psycopg2 psycopg2-binary
-
-
-home IP
-98.33.42.216
-
-
-
-
-
-
 
 

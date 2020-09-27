@@ -100,7 +100,7 @@ $(function() {
     plotCdfName = createPlotCdfName(plotStnPair);
     tableName   = createTableName(plotStnPair);    
     $("#plot_text").text(plotText);
-    $("#plot_selected").find('img').attr("src", "../images/"+plotName);
+    $("#plot_selected").find('img').attr("src", "../../images/"+plotName);
     // note csmith: uncomment after 10/01
     //$("#plot_cdf").find('img').attr("src", "../top_events/"+plotCdfName);
     //$("#plot_table").find('img').attr("src", "../top_events/"+tableName);
