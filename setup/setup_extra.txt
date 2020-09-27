@@ -14,6 +14,11 @@ ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-70-6-52.us-west-2.com
 
 pip freeze > requirements.txt
 
+conda create -n cartopy -c conda-forge cartopy netCDF4 xarray 
+conda activate cartopy
+conda install spyder‑kernels
+
+
 create test files on s3://to_process
 temp1.txt
 temp2.txt

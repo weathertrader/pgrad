@@ -26,6 +26,8 @@ repo: https://github.com/weathertrader/battery_charge
 #      units conversion
 #      calc p_sfc from which variable
 
+# 1 hr tweak cleanup script - each full of fully processed data is 1.1 Gb
+
 import os
 import sys
 import csv
