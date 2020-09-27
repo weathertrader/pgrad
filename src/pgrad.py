@@ -886,8 +886,9 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     dt_init_list[i]
     model_name = 'gfs'
     m = 0
-    d = 2
-    n_days = 10    
+    d, n_days = 0, 2    
+    #d, n_days = 1, 3    
+    #d, n_days = 2, 10    
     for s,stn_id_pair in enumerate(stn_id_pair_list):
         #if stn_id_pair == 'KWMC-KSAC':
         if stn_id_pair in stn_id_pair_list_to_plot:
@@ -896,12 +897,13 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
             for d, n_days in enumerate(n_days_list):
 
                 dt_min_plot = dt(dt_axis_lt_init[i,0].year, dt_axis_lt_init[i,0].month, dt_axis_lt_init[i,0].day, 0, 0, 0)
-                dt_max_plot = dt_min_plot + td(days=n_days+1)
+                #dt_max_plot = dt_min_plot + td(days=n_days+1)
+                dt_max_plot = dt_min_plot + td(days=n_days)
                 if   n_days == 2:
                     delta_ticks = td(hours=12)
-                    dt_format = '%d %H'
-                elif n_days == 4:
-                    delta_ticks = td(hours=24)
+                    dt_format = '%m/%d %H'
+                elif n_days == 3:
+                    delta_ticks = td(hours=12)
                     dt_format = '%m/%d %H'    
                 elif n_days == 10:
                     delta_ticks = td(hours=24)
@@ -933,6 +935,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                     #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
                 #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
                 plt.legend(loc=4,fontsize=size_font-2,ncol=1) 
+                plt.plot([dt_start_lt, dt_start_lt], [y_min, y_max], 'y', linestyle='--', linewidth=1.0, marker='o', markersize=0, markeredgecolor='k') 
                 plt.plot([dt_ticks[0], dt_ticks[-1]], [0.0, 0.0], 'k', linestyle='-', linewidth=2.0, marker='o', markersize=0, markeredgecolor='k') 
                 for y_tick in y_ticks:
                     plt.plot([dt_ticks[0], dt_ticks[-1]], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
@@ -966,24 +969,26 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     print      ('  plot single model, all inits ')
     logger.info('  plot single model, all inits ')
     
-    model_name = 'gfs'
-    m = 0
-    for m, model_name in enumerate(model_name_list):
-        for s,stn_id_pair in enumerate(stn_id_pair_list):
-            #if stn_id_pair == 'KWMC-KSAC':
-            if stn_id_pair in stn_id_pair_list_to_plot:
-                print      ('    plotting %s %s ' %(s, stn_id_pair))
-                logger.info('    plotting %s %s ' %(s, stn_id_pair))
+    m, model_name = 0, 'gfs'
+    m, model_name = 1, 'nam'
+    m, model_name = 2, 'hrrr'
+    for s,stn_id_pair in enumerate(stn_id_pair_list):
+        #if stn_id_pair == 'KWMC-KSAC':
+        if stn_id_pair in stn_id_pair_list_to_plot:
+            print      ('    plotting %s %s ' %(s, stn_id_pair))
+            logger.info('    plotting %s %s ' %(s, stn_id_pair))
+            for m, model_name in enumerate(model_name_list):
                 for d, n_days in enumerate(n_days_list):
                     if (model_name == 'hrrr' and n_days == 2) or (model_name == 'nam' and n_days == 3) or (model_name == 'gfs' and n_days == 10):
                         #dt_min_plot = dt(dt_axis_lt_init[4,0].year, dt_axis_lt_init[4,0].month, dt_axis_lt_init[i,0].day, 0, 0, 0)
                         dt_min_plot = dt(dt_axis_lt_init[-1,0].year, dt_axis_lt_init[-1,0].month, dt_axis_lt_init[-1,0].day, 0, 0, 0)
-                        dt_max_plot = dt_min_plot + td(days=n_days+1)
+                        #dt_max_plot = dt_min_plot + td(days=n_days+1)
+                        dt_max_plot = dt_min_plot + td(days=n_days)
                         if   n_days == 2:
                             delta_ticks = td(hours=12)
-                            dt_format = '%d %H'
-                        elif n_days == 4:
-                            delta_ticks = td(hours=24)
+                            dt_format = '%m/%d %H'
+                        elif n_days == 3:
+                            delta_ticks = td(hours=12)
                             dt_format = '%m/%d %H'    
                         elif n_days == 10:
                             delta_ticks = td(hours=24)
@@ -1017,6 +1022,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                             #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
                         #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
                         plt.legend(loc=4,fontsize=size_font-2,ncol=1) 
+                        plt.plot([dt_start_lt, dt_start_lt], [y_min, y_max], 'y', linestyle='--', linewidth=1.0, marker='o', markersize=0, markeredgecolor='k') 
                         plt.plot([dt_ticks[0], dt_ticks[-1]], [0.0, 0.0], 'k', linestyle='-', linewidth=2.0, marker='o', markersize=0, markeredgecolor='k') 
                         for y_tick in y_ticks:
                             plt.plot([dt_ticks[0], dt_ticks[-1]], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 

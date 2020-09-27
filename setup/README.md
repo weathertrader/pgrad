@@ -72,41 +72,14 @@ navigate to the webpage and view the initial website at ip:/pgrad.html
 
 ```
 cd /var/www/html
-sudo ln -s ~/pgrad/www/pgrad.html .
-sudo ln -s ~/pgrad/www/pgrad.js .
+sudo ln -s ~/pgrad/www/html/pgrad.html .
+sudo ln -s ~/pgrad/www/html/pgrad.js .
 # sudo ln -s ~/pgrad/www/style.css .
 
-cd /var/www
 sudo ln -s ~/pgrad/images/ .
 sudo ln -s ~/pgrad/top_events/ .
 
 
-ln -s /var/www/* /ZFSRaidz/XBMC/Multimedia/Anime/Naruto_Shippuuden-2/
-ln -s ~/code/notes/notes ~/bin/notes
-
-sudo ln -s /home/ubuntu/pgrad/www/css /var/www/
-sudo ln -s /home/ubuntu/pgrad/www/js /var/www/
-sudo ln -s /home/ubuntu/pgrad/images /var/www/
-sudo ln -s /home/ubuntu/pgrad/top_events /var/www/
-
-sudo ln -s /home/ubuntu/pgrad/www/html/pgrad.html /var/www/html/
-
-/home/user/pgrad/www has permissions 775
-
-Check /home/user/www and /var/www/html owners
-Apache user\group must have access to /home, /home/user and /home/user/www paths
-
-Check Apache configuration:
-look for FollowSymLinks option
-
-<Directory /var/www/html>
-    ...
-    Options FollowSymLinks
-</Directory>
-
-/home/user to 711 and see if that helps any. Keep in mind... localhost/www won't exist unless you have a folder called www inside of the DocumentRoot.
-
-Also, you're better off using ~/public_html over symlinking /var/www/html to something in your home directory. Bad practice/juju.
 
 
 ```
@@ -158,6 +131,22 @@ aws_access_key_id=
 aws_secret_access_key=
 
 ```
+  
+Not needed 
+/home/user/pgrad/www has permissions 775
+Check /home/user/www and /var/www/html owners
+Apache user\group must have access to /home, /home/user and /home/user/www paths
+
+Check Apache configuration:
+look for FollowSymLinks option
+<Directory /var/www/html>
+    ...
+    Options FollowSymLinks
+</Directory>
+
+can chmod to 755 or 711
+
+ 
   
   
   
