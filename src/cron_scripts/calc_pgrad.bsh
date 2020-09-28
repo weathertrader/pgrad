@@ -3,5 +3,5 @@
 # source /etc/bashrc
 # source /home/ubuntu/.bashrc
 # plot_data
-~/miniconda3/bin/python ~/pgrad/src/pgrad.py --process_name=plot_data --bucket_name=data 
+~/miniconda3/bin/python ~/pgrad/src/pgrad.py --process_name=calc_pgrad --bucket_name=data 
 # /home/ubuntu/miniconda3/bin/python ./src/pgrad.py --process_name=plot_data --bucket_name=data 
