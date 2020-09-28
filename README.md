@@ -3,8 +3,8 @@
 
 Operational pressure differences from key weather stations on the West Coast are often
 used a rubrics for the strenght of various wind events such as Sundowners and Diablo winds.
-
-![alt text](images_repo/sample_time_series.png "hover text")
+This repo is a fully contained codebase for observing and forecasting this rubric
+and contextualizing it with historical events.
 
 ## Table of Contents
 
@@ -30,20 +30,24 @@ and relative to all observed events.  It will also all the end-user to
 examine how the model solutions are tracking against observed values to check for bias, 
 and how various model solutions compare against each other.
 
+![alt text](images_repo/sample_time_series.png "hover text")
+
+*Example figure showing forecast pressure difference Winnemmucca to Sacramento 
+across recent NAM initializations*
+
 ## Dataset
 
 Observational data consists of surface observations pulled in via MesoWest API.
 Model consists of operational runs updated 4x day of the following NWS models:
-GFS - 10 day forecast horizon
-NAM - 60 hr forecast horizon
-HRRR - 36 hr forecast horizon 
+- GFS - 10 day forecast horizon
+- NAM - 60 hr forecast horizon
+- HRRR - 36 hr forecast horizon 
 
 All data and figures are refreshed hourly.
 
 ## Stations
 
-Pressure differences are calculated from stations pairs shown below.  
-Feel free to suggest more.
+Pressure differences are calculated from stations pairs shown below.  Feel free to suggest more.
 
 ![alt text](images_repo/stn_map.png "hover text")
 
@@ -51,7 +55,7 @@ Feel free to suggest more.
 
 Project currently runs on a t1 instance on AWS with no additional hard disk.
 ETLs are written in bash and python using cron jobs, and the website is served with Apache.
-The `setup/README.md` contains details of all jobs that are run and 
-the setup readme has additional details.
+The `src/crontab.txt` contains details of all jobs that are run and 
+the `setup/README.md` has additional details.
 [Link](https://github.com/weathertrader/pgrad/tree/master/setup)
 
