@@ -1,7 +1,5 @@
 
-# pGrad setup readme
-
-![alt text](../images/racecast_tech_stack.png "hover text")
+# pgrad setup readme
 
 ## Table of Contents
 1. [Instance Setup](README.md#Instance-Setup)
@@ -10,7 +8,7 @@
 
 ## Instance Setup
 
-Spin up an EC2 instance.  I chose a Ubuntu t2.micro. 
+Spin up an EC2 instance.  I chose a t2.micro with Ubuntu 20.04. 
 Default 8 Gb of hard disk.
 Allow ports ssh from home IP, HTTP and HTTPS.  
 Add the keypair from local to the instance.
@@ -19,12 +17,10 @@ ssh into the instance and
 Intall Postgres and Apache webserver
 ```
 sudo apt-get update && sudo apt upgrade && sudo apt-get install postgresql postgresql-contrib libpq-dev python3-psycopg2 apache2
-
 ```
 and navigate to the IP address to view the default index.html and check that Apache is running.
 
 Clone the repo via https (not ssh)  
-
 ```
 git clone https://github.com/weathertrader/pgrad.git
 ```
@@ -34,7 +30,6 @@ Install Python from miniconda.  After changing permissions on the executable, ex
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 chmod 755 Miniconda3-latest-Linux-x86_64.sh
 source ~/.bashrc
-
 ```
 
 Install the environment (requirements.txt doesn't work yet)
@@ -60,38 +55,33 @@ Backfill data from the last few forecast runs
 ```
 src/backfill.sh
 ```
-Once this done, go ahead and execute an operational full ETL to make sure 
-you have the latest data
+Once this done, execute an operational full ETL to make sure you have the latest data
 ```
 src/operational.sh
 ```
 
-
-Link the apache www directory to the repo www and 
-navigate to the webpage and view the initial website at ip:/pgrad.html  
-
+Link the apache `www/html` directory to the repo `www/html` and 
+navigate to the webpage and view the initial website at ip://pgrad.html  
 ```
 cd /var/www/html
 sudo ln -s ~/pgrad/www/html/pgrad.html .
 sudo ln -s ~/pgrad/www/html/pgrad.js .
 # sudo ln -s ~/pgrad/www/style.css .
-
 sudo ln -s ~/pgrad/images/ .
 sudo ln -s ~/pgrad/top_events/ .
-
-
-
-
 ```
-
+Note that the images directory contains the images that are updated hourly
+and the top_events images are included in the repo and do not be updated 
+outside of that.
 
 
 Install the crontab 
-
 ```
 crontab src/crontab.txt
 ```
 
+
+BELOW NOT ORGANIZED YET 
 
 NOT NEEDED 
 copy over a .bashrc with xyz environmental variables 

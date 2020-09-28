@@ -1,5 +1,5 @@
 
-# pgrad.io
+# pgrad
 
 Operational pressure differences from key weather stations on the West Coast are often
 used a rubrics for the strenght of various wind events such as Sundowners and Diablo winds.
@@ -19,10 +19,10 @@ The website is currently only available inside a VPN.  Public release is
 slated for 11/01/2020.
 
 Website currently consists of the following:
-Operational time series of observed and forecast pressure differences from various
+- Operational time series of observed and forecast pressure differences from various
 surface stations across the Western US.
-Tables of maximum observed pressure difference from historical top events for station pairs
-Cumuluative Distribution function of observed pressure difference from station pairs.
+- Tables of maximum observed pressure difference from historical top events for station pairs
+- Cumulative Distribution function of observed pressure difference from station pairs.
 
 Taken together, this roughly allows the end-user to determine in operational 
 context how an upcoming forecast event will compare relative to events of historical importance
@@ -56,6 +56,5 @@ Pressure differences are calculated from stations pairs shown below.  Feel free 
 Project currently runs on a t1 instance on AWS with no additional hard disk.
 ETLs are written in bash and python using cron jobs, and the website is served with Apache.
 The `src/crontab.txt` contains details of all jobs that are run and 
-the `setup/README.md` has additional details.
-[Link](https://github.com/weathertrader/pgrad/tree/master/setup)
+the `setup/README.md` [Link](https://github.com/weathertrader/pgrad/tree/master/setup) has additional details.
 
