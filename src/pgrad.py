@@ -1024,7 +1024,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
 
 
 ###############################################################################
-def obs_historical_download(dict_stn_metadata, utc_conversion, time_zone_label, bucket_name):
+def obs_historical_download(dict_stn_metadata, stn_list_to_use, utc_conversion, time_zone_label, bucket_name):
 
     print      ('obs_historical_download begin ')
     logger.info('obs_historical_download begin ')
@@ -1035,7 +1035,7 @@ def obs_historical_download(dict_stn_metadata, utc_conversion, time_zone_label, 
 
     mesowest_token = os.environ['mesowest_token']
     url_base = 'http://api.mesowest.net/v2/stations/timeseries?stid='
-        
+            
     s = 2 # KSAC
     s = 9 # KWMC
     #for s in range(6,8,1): 
@@ -1045,107 +1045,119 @@ def obs_historical_download(dict_stn_metadata, utc_conversion, time_zone_label, 
         print      ('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
         logger.info('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
         #for d in range(0, n_days, 1):
-        yy = 2018
-        while yy <= dt.utcnow().year:
-            dt_start = dt(yy, 1, 1)
-            dt_end   = dt(yy, 12, 31, 23, 59)
-            print      ('    processing yy %s ' % (yy))
-            logger.info('    processing yy %s ' % (yy))
-            #url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_temp.strftime('%Y%m%d0000')+'&end='+dt_temp.strftime('%Y%m%d2359')+'&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
-            url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_start.strftime('%Y%m%d0000')+'&end='+dt_end.strftime('%Y%m%d2359')+'&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
-            
-            # NOTE CSMITH - need to filter to only variables needed - alt and slp yes, pres no
-            # &vars=air_temp,volt&token=YOUR_TOKEN_HERE
-            
-            
-            print      ('    url_temp is %s ' % (url_temp))
-            logger.info('    url_temp is %s ' % (url_temp))
-            web_temp = requests.get(url_temp)
-            response  = web_temp.json() 
-            data_parse = response['STATION']
-            if (len(data_parse) == 0): # station contains no data 
-                print      ('    sensor_list empty')
-                logger.info('    sensor_list empty')
-            else: # (len(data_parse) > 0)
-    
-                dt_read = np.array(response['STATION'][0]['OBSERVATIONS']['date_time']) # e.g. [u'2015-11-18T00:53:00Z', u'2015-11-18T01:53:00Z', ... u'2015-11-18T23:53:00Z'],
-                n_time_read = len(dt_read)
-                dt_obs_temp = []
-                n = 0 
-                for n in range(0,n_time_read,1): 
-                    # dt_read_temp = dt.strptime(str(dt_read[n]),'%Y-%m-%dT%H:%M:%SZ')
-                    dt_read_temp = dt.strptime(str(dt_read[n]),'%Y-%m-%d_%H-%M')
-                    dt_obs_temp.append(dt_read_temp)
-                    del dt_read_temp 
-                sensor_list = response['STATION'][0]['SENSOR_VARIABLES'] 
-                #print (sensor_list)
-        
-                # temp 
-                if   ('air_temp' in sensor_list): 
-                    temp_read = np.array(response['STATION'][0]['OBSERVATIONS']['air_temp_set_1'],dtype='float') 
-                else: 
-                    temp_read = np.zeros([n_time_read])
-                # ws 
-                if   ('wind_speed' in sensor_list): 
-                    ws_read = np.array(response['STATION'][0]['OBSERVATIONS']['wind_speed_set_1'],dtype='float') 
-                else: 
-                    ws_read = np.zeros([n_time_read])
-                # wsg 
-                if   ('wind_gust' in sensor_list): 
-                    wsg_read = np.array(response['STATION'][0]['OBSERVATIONS']['wind_gust_set_1'],dtype='float') 
-                else: 
-                    wsg_read = np.zeros([n_time_read])
-                # wd             
-                if   ('wind_direction' in sensor_list): 
-                    wd_read = np.array(response['STATION'][0]['OBSERVATIONS']['wind_direction_set_1'],dtype='float') 
-                else: 
-                    wd_read = np.zeros([n_time_read])
-                if   ('relative_humidity' in sensor_list): 
-                    rh_read = np.array(response['STATION'][0]['OBSERVATIONS']['relative_humidity_set_1'],dtype='float') 
-                else: 
-                    rh_read = np.zeros([n_time_read])
-        
-                if   ('sea_level_pressure' in sensor_list): 
-                    slp_read = np.array(response['STATION'][0]['OBSERVATIONS']['sea_level_pressure_set_1d'],dtype='float')            
-                else: 
-                    slp_read = np.zeros([n_time_read])
-        
-                if   ('pressure' in sensor_list): 
-                    pres_read = np.array(response['STATION'][0]['OBSERVATIONS']['pressure_set_1d'],dtype='float') 
-                else: 
-                    pres_read = np.zeros([n_time_read])
-        
-                if   ('altimeter' in sensor_list): 
-                    alt_read = np.array(response['STATION'][0]['OBSERVATIONS']['altimeter_set_1'],dtype='float') 
-                else: 
-                    alt_read = np.zeros([n_time_read])
-        
-                # units conversion hpa -> mb
-                pres_read = 0.01*pres_read
-                alt_read  = 0.01*alt_read
-                slp_read  = 0.01*slp_read
-        
-                #alt_read  = np.zeros([n_time_read])
-                #slp_read  = np.zeros([n_time_read])
-                u_ws_read = np.zeros([n_time_read])
-                v_ws_read = np.zeros([n_time_read])
-                            
-                # write the csv file - yes rh
-                stn_data = [temp_read, ws_read, wsg_read, wd_read, rh_read, slp_read, pres_read, alt_read]
-                stn_data = np.transpose(stn_data) 
-                stn_data_df = pd.DataFrame(stn_data, index=dt_obs_temp, columns=['temp','ws', 'wsg', 'wd', 'rh', 'slp', 'pres', 'alt']).round(2) 
-                #file_name_stn_write = os.path.join(dir_data_ingest, 'stn_obs_'+dict_stn_metadata['stn_id'][s]+'_'+dt_temp.strftime('%Y-%m-%d')+'.csv') 
+        if (dict_stn_metadata['stn_id'][s] in stn_list_to_use):
+            yy = 2017 # 2017, 2018, 2019, 2020 done already 
+            while yy <= dt.utcnow().year:
+                #dt_start = dt(2020, 9, 25)
+                #dt_end   = dt(2020, 9, 29)            
+                dt_start = dt(yy, 1, 1)
+                #dt_end   = dt(yy, 12, 31, 23, 59)
+                dt_end   = min(dt(yy, 12, 31, 23, 59), dt.utcnow())
+                print      ('    processing yy %s ' % (yy))
+                logger.info('    processing yy %s ' % (yy))
                 file_name_stn_write = os.path.join(dir_sfc_obs_historical, 'stn_obs_'+dict_stn_metadata['stn_id'][s]+'_'+str(yy)+'.csv') 
-                stn_data_df.to_csv(file_name_stn_write) 
-          
-                ## change nan to NULL for compatability with postgres
-                ## temp 
-                #index_nan = ([np.isnan(temp_read)]) 
-                #temp_read = temp_read.astype(object)
-                #temp_read[index_nan] = 'NULL'
-                #del index_nan 
+                if os.path.isfile(file_name_stn_write):
+                    print      ('      skipping, file exists already')
+                    logger.info('      skipping, file exists already')
+                else:                
+                    # url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_temp.strftime('%Y%m%d0000')+'&end='+dt_temp.strftime('%Y%m%d2359')+'&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
+                    # url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_start.strftime('%Y%m%d0000')+'&end='+dt_end.strftime('%Y%m%d2359')+'&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
+                    # slp and alt 
+                    #url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_start.strftime('%Y%m%d0000')+'&end='+dt_end.strftime('%Y%m%d2359')+'&vars=sea_level_pressure,altimeter&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
+                    # slp only 
+                    url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_start.strftime('%Y%m%d0000')+'&end='+dt_end.strftime('%Y%m%d2359')+'&vars=sea_level_pressure&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
+                    # print(url_temp)
+                    # NOTE CSMITH - need to filter to only variables needed - alt and slp yes, pres no
+                    # &vars=air_temp,volt&token=YOUR_TOKEN_HERE        
+                    # &vars=sea_level_pressure,altimeter&token=YOUR_TOKEN_HERE
+     
+                    print      ('    url_temp is %s ' % (url_temp))
+                    logger.info('    url_temp is %s ' % (url_temp))
+                    web_temp = requests.get(url_temp)
+                    response  = web_temp.json() 
+                    data_parse = response['STATION']
+                    if (len(data_parse) == 0): # station contains no data 
+                        print      ('    sensor_list empty')
+                        logger.info('    sensor_list empty')
+                    else: # (len(data_parse) > 0)
             
-            yy += 1
+                        dt_read = np.array(response['STATION'][0]['OBSERVATIONS']['date_time']) # e.g. [u'2015-11-18T00:53:00Z', u'2015-11-18T01:53:00Z', ... u'2015-11-18T23:53:00Z'],
+                        n_time_read = len(dt_read)
+                        dt_obs_temp = []
+                        n = 0 
+                        for n in range(0,n_time_read,1): 
+                            # dt_read_temp = dt.strptime(str(dt_read[n]),'%Y-%m-%dT%H:%M:%SZ')
+                            dt_read_temp = dt.strptime(str(dt_read[n]),'%Y-%m-%d_%H-%M')
+                            dt_obs_temp.append(dt_read_temp)
+                            del dt_read_temp 
+                        sensor_list = response['STATION'][0]['SENSOR_VARIABLES'] 
+                        #print (sensor_list)
+                
+                        # temp 
+                        if   ('air_temp' in sensor_list): 
+                            temp_read = np.array(response['STATION'][0]['OBSERVATIONS']['air_temp_set_1'],dtype='float') 
+                        else: 
+                            temp_read = np.zeros([n_time_read])
+                        # ws 
+                        if   ('wind_speed' in sensor_list): 
+                            ws_read = np.array(response['STATION'][0]['OBSERVATIONS']['wind_speed_set_1'],dtype='float') 
+                        else: 
+                            ws_read = np.zeros([n_time_read])
+                        # wsg 
+                        if   ('wind_gust' in sensor_list): 
+                            wsg_read = np.array(response['STATION'][0]['OBSERVATIONS']['wind_gust_set_1'],dtype='float') 
+                        else: 
+                            wsg_read = np.zeros([n_time_read])
+                        # wd             
+                        if   ('wind_direction' in sensor_list): 
+                            wd_read = np.array(response['STATION'][0]['OBSERVATIONS']['wind_direction_set_1'],dtype='float') 
+                        else: 
+                            wd_read = np.zeros([n_time_read])
+                        if   ('relative_humidity' in sensor_list): 
+                            rh_read = np.array(response['STATION'][0]['OBSERVATIONS']['relative_humidity_set_1'],dtype='float') 
+                        else: 
+                            rh_read = np.zeros([n_time_read])
+                
+                        if   ('sea_level_pressure' in sensor_list): 
+                            slp_read = np.array(response['STATION'][0]['OBSERVATIONS']['sea_level_pressure_set_1d'],dtype='float')            
+                        else: 
+                            slp_read = np.zeros([n_time_read])
+                
+                        if   ('pressure' in sensor_list): 
+                            pres_read = np.array(response['STATION'][0]['OBSERVATIONS']['pressure_set_1d'],dtype='float') 
+                        else: 
+                            pres_read = np.zeros([n_time_read])
+                
+                        if   ('altimeter' in sensor_list): 
+                            alt_read = np.array(response['STATION'][0]['OBSERVATIONS']['altimeter_set_1'],dtype='float') 
+                        else: 
+                            alt_read = np.zeros([n_time_read])
+                
+                        # units conversion hpa -> mb
+                        pres_read = 0.01*pres_read
+                        alt_read  = 0.01*alt_read
+                        slp_read  = 0.01*slp_read
+                
+                        #alt_read  = np.zeros([n_time_read])
+                        #slp_read  = np.zeros([n_time_read])
+                        u_ws_read = np.zeros([n_time_read])
+                        v_ws_read = np.zeros([n_time_read])
+                                    
+                        # write the csv file - yes rh
+                        stn_data = [temp_read, ws_read, wsg_read, wd_read, rh_read, slp_read, pres_read, alt_read]
+                        stn_data = np.transpose(stn_data) 
+                        stn_data_df = pd.DataFrame(stn_data, index=dt_obs_temp, columns=['temp','ws', 'wsg', 'wd', 'rh', 'slp', 'pres', 'alt']).round(2) 
+                        #file_name_stn_write = os.path.join(dir_data_ingest, 'stn_obs_'+dict_stn_metadata['stn_id'][s]+'_'+dt_temp.strftime('%Y-%m-%d')+'.csv') 
+                        stn_data_df.to_csv(file_name_stn_write) 
+                  
+                        ## change nan to NULL for compatability with postgres
+                        ## temp 
+                        #index_nan = ([np.isnan(temp_read)]) 
+                        #temp_read = temp_read.astype(object)
+                        #temp_read[index_nan] = 'NULL'
+                        #del index_nan 
+                
+                yy += 1
 
     print      ('obs_historical_download end ')
     logger.info('obs_historical_download end ')
@@ -1243,6 +1255,98 @@ def datematch_to_hourly(var_raw, dt_axis_raw, dt_axis_hr_lst, obs_window_minutes
 
     return var_hr  
 
+###############################################################################
+def datematch_to_5min(var_raw, dt_axis_raw, dt_axis_5min_lst, obs_window_minutes):
+    # debugging    
+    # var_raw = stn_read_df_f['slp'].values
+    # dt_axis_raw = stn_read_df_f.index
+
+    warnings.simplefilter('ignore', RuntimeWarning) # nanmean of all nan
+
+    n_5min = len(dt_axis_5min_lst)
+    dummy_axis = np.arange(0, n_5min) 
+    dt_axis_5min_lst_df = pd.DataFrame(dummy_axis, index=dt_axis_5min_lst)
+    nt = len(dt_axis_raw) 
+
+    n_dims = np.ndim(var_raw) 
+    if   (n_dims == 1): 
+        [n_dim1] = np.shape(var_raw) 
+        var_raw_df = pd.DataFrame(var_raw[:], index=dt_axis_raw)
+        var_5min = np.full([n_5min], np.nan, dtype='float')
+    elif (n_dims == 2): 
+        [n_dim1, n_dim2] = np.shape(var_raw) 
+        var_raw_df = pd.DataFrame(var_raw[:,0], index=dt_axis_raw)
+        var_5min = np.full([n_5min, n_dim2], np.nan, dtype='float')
+    elif (n_dims == 3): 
+        [n_dim1, n_dim2, n_dim3] = np.shape(var_raw) 
+        var_raw_df = pd.DataFrame(var_raw[:,0,0], index=dt_axis_raw)
+        var_5min = np.full([n_5min, n_dim2, n_dim3], np.nan, dtype='float')
+    elif (n_dims == 4): 
+        [n_dim1, n_dim2, n_dim3, n_dim4] = np.shape(var_raw) 
+        var_raw_df = pd.DataFrame(var_raw[:,0,0,0], index=dt_axis_raw)
+        var_5min = np.full([n_5min, n_dim2, n_dim3, n_dim4], np.nan, dtype='float')
+        
+    # n = 100812
+    for n in range(0, n_5min, 1):  
+        if (n%10000 == 0):
+            print      ('      processing %s of %s' %(str(n).zfill(6), n_5min))
+            logger.info('      processing %s of %s' %(str(n).zfill(6), n_5min))
+        index_min = (var_raw_df.index <= dt_axis_5min_lst_df.index[n]-td(minutes=2)).argmin() 
+        index_max = (var_raw_df.index <= dt_axis_5min_lst_df.index[n]+td(minutes=2)).argmin() 
+        if (index_min < nt and index_max > 0):
+            if (index_min != index_max):      
+                index_diff = index_max-index_min
+                #if (index_diff != 1 or (index_diff == 1 and not np.isnan(var_raw[index_min,0,0,0]))):                     
+                if   (index_diff == 1): # only 1 data point found                 
+                    if   (n_dims == 1): 
+                        var_5min[n]       = var_raw[index_min] 
+                    elif (n_dims == 2): 
+                        var_5min[n,:]     = var_raw[index_min,:] 
+                    elif (n_dims == 3): 
+                        var_5min[n,:,:]   = var_raw[index_min,:,:] 
+                    elif (n_dims == 4): 
+                        var_5min[n,:,:,:] = var_raw[index_min,:,:,:]                
+                elif (index_diff != 1): # more than one data point found 
+                    if   (n_dims == 1): 
+                        var_5min[n]       = np.nanmean(var_raw[index_min:index_max]) 
+                    elif (n_dims == 2): 
+                        #var_5min[n,:]     = np.nanmean(var_raw[index_min:index_max,:]) 
+                        for n2 in range(0, n_dim2, 1):   
+                            var_5min[n,n2] = np.nanmean(var_raw[index_min:index_max,n2]) 
+                    elif (n_dims == 3): 
+                        #var_5min[n,:,:]   = np.nanmean(var_raw[index_min:index_max,:,:]) 
+                        for n2 in range(0, n_dim2, 1):   
+                            for n3 in range(0, n_dim3, 1):   
+                                  var_5min[n,n2,n3] = np.nanmean(var_raw[index_min:index_max,n2,n3]) 
+                    elif (n_dims == 4): 
+                        #var_5min[n,:,:,:] = np.nanmean(var_raw[index_min:index_max,:,:,:]) 
+                        for n2 in range(0, n_dim2, 1):   
+                            for n3 in range(0, n_dim3, 1):   
+                                for n4 in range(0, n_dim4, 1):   
+                                  var_5min[n,n2,n3,n4] = np.nanmean(var_raw[index_min:index_max,n2,n3,n4]) 
+                del index_diff       
+        # note csmith 2016/04/26 - add these two lines of code below for most recent data point 
+        elif (index_min == nt-1 and index_max == 0): # right most data point 
+            if   (n_dims == 1): 
+                var_5min[n]       = np.nanmean(var_raw[index_min]) 
+            elif (n_dims == 2): 
+                #var_5min[n,:]     = np.nanmean(var_raw[index_min,:]) 
+                for n2 in range(0, n_dim2, 1):   
+                    var_5min[n,n2] = np.nanmean(var_raw[index_min,n2]) 
+            elif (n_dims == 3): 
+                #var_5min[n,:,:]   = np.nanmean(var_raw[index_min,:,:]) 
+                for n2 in range(0, n_dim2, 1):   
+                    for n3 in range(0, n_dim3, 1):   
+                        var_5min[n,n2,n3] = np.nanmean(var_raw[index_min,n2,n3]) 
+            elif (n_dims == 4): 
+                #var_5min[n,:,:,:] = np.nanmean(var_raw[index_min,:,:,:]) 
+                for n2 in range(0, n_dim2, 1):   
+                    for n3 in range(0, n_dim3, 1):   
+                        for n4 in range(0, n_dim4, 1):   
+                          var_5min[n,n2,n3,n4] = np.nanmean(var_raw[index_min,n2,n3,n4])
+        del index_min, index_max  
+
+    return var_5min  
 
 ###############################################################################
 def read_sfc_obs_csv_data(file_name_full_path, replace_nan_with_null): 
@@ -1307,80 +1411,89 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
 
     dir_sfc_obs_historical = os.path.join('data', 'sfc_obs_historical')
     utc_conversion = 8
-    dt_start = dt(2017, 1, 1)
+    #dt_start = dt(2017, 1, 1)
     #dt_start = dt(2000, 1, 1)
+    #dt_end = dt.utcnow()
+    dt_start = dt(2017, 1, 1)
+    #dt_end   = dt(2020, 9, 29)
     dt_end = dt.utcnow()
+
     n_days = (dt_end - dt_start).days 
-    n_hrs = n_days*24
+
+    # hourly
+    #obs_window_minutes = 29 
+    #n_hrs = n_days*24
+    #dt_axis_hr_lst = []
+    #for n in range(0, n_hrs): 
+    #    dt_axis_hr_lst.append(dt_start + td(hours=n))
+    #print      ('dt_axis_hr_lst is %s - %s ' % (dt_axis_hr_lst[0].strftime('%Y-%m-%d %H:%M'), dt_axis_hr_lst[-1].strftime('%Y-%m-%d %H:%M'))) 
+    #logger.info('dt_axis_hr_lst is %s - %s ' % (dt_axis_hr_lst[0].strftime('%Y-%m-%d %H:%M'), dt_axis_hr_lst[-1].strftime('%Y-%m-%d %H:%M')))     
+    #dummy_axis = np.arange(0, n_hrs)
+    #axis_hr_lst_df = pd.DataFrame(dummy_axis, index=dt_axis_hr_lst)
+
+    # 5 min
+    obs_window_minutes = 2 
+    n_5min = n_days*24*12
     #dt_axis_hr_utc = []
-    dt_axis_hr_lst = []
-    for n in range(0, n_hrs): 
-        dt_axis_hr_lst.append(dt_start + td(hours=n))
-        #datetime_axis_master_1hr_lst.append(datetime_start + datetime.timedelta(hours=n) - datetime.timedelta(hours=utc_conversion))
+    dt_axis_5min_lst = []
+    for n in range(0, n_5min): 
+        dt_axis_5min_lst.append(dt_start + td(minutes=5*n))   
+    print      ('dt_axis_5min_lst is %s - %s ' % (dt_axis_5min_lst[0].strftime('%Y-%m-%d %H:%M'), dt_axis_5min_lst[-1].strftime('%Y-%m-%d %H:%M'))) 
+    logger.info('dt_axis_5min_lst is %s - %s ' % (dt_axis_5min_lst[0].strftime('%Y-%m-%d %H:%M'), dt_axis_5min_lst[-1].strftime('%Y-%m-%d %H:%M')))     
+    dummy_axis = np.arange(0, n_5min)
+    axis_5min_lst_df = pd.DataFrame(dummy_axis, index=dt_axis_5min_lst)
     
-    print      ('dt_axis_hr_lst is %s - %s ' % (dt_axis_hr_lst[0].strftime('%Y-%m-%d %H:%M'), dt_axis_hr_lst[-1].strftime('%Y-%m-%d %H:%M'))) 
-    logger.info('dt_axis_hr_lst is %s - %s ' % (dt_axis_hr_lst[0].strftime('%Y-%m-%d %H:%M'), dt_axis_hr_lst[-1].strftime('%Y-%m-%d %H:%M'))) 
-    
-    dummy_axis = np.arange(0, n_hrs)
-    axis_hr_lst_df = pd.DataFrame(dummy_axis, index=dt_axis_hr_lst)
-    
-    obs_window_minutes = 29 
-    
-    pres_obs_hr_s = np.full([n_hrs, dict_stn_metadata['n_stn']], np.nan, dtype='float') 
-    slp_obs_hr_s  = np.full([n_hrs, dict_stn_metadata['n_stn']], np.nan, dtype='float') 
-    alt_obs_hr_s  = np.full([n_hrs, dict_stn_metadata['n_stn']], np.nan, dtype='float') 
+    slp_obs_5min_s  = np.full([n_5min, dict_stn_metadata['n_stn']], np.nan, dtype='float') 
+    #alt_obs_5min_s  = np.full([n_5min, dict_stn_metadata['n_stn']], np.nan, dtype='float') 
     
     replace_nan_with_null = False
     
     s = 2 # KSAC
     s = 9 # KWMC
     for s in range(0, dict_stn_metadata['n_stn']):
-        if (s == 2 or s == 9):
-            print      ('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
-            logger.info('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
-            file_name_list = glob.glob(os.path.join(dir_sfc_obs_historical,'stn_obs*'+dict_stn_metadata['stn_id'][s]+'*csv'))    
-            file_name_list.sort()
-            n_files = len(file_name_list)
-            print      ('  stn_id %s, n_files %s ' % (dict_stn_metadata['stn_id'][s], n_files)) 
-            logger.info('  stn_id %s, n_files %s ' % (dict_stn_metadata['stn_id'][s], n_files)) 
-            f_count = 0
-            if (n_files > 0): 
-                for f in range(0, n_files, 1): 
-                    file_name_full_path = file_name_list[f] 
-                    #if ('2014' in file_name_full_path or '2015' in file_name_full_path):
-                    #if ('2016' in file_name_full_path):
-                    #if ('20' in file_name_full_path):
-                    print      ('    file %s of %s ' % (f, n_files))
-        
-                    stn_read_df = read_sfc_obs_csv_data(file_name_full_path, replace_nan_with_null)
-                    # convert dt string to dt type and convert to lst     
-                    #dt_read_utc = pd.to_datetime(stn_read_df.index) 
-                    dt_read_lst  = pd.to_datetime(stn_read_df.index) - td(hours=8)
-                    stn_read_df = stn_read_df.set_index(dt_read_lst)
-                    #stn_read_df.index    
-                    if (f_count == 0):
-                        stn_read_df_f = stn_read_df
-                    else: 
-                        stn_read_df_f = pd.concat([stn_read_df_f, stn_read_df])
-                    del stn_read_df
-                    f_count += 1
+        #if (s == 2 or s == 9):
+        print      ('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
+        logger.info('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
+        file_name_list = glob.glob(os.path.join(dir_sfc_obs_historical,'stn_obs*'+dict_stn_metadata['stn_id'][s]+'*csv'))    
+        file_name_list.sort()
+        n_files = len(file_name_list)
+        print      ('  stn_id %s, n_files %s ' % (dict_stn_metadata['stn_id'][s], n_files)) 
+        logger.info('  stn_id %s, n_files %s ' % (dict_stn_metadata['stn_id'][s], n_files)) 
+        f_count = 0
+        if (n_files > 0): 
+            for f in range(0, n_files, 1): 
+                file_name_full_path = file_name_list[f] 
+                #if ('2014' in file_name_full_path or '2015' in file_name_full_path):
+                #if ('2016' in file_name_full_path):
+                #if ('20' in file_name_full_path):
+                print      ('    file %s of %s ' % (f, n_files))
     
-                print      ('    datematch start ' ) 
-                logger.info('    datematch start ' ) 
-                var_raw = np.vstack((stn_read_df_f['pres'].values, stn_read_df_f['alt'].values, stn_read_df_f['slp'].values)).T
-                # np.shape(stn_read_df_f['pres'].values)
-                # np.shape(var_raw)
-                #var_hr = datematch_to_hourly(stn_read_df_f['slp'].values, stn_read_df_f.index, dt_axis_hr_lst, obs_window_minutes)
-                # 4 min each # 20 station
-                var_hr = datematch_to_hourly(var_raw, stn_read_df_f.index, dt_axis_hr_lst, obs_window_minutes)
-                pres_obs_hr_s[:,s] = var_hr[:,0]
-                alt_obs_hr_s [:,s] = var_hr[:,1]
-                slp_obs_hr_s [:,s] = var_hr[:,2]
-                del var_hr, stn_read_df_f 
+                stn_read_df = read_sfc_obs_csv_data(file_name_full_path, replace_nan_with_null)
+                # convert dt string to dt type and convert to lst     
+                dt_read_lst  = pd.to_datetime(stn_read_df.index) - td(hours=8)
+                stn_read_df = stn_read_df.set_index(dt_read_lst)
+                #stn_read_df.index    
+                if (f_count == 0):
+                    stn_read_df_f = stn_read_df
+                else: 
+                    stn_read_df_f = pd.concat([stn_read_df_f, stn_read_df])
+                del stn_read_df
+                f_count += 1
+
+            print      ('    datematch start ' ) 
+            logger.info('    datematch start ' ) 
+            #var_raw = np.vstack((stn_read_df_f['pres'].values, stn_read_df_f['alt'].values, stn_read_df_f['slp'].values)).T
+            
+            #print(len(stn_read_df_f), n_5min)
+            # var_raw = np.vstack((stn_read_df_f['alt'].values, stn_read_df_f['slp'].values)).T
+            var_5min = datematch_to_5min(stn_read_df_f['slp'].values, stn_read_df_f.index, dt_axis_5min_lst, obs_window_minutes)
+            slp_obs_5min_s [:,s] = var_5min
+            # alt_obs_hr_s [:,s] = var_hr[:,0]
+            del var_5min, stn_read_df_f 
  
-    pres_diff_hr_s = np.full([n_hrs, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
-    alt_diff_hr_s  = np.full([n_hrs, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
-    slp_diff_hr_s  = np.full([n_hrs, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
+    #pres_diff_5min_s = np.full([n_5min, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
+    #alt_diff_5min_s  = np.full([n_5min, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
+    slp_diff_5min_s  = np.full([n_5min, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
     stn_id_pair_list = [None]*dict_stn_metadata['n_stn']**2
     s1, s2 = 9, 2
     s1, s2 = 2, 9
@@ -1390,28 +1503,32 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
         print      ('      processing s1 %s ' %(s1))
         logger.info('      processing s1 %s ' %(s1))
         for s2 in range(0, dict_stn_metadata['n_stn']):
-            if (s1 == 2 and s2 == 9) or (s1 == 9 and s2 == 2):
-                pres_diff_hr_s[:,s1*dict_stn_metadata['n_stn']+s2] = pres_obs_hr_s[:,s1] - pres_obs_hr_s[:,s2] 
-                alt_diff_hr_s [:,s1*dict_stn_metadata['n_stn']+s2] =  alt_obs_hr_s[:,s1] -  alt_obs_hr_s[:,s2] 
-                slp_diff_hr_s [:,s1*dict_stn_metadata['n_stn']+s2] =  slp_obs_hr_s[:,s1] -  slp_obs_hr_s[:,s2] 
-                stn_id_pair_list[s1*dict_stn_metadata['n_stn']+s2] = dict_stn_metadata['stn_id'][s1]+'-'+dict_stn_metadata['stn_id'][s2]
-    del pres_obs_hr_s, alt_obs_hr_s, slp_obs_hr_s
+            #if (s1 == 2 and s2 == 9) or (s1 == 9 and s2 == 2):
+            #pres_diff_5min_s[:,s1*dict_stn_metadata['n_stn']+s2] = pres_obs_5min_s[:,s1] - pres_obs_5min_s[:,s2] 
+            #alt_diff_5min_s [:,s1*dict_stn_metadata['n_stn']+s2] =  alt_obs_5min_s[:,s1] -  alt_obs_5min_s[:,s2] 
+            slp_diff_5min_s [:,s1*dict_stn_metadata['n_stn']+s2] =  slp_obs_5min_s[:,s1] -  slp_obs_5min_s[:,s2] 
+            stn_id_pair_list[s1*dict_stn_metadata['n_stn']+s2] = dict_stn_metadata['stn_id'][s1]+'-'+dict_stn_metadata['stn_id'][s2]
+    # del slp_obs_5min_s
+    # del pres_obs_5min_s, alt_obs_5min_s
             
     # create df of the arrays        
-    pres_diff_hr_s_df = pd.DataFrame(pres_diff_hr_s, index=dt_axis_hr_lst, columns=stn_id_pair_list).round(2)
-    del pres_diff_hr_s
-    alt_diff_hr_s_df  = pd.DataFrame( alt_diff_hr_s, index=dt_axis_hr_lst, columns=stn_id_pair_list).round(2)
-    del alt_diff_hr_s
-    slp_diff_hr_s_df  = pd.DataFrame( slp_diff_hr_s, index=dt_axis_hr_lst, columns=stn_id_pair_list).round(2)
-    del slp_diff_hr_s
+    #pres_diff_5min_s_df = pd.DataFrame(pres_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list).round(2)
+    #del pres_diff_5min_s
+    #alt_diff_5min_s_df  = pd.DataFrame( alt_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list).round(2)
+    #del alt_diff_5min_s
+    slp_diff_5min_s_df  = pd.DataFrame( slp_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list).round(2)
+    del slp_diff_5min_s
 
+    #for n in range(0, n_5min):
+    #    print(' %s, %s, %s, %s ' % ( dt_axis_5min_lst[n].strftime('%Y-%m-%d %H:%M'), slp_diff_5min_s_df['KWMC-KSAC'][n], slp_obs_5min_s[n,9], slp_obs_5min_s[n, 2])) 
+ 
     # roll up to daily daily max
     print      ('  calculating daily roll-ups') 
     logger.info('  calculating daily roll-ups') 
     
-    pres_diff_day_s_df = pres_diff_hr_s_df.resample('D').max()
-    slp_diff_day_s_df  =  slp_diff_hr_s_df.resample('D').max()
-    alt_diff_day_s_df  =  alt_diff_hr_s_df.resample('D').max()
+    #pres_diff_day_s_df = pres_diff_5min_s_df.resample('D').max()
+    slp_diff_day_s_df = slp_diff_5min_s_df.resample('D').max()
+    #alt_diff_day_s_df  =  alt_diff_5min_s_df.resample('D').max()
     #pres_diff_day_s_df['KWMC-KSAC'].head()
     #slp_diff_day_s_df['KWMC-KSAC'].head()
     #alt_diff_day_s_df['KWMC-KSAC'].head()
@@ -1420,132 +1537,134 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
     logger.info('  find top events ') 
     
     # find top events and write to file
-    n_top_events = 20
+    #n_top_events = 20
+    n_top_events = 2
     stn_id_pair = 'KWMC-KSAC'
     s = 254 # s_diff 65, 254
     for s,stn_id_pair in enumerate(stn_id_pair_list):
         #if stn_id_pair == 'KWMC-KSAC':
         if stn_id_pair in stn_id_pair_list_to_plot:
             slp_top_events_df  =  slp_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
-            alt_top_events_df  =  alt_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
-            pres_top_events_df = pres_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
-            file_name_stn_write = os.path.join('top_events', 'slp_diff_'+stn_id_pair+'.csv') 
-            slp_top_events_df.to_csv(file_name_stn_write) 
-            file_name_stn_write = os.path.join('top_events', 'alt_diff_'+stn_id_pair+'.csv') 
-            alt_top_events_df.to_csv(file_name_stn_write) 
-            file_name_stn_write = os.path.join('top_events', 'pres_diff_'+stn_id_pair+'.csv') 
-            pres_top_events_df.to_csv(file_name_stn_write) 
-            print      ('%s top events ' %(stn_id_pair)) 
-            logger.info('%s top events ' %(stn_id_pair)) 
-            i = 8
-            #for i, row in enumerate(slp_top_events_df):
-            print      ('  slp')
-            logger.info('  slp')
-            for i in range(0, n_top_events):
-                print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
-                logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
-            print      ('  alt')
-            logger.info('  alt')
-            for i in range(0, n_top_events):
-                print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
-                logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
-            print      ('  pres')
-            logger.info('  pres')
-            for i in range(0, n_top_events):
-                print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), pres_top_events_df.index[i].strftime('%Y-%m-%d'), pres_top_events_df[i]))
-                logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), pres_top_events_df.index[i].strftime('%Y-%m-%d'), pres_top_events_df[i]))
-
-            ################################################
-            # plot cdf 
-            mask = ~np.isnan(slp_diff_day_s_df[stn_id_pair])
-            var_temp = slp_diff_day_s_df[stn_id_pair][mask]
-            #np.min(var_temp)
-            #np.max(var_temp)
-            [x_min, x_max, x_int] = [float(math.floor(np.min(var_temp))), float(math.ceil(np.max(var_temp))), 2.0]
-            hist, var_bins = np.histogram(var_temp, bins=100, range=[x_min, x_max])
-            cdf = 100.0*np.cumsum(hist)/len(var_temp)
-            [y_min, y_max, y_int] = [80, 100, 2]
-            
-            
-            index = (cdf < 80.0).argmin()
-            [x_min, x_max, x_int] = [float(math.floor(var_bins[index])), float(math.ceil(np.max(var_temp))), 1.0]
-            y_ticks = list(np.arange(y_min, y_max+y_int, y_int))
-            x_ticks = list(np.arange(x_min, x_max+x_int, x_int))
-            # n_days_plot = (dt_max_plot - dt_min_plot).days 
-            
-            figsize_x, figsize_y = 9, 8
-            size_font = 14
-            
-            fig_num = 141
-            fig = plt.figure(num=fig_num,figsize=(figsize_x, figsize_y)) 
-            plt.clf()
-            plt.plot(var_bins[1:], cdf, 'r', linestyle='-', label=model_name.upper(), linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
-            #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
-            #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
-            #plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
-            for y_tick in y_ticks:
-                plt.plot([x_min, x_max], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
-            for x_tick in x_ticks:
-                plt.plot([x_tick, x_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
-            
-            #plt.gca().xaxis.set_major_formatter(DateFormatter(dt_format))
-            plt.xticks(x_ticks, visible=True, fontsize=size_font) 
-            plt.xlim([x_ticks[0], x_ticks[-1]])
-            plt.yticks(y_ticks, fontsize=size_font)
-            plt.ylim([y_min, y_max])
-            plt.ylabel('CDF [%]',fontsize=size_font,labelpad=00)
-            plt.xlabel('$\Delta$ slp [mb]',fontsize=size_font,labelpad=20)
-            plt.title('$\Delta$ slp %s, Observed CDF ' % (stn_id_pair), \
-              fontsize=size_font+2, x=0.5, y=1.01)                     
-            plt.show() 
-            #filename = 'del_slp_all_model_'+stn_id_pair+'_'+dt_init_list[i].strftime('%Y-%m-%d_%H')+'_'+str(n_days)+'.png' 
-            filename = 'del_slp_cdf_'+stn_id_pair+'.png' 
-            plot_name = os.path.join('top_events', filename)
-            plt.savefig(plot_name) 
-            
-            width_line = 2.0
-            [x_line1, x_line2, x_line3] = [0.5, 1.5, 2.5]  # 1.0, 2.0, 3.0
-             
-            line_spacing = 1.0  
-            y_line_offset = 0.5 # was 0.2
-            n_lines = 20 
-            y_top = 21.0 # was 11.0
-            
-            fig_num = 151 
-            fig = plt.figure(num=fig_num,figsize=(8,7)) # was 11,9
-            plt.clf() 
-            
-            for l in range(0, n_lines+1, 1): 
-                #print (l)
-                #print (l*line_spacing)
-                plt.plot([ 0, x_line3], [l*line_spacing, l*line_spacing], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
-            plt.plot([             0,              0], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
-            plt.plot([x_line1, x_line1], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
-            plt.plot([x_line2, x_line2], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
-            plt.plot([x_line3, x_line3], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
-            
-            plt.axis('off')
-            
-            [x_offset, y_offset] = [0.2, 0.5]
-            for l in range(0, n_lines, 1): 
-                plt.text(               x_offset, l*line_spacing+y_offset, str(n_lines-l).zfill(2), fontsize=size_font,                               ha='left', va='center', color='k')  
-                plt.text(x_line1+x_offset, l*line_spacing+y_offset, slp_top_events_df.index[n_lines-l-1].strftime('%Y-%m-%d'), fontsize=size_font, ha='left', va='center', color='k')  
-                plt.text(x_line2+x_offset, l*line_spacing+y_offset, slp_top_events_df[n_lines-l-1], fontsize=size_font,                            ha='left', va='center', color='k')  
-            # headers
-            plt.text(               x_offset, 20.0+y_offset, 'rank', fontsize=size_font,                               ha='left', va='center', color='k')  
-            plt.text(x_line1+x_offset, 20.0+y_offset, 'date', fontsize=size_font,                               ha='left', va='center', color='k')  
-            plt.text(x_line2+x_offset, 20.0+y_offset, '$\Delta$ slp [mb]', fontsize=size_font,                               ha='left', va='center', color='k')  
-            plt.title('$\Delta$ slp %s, Top events ' % (stn_id_pair), \
-              fontsize=size_font+2, x=0.5, y=1.01)                     
+            #alt_top_events_df  =  alt_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
+            if len(slp_top_events_df) > 0:
+                #pres_top_events_df = pres_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
+                file_name_stn_write = os.path.join('top_events', 'slp_diff_'+stn_id_pair+'.csv') 
+                slp_top_events_df.to_csv(file_name_stn_write) 
+                #file_name_stn_write = os.path.join('top_events', 'alt_diff_'+stn_id_pair+'.csv') 
+                #alt_top_events_df.to_csv(file_name_stn_write) 
+                #file_name_stn_write = os.path.join('top_events', 'pres_diff_'+stn_id_pair+'.csv') 
+                #pres_top_events_df.to_csv(file_name_stn_write) 
+                print      ('%s top events ' %(stn_id_pair)) 
+                logger.info('%s top events ' %(stn_id_pair)) 
+                i = 8
+                #for i, row in enumerate(slp_top_events_df):
+                print      ('  slp')
+                logger.info('  slp')
+                for i in range(0, n_top_events):
+                    print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
+                    logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
+                #print      ('  alt')
+                #logger.info('  alt')
+                #for i in range(0, n_top_events):
+                #    print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
+                #    logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
+                #print      ('  pres')
+                #logger.info('  pres')
+                #for i in range(0, n_top_events):
+                #    print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), pres_top_events_df.index[i].strftime('%Y-%m-%d'), pres_top_events_df[i]))
+                #    logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), pres_top_events_df.index[i].strftime('%Y-%m-%d'), pres_top_events_df[i]))
+    
+                ################################################
+                # plot cdf 
+                mask = ~np.isnan(slp_diff_day_s_df[stn_id_pair])
+                var_temp = slp_diff_day_s_df[stn_id_pair][mask]
+                #np.min(var_temp)
+                #np.max(var_temp)
+                [x_min, x_max, x_int] = [float(math.floor(np.min(var_temp))), float(math.ceil(np.max(var_temp))), 2.0]
+                hist, var_bins = np.histogram(var_temp, bins=100, range=[x_min, x_max])
+                cdf = 100.0*np.cumsum(hist)/len(var_temp)
+                [y_min, y_max, y_int] = [80, 100, 2]
                 
-            #plt.xlim([-0.2, 11.2])
-            #plt.ylim([-4.2, 12.0])
-            
-            plt.show() 
-            plt.tight_layout()
-            filename = 'del_slp_top_events_'+stn_id_pair+'.png' 
-            plot_name = os.path.join('top_events', filename)
-            plt.savefig(plot_name) 
+                
+                index = (cdf < 80.0).argmin()
+                [x_min, x_max, x_int] = [float(math.floor(var_bins[index])), float(math.ceil(np.max(var_temp))), 1.0]
+                y_ticks = list(np.arange(y_min, y_max+y_int, y_int))
+                x_ticks = list(np.arange(x_min, x_max+x_int, x_int))
+                # n_days_plot = (dt_max_plot - dt_min_plot).days 
+                
+                figsize_x, figsize_y = 9, 8
+                size_font = 14
+                
+                fig_num = 141
+                fig = plt.figure(num=fig_num,figsize=(figsize_x, figsize_y)) 
+                plt.clf()
+                plt.plot(var_bins[1:], cdf, 'r', linestyle='-', label=model_name.upper(), linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
+                #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
+                #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
+                #plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
+                for y_tick in y_ticks:
+                    plt.plot([x_min, x_max], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
+                for x_tick in x_ticks:
+                    plt.plot([x_tick, x_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
+                
+                #plt.gca().xaxis.set_major_formatter(DateFormatter(dt_format))
+                plt.xticks(x_ticks, visible=True, fontsize=size_font) 
+                plt.xlim([x_ticks[0], x_ticks[-1]])
+                plt.yticks(y_ticks, fontsize=size_font)
+                plt.ylim([y_min, y_max])
+                plt.ylabel('CDF [%]',fontsize=size_font,labelpad=00)
+                plt.xlabel('$\Delta$ slp [mb]',fontsize=size_font,labelpad=20)
+                plt.title('$\Delta$ slp %s, Observed CDF ' % (stn_id_pair), \
+                  fontsize=size_font+2, x=0.5, y=1.01)                     
+                plt.show() 
+                #filename = 'del_slp_all_model_'+stn_id_pair+'_'+dt_init_list[i].strftime('%Y-%m-%d_%H')+'_'+str(n_days)+'.png' 
+                filename = 'del_slp_cdf_'+stn_id_pair+'.png' 
+                plot_name = os.path.join('top_events', filename)
+                plt.savefig(plot_name) 
+                
+                width_line = 2.0
+                [x_line1, x_line2, x_line3] = [0.5, 1.5, 2.5]  # 1.0, 2.0, 3.0
+                 
+                line_spacing = 1.0  
+                y_line_offset = 0.5 # was 0.2
+                n_lines = 20 
+                y_top = 21.0 # was 11.0
+                
+                fig_num = 151 
+                fig = plt.figure(num=fig_num,figsize=(8,7)) # was 11,9
+                plt.clf() 
+                
+                for l in range(0, n_lines+1, 1): 
+                    #print (l)
+                    #print (l*line_spacing)
+                    plt.plot([ 0, x_line3], [l*line_spacing, l*line_spacing], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+                plt.plot([             0,              0], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+                plt.plot([x_line1, x_line1], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+                plt.plot([x_line2, x_line2], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+                plt.plot([x_line3, x_line3], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+                
+                plt.axis('off')
+                
+                [x_offset, y_offset] = [0.2, 0.5]
+                for l in range(0, n_lines, 1): 
+                    plt.text(               x_offset, l*line_spacing+y_offset, str(n_lines-l).zfill(2), fontsize=size_font,                               ha='left', va='center', color='k')  
+                    plt.text(x_line1+x_offset, l*line_spacing+y_offset, slp_top_events_df.index[n_lines-l-1].strftime('%Y-%m-%d'), fontsize=size_font, ha='left', va='center', color='k')  
+                    plt.text(x_line2+x_offset, l*line_spacing+y_offset, slp_top_events_df[n_lines-l-1], fontsize=size_font,                            ha='left', va='center', color='k')  
+                # headers
+                plt.text(               x_offset, 20.0+y_offset, 'rank', fontsize=size_font,                               ha='left', va='center', color='k')  
+                plt.text(x_line1+x_offset, 20.0+y_offset, 'date', fontsize=size_font,                               ha='left', va='center', color='k')  
+                plt.text(x_line2+x_offset, 20.0+y_offset, '$\Delta$ slp [mb]', fontsize=size_font,                               ha='left', va='center', color='k')  
+                plt.title('$\Delta$ slp %s, Top events ' % (stn_id_pair), \
+                  fontsize=size_font+2, x=0.5, y=1.01)                     
+                    
+                #plt.xlim([-0.2, 11.2])
+                #plt.ylim([-4.2, 12.0])
+                
+                plt.show() 
+                plt.tight_layout()
+                filename = 'del_slp_top_events_'+stn_id_pair+'.png' 
+                plot_name = os.path.join('top_events', filename)
+                plt.savefig(plot_name) 
 
     print      ('obs_historical_process end ')
     logger.info('obs_historical_process end ')
@@ -1721,18 +1840,20 @@ if __name__ == "__main__":
     #     'KSAC-KBFL',
     #     'KACV-KSAC']
 
-    # 10-11 mb pressure gradient from MFR to SAC
-
     stn_id_pair_list_to_plot = [
-        'KBFL-KSBA',
-        'KVBG-KSBA',
-        'KSMX-KSBA',
-        'KDAG-KLAX',
-        'KWMC-KSAC',
-        'KWMC-KSFO',
         'KACV-KSFO',
+        'KBFL-KSBA',
+        'KDAG-KLAX',
+        'KMFR-KRDD',
+        'KMFR-KSAC',
+        'KMFR-KSFO',
         'KRDD-KSAC',
-        'KMFR-KSAC']
+        'KSMX-KSBA',
+        'KWMC-KSAC',
+        'KWMC-KSFO']
+        
+    stn_list_to_use = ['KBFL', 'KSMX', 'KSBA', 'KLAX', 'KDAG', 'KSFO', 'KACV', 'KWMC', 'KSAC', 'KMFR', 'KRDD']
+    
     #stn_id_pair_list_to_plot = [
     #    'KWMC-KSFO']
  
@@ -1759,7 +1880,7 @@ if __name__ == "__main__":
         #plot_data(model_name_list, dt_init, forecast_horizon_hr=120+1, bucket_name)
         plot_data(dict_stn_metadata, model_name_list, dt_init, 241, dt_start_lt, utc_conversion, time_zone_label, stn_id_pair_list_to_plot, bucket_name)
     if process_name == 'obs_historical_download':
-        obs_historical_download(dict_stn_metadata, utc_conversion, time_zone_label, bucket_name)
+        obs_historical_download(dict_stn_metadata, stn_list_to_use, utc_conversion, time_zone_label, bucket_name)
     if process_name == 'obs_historical_process':
         obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, stn_id_pair_list_to_plot, bucket_name)
     if process_name == 'cleanup':
