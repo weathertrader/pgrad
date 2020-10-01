@@ -1412,10 +1412,10 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
     dir_sfc_obs_historical = os.path.join('data', 'sfc_obs_historical')
     utc_conversion = 8
     #dt_start = dt(2017, 1, 1)
-    #dt_start = dt(2000, 1, 1)
     #dt_end = dt.utcnow()
-    dt_start = dt(2017, 1, 1)
-    #dt_end   = dt(2020, 9, 29)
+    #dt_start = dt(2018, 10, 10)
+    dt_start = dt(2018, 10,  1)
+    #dt_end   = dt(2019, 11, 15)
     dt_end = dt.utcnow()
 
     n_days = (dt_end - dt_start).days 
@@ -1511,6 +1511,8 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
     # del slp_obs_5min_s
     # del pres_obs_5min_s, alt_obs_5min_s
             
+    print      ('  create slp_diff df ') 
+    logger.info('  create slp_diff df ') 
     # create df of the arrays        
     #pres_diff_5min_s_df = pd.DataFrame(pres_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list).round(2)
     #del pres_diff_5min_s
@@ -1538,7 +1540,7 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
     
     # find top events and write to file
     #n_top_events = 20
-    n_top_events = 2
+    n_top_events = 20
     stn_id_pair = 'KWMC-KSAC'
     s = 254 # s_diff 65, 254
     for s,stn_id_pair in enumerate(stn_id_pair_list):
@@ -1614,8 +1616,8 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
                 plt.ylim([y_min, y_max])
                 plt.ylabel('CDF [%]',fontsize=size_font,labelpad=00)
                 plt.xlabel('$\Delta$ slp [mb]',fontsize=size_font,labelpad=20)
-                plt.title('$\Delta$ slp %s, Observed CDF ' % (stn_id_pair), \
-                  fontsize=size_font+2, x=0.5, y=1.01)                     
+                plt.title('$\Delta$ slp %s, Observed CDF %s - %s ' % (stn_id_pair, dt_start.strftime('%Y-%m-%d'), dt_end.strftime('%Y-%m-%d')), \
+                  fontsize=size_font+2, x=0.5, y=1.01)                    
                 plt.show() 
                 #filename = 'del_slp_all_model_'+stn_id_pair+'_'+dt_init_list[i].strftime('%Y-%m-%d_%H')+'_'+str(n_days)+'.png' 
                 filename = 'del_slp_cdf_'+stn_id_pair+'.png' 
@@ -1647,19 +1649,17 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
                 
                 [x_offset, y_offset] = [0.2, 0.5]
                 for l in range(0, n_lines, 1): 
-                    plt.text(               x_offset, l*line_spacing+y_offset, str(n_lines-l).zfill(2), fontsize=size_font,                               ha='left', va='center', color='k')  
+                    plt.text(               x_offset, l*line_spacing+y_offset, str(n_lines-l).zfill(2), fontsize=size_font,                            ha='left', va='center', color='k')  
                     plt.text(x_line1+x_offset, l*line_spacing+y_offset, slp_top_events_df.index[n_lines-l-1].strftime('%Y-%m-%d'), fontsize=size_font, ha='left', va='center', color='k')  
                     plt.text(x_line2+x_offset, l*line_spacing+y_offset, slp_top_events_df[n_lines-l-1], fontsize=size_font,                            ha='left', va='center', color='k')  
                 # headers
                 plt.text(               x_offset, 20.0+y_offset, 'rank', fontsize=size_font,                               ha='left', va='center', color='k')  
                 plt.text(x_line1+x_offset, 20.0+y_offset, 'date', fontsize=size_font,                               ha='left', va='center', color='k')  
                 plt.text(x_line2+x_offset, 20.0+y_offset, '$\Delta$ slp [mb]', fontsize=size_font,                               ha='left', va='center', color='k')  
-                plt.title('$\Delta$ slp %s, Top events ' % (stn_id_pair), \
-                  fontsize=size_font+2, x=0.5, y=1.01)                     
-                    
+                plt.title('$\Delta$ slp %s, Top events %s - %s ' % (stn_id_pair, dt_start.strftime('%Y-%m-%d'), dt_end.strftime('%Y-%m-%d')), \
+                  fontsize=size_font+2, x=0.5, y=1.01) 
                 #plt.xlim([-0.2, 11.2])
-                #plt.ylim([-4.2, 12.0])
-                
+                #plt.ylim([-4.2, 12.0]) 
                 plt.show() 
                 plt.tight_layout()
                 filename = 'del_slp_top_events_'+stn_id_pair+'.png' 
