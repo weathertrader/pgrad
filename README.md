@@ -15,8 +15,7 @@ and contextualizing it with historical events.
 
 ## Website and scientific presentation
 
-The website is currently only available inside a VPN.  Public release is 
-slated for 11/01/2020.
+Public release of the website is currently slated for 10/15/2020.
 
 Website currently consists of the following:
 - Operational time series of observed and forecast pressure differences from various
