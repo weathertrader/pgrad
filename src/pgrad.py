@@ -1,16 +1,4 @@
 
-# LAX-DAG surface gradient has trended down to -3.9 MB at 5 AM Monday morning. 
-# but northerly gradients  from SFO to Arcata are now up to 4 mb,
-# 09/27 
-# Since yesterday afternoon surface high pressure has been building 
-#  strongly to our north and northeast. The ACV-SFO surface pressure 
-#  gradient currently stands at an impressive 8.5 mb while the WMC- 
-#  SFO gradient has climbed quickly past 9 mb. 
-# 09/27 at 12;01 midnite the
-# gradients were +13.2 mb from Medford to Sacramento and +7.0 mb
-# from Winnemucca, Nevada to San Francisco.
-# 09/27 causing the  LAX-DAG gradient to strengthen to around -3.5MB by Monday morning. 
-
 '''
 name: pgrad.py 
 purpose: process and analyze pressure gradient forcing from NWP models 
@@ -18,25 +6,6 @@ author: Craig Smith, craig.matthew.smith@gmail.com
 usage: ./src/run.sh n  where n is the number of batteries to analyze [1-5]
 repo: https://github.com/weathertrader/battery_charge
 '''
-
-#############################################
-# to do 
-#
-# 10/01 new billing month - redo sfc obs, see comments in code 
-# 1hr  mesowest account and data dl
-#      https://myaccount.synopticdata.com/#usage
-#      https://developers.synopticdata.com/about/station-variables/
-#      https://developers.synopticdata.com/mesonet/v2/station-selectors/
-#      https://developers.synopticdata.com/mesonet/pricing/
-#      used 129M SU, 5M per month is free
-#      pricing is $0.015 per 1 M SU 
-# 1hr  download all back to 2020 for all stations
-# 1hr  process all historical data and write events
-# 2hr  compare values to forecasts
-#      units conversion
-#      calc p_sfc from which variable
-
-# 1 hr tweak cleanup script - each full of fully processed data is 1.1 Gb
 
 import os
 import sys

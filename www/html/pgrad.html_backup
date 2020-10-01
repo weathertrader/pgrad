@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <!-- Latest compiled JavaScript -->
@@ -15,26 +14,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.11/jquery.csv.min.js"></script>
     <script src="./pgrad.js"></script>
 </head>
-
-<style>
-
-
-.fa {
-  padding: 20px;
-  font-size: 30px;
-  width: 50px;
-  text-align: center;
-  text-decoration: none;
-}
-
-/* Add a hover effect if you want */
-.fa:hover {
-  opacity: 0.7;
-}
-
-</style>
-
 <body>
+
+
 
 <!-- comment begin
 <nav class="navbar sticky-top navbar-inverse bg-primary">
@@ -43,16 +25,6 @@
  commmend end -->
 
 <nav class="navbar navbar-sticky-top navbar-inverse">
-  <div class="container justify-content-center">
-      <ul class="nav navbar-nav justify-content-center">
-        <a href="https://twitter.com/weathertrader" class="fa fa-twitter"></a>
-        <a href="https://github.com/weathertrader/pgrad" class="fa fa-github"></a>
-      </ul>
-  </div>
-</nav>
-
-<!-- comment begin
-<nav class="navbar navbar-sticky-top navbar-inverse">
   <div class="container">
     <button type="button" class="pull-center navbar-toggle justify-content-center" data-toggle="collapse" data-target="#myNavbar">
       <span class="icon-bar"></span>
@@ -60,21 +32,20 @@
       <span class="icon-bar"></span> 
     </button>
     <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav justify-content-center">
-        <li><a href="https://twitter.com/weathertrader" class="fa fa-twitter"></a></li>
-        <li><a href="https://github.com/weathertrader/pgrad" class="fa fa-github"></a></li>
-        <li><a class="nav-item nav-link" href="pgrad.html">Home</a></li> 
+      <ul class="nav navbar-nav justify-content-left">
+        <li><a class="nav-item nav-link" href="pgrad.html">Home</a></li>      
         <li><a class="nav-item nav-link" href="faq.html">FAQ</a></li>
+        <li><IMG SRC="GitHub-Mark-120px-plus.png" ALT="some text" width=100 height=100><li>
+<!-- comment begin
         <li><a class="nav-item nav-link" href="status.html">Status</a></li>
         <li><a href="https://twitter.com/weathertrader?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">@weathertrader</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></li>
         <li><a href="https://twitter.com/weathertrader?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @weathertrader</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></li>
+commmend end -->
         <li><a href="https://twitter.com/intent/tweet?screen_name=weathertrader&ref_src=twsrc%5Etfw" class="twitter-mention-button" data-show-count="false">Tweet to @weathertrader</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></li>
       </ul>
     </div>
   </div>
 </nav>
- commmend end -->
-
 
 <!-- comment begin
 <div class="container">
