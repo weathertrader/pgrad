@@ -16,7 +16,7 @@ ssh into the instance and
 
 Intall Postgres and Apache webserver
 ```
-sudo apt-get update && sudo apt upgrade && sudo apt-get install postgresql postgresql-contrib libpq-dev python3-psycopg2 apache2
+sudo apt-get update && sudo apt upgrade && sudo apt-get install build-essential postgresql postgresql-contrib libpq-dev python3-psycopg2 apache2
 ```
 and navigate to the IP address to view the default index.html and check that Apache is running.
 
@@ -51,15 +51,61 @@ cd pgrad
 # pip install -r requirements.txt
 ```
 
-Backfill data from the last few forecast runs
+Backfill data from the last few forecast runs.  I suggest backgrounding this process 
+as it will likely take 30 min or so.
 ```
-src/backfill.sh
+src/backfill.sh&
 ```
-Once this done, execute an operational full ETL to make sure you have the latest data
+
+The operational ETLs can be run using the provided crontab 
+```
+crontab src/crontab.txt
+```
+or using Apache Airflow, which can be installed by adding the following to the `/.bashrc`
+```
+export AIRFLOW_HOME=~/pgrad/airflow
+pip install apache-airflow
+```
+and installing via pip. After installing, edit the `airflow.cfg` config file and set
+```
+load_examples = False
+catchup_by_default = False
+```
+Then initialize the db and run the scheduler and webserves as daemons.  
+```
+airflow initdb
+airflow scheduler -D
+airflow webserver -D
+```
+If you've opened port 8080 on your EC2 instance, you can browse the 
+dags at `http://localhost:8080/admin/`
+You can view the active dags using 
+```
+airflow list_dags
+airflow list_tasks pgrad_dag
+airflow list_tasks pgrad_dag --tree
+```
+In case you need to reset or kill airflow you can use the following
+```
+airflow resetdb
+more ~/pgrad/airflow/airflow-webserver.pid
+ps -aux | grep airflow
+kill -9 pid
+```
+Most of these ETLs are set to run hourly and their logs can be viewed at `logs/log*txt`.
+You can also view their performance over time via a command such as
+```
+tail -n 2 logs/log_download_gfs_*txt
+```
+Logs are rotated after 7 days and that can be edited in `src/pgrad.py` with the 
+`n_days_to_retain` variable.
+
+In case of debugging needs, it's also possible to run through all operational ETL's using  
 ```
 src/operational.sh
 ```
 
+Next task is to set the webserver to read the repo web pages.
 Link the apache `www/html` directory to the repo `www/html` and 
 navigate to the webpage and view the initial website at ip://pgrad.html  
 ```
@@ -75,12 +121,8 @@ and the top_events images are included in the repo and do not be updated
 outside of that.
 
 
-Install the crontab 
-```
-crontab src/crontab.txt
-```
 
-
+##############################################################################
 BELOW NOT ORGANIZED YET 
 
 NOT NEEDED 

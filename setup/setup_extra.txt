@@ -19,74 +19,11 @@ conda activate cartopy
 conda install spyder‑kernels
 
 
-######################################
-# airflow 
-
-sudo apt-get update
-sudo apt-get install build-essential
-
-
-
-in bashrc 
-export AIRFLOW_HOME=~/pgrad/airflow
-
-pip install apache-airflow
-
 pip freeze > requirements.txt
 pip install requirements.txt
 
-airflow initdb
-airflow resetdb
-airflow webserver -p 8080
-airflow scheduler
-
-airflow scheduler -D
-airflow webserver -D
-
-Then you can visit http://localhost:8080 in the browser
-
-Edit airflow.cfg and set 
-load_examples = False
-catchup_by_default = False
-
-
-to kill the airflow server 
-more ~/pgrad/airflow/airflow-webserver.pid
-
-
-cat $AIRFLOW_HOME/airflow-webserver.pid | xargs kill -9
-
-ps -aux | grep airflow
-kill -9 pid
-
-
-
-
-airflow run example_bash_operator runme_0 2017-07-01
-
-dag goes in 
-~/airflow/dag/<your dag>.py
-
-
-python ~/airflow/dags/tutorial.py
-
-# list active dags 
-airflow list_dags
-# lists tasks associated with pgrad_dag 
-airflow list_tasks pgrad_dag
-airflow list_tasks pgrad_dag --tree
-
-airflow test pgrad_dag id_cleanup 2015-06-01
-
-
-# testing print_date
-airflow test tutorial print_date 2015-06-01
-
-# testing sleep
-airflow test tutorial sleep 2015-06-01
-
-airflow backfill tutorial -s 2015-06-01 -e 2015-06-07
-
+######################################
+# airflow 
 
 # airflow 
 ######################################
