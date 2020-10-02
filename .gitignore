@@ -2,6 +2,8 @@
 data/
 logs/
 images/
+airflow/miniconda3/
+airflow/logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

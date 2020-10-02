@@ -1,0 +1,5 @@
+#!/bin/bash
+# source /etc/profile
+# source /etc/bashrc
+# source /home/ubuntu/.bashrc
+~/miniconda3/bin/python ~/pgrad/src/pgrad.py --model_name=gfs --process_name=calc_pgrad --bucket_name=data 

@@ -53,7 +53,7 @@ Pressure differences are calculated from stations pairs shown below.  Feel free 
 ## Architecture and Setup
 
 Project currently runs on a t1 instance on AWS with no additional hard disk.
-ETLs are written in bash and python using cron jobs, and the website is served with Apache.
-The `src/crontab.txt` contains details of all jobs that are run and 
-the `setup/README.md` [Link](https://github.com/weathertrader/pgrad/tree/master/setup) has additional details.
+ETLs are written in bash and python and scheduled using Airflow or cron jobs, and the website is served with Apache.
+Details of jobs that are run can be found in the `src/crontab.txt` or `airflow/dags/pgrad_dag.py`.
+the [Link] `setup/README.md` (https://github.com/weathertrader/pgrad/tree/master/setup) has additional details.
 

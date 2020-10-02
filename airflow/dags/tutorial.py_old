@@ -30,6 +30,7 @@ default_args = {
     # 'sla_miss_callback': yet_another_function,
     # 'trigger_rule': 'all_success'
 }
+
 dag = DAG(
     'tutorial',
     default_args=default_args,

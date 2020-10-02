@@ -1,0 +1,389 @@
+[[34m2020-10-02 14:04:11,193[0m] {[34mscheduler_job.py:[0m1367} INFO[0m - Starting the scheduler[0m
+[[34m2020-10-02 14:04:11,193[0m] {[34mscheduler_job.py:[0m1375} INFO[0m - Running execute loop for -1 seconds[0m
+[[34m2020-10-02 14:04:11,194[0m] {[34mscheduler_job.py:[0m1376} INFO[0m - Processing each file at most -1 times[0m
+[[34m2020-10-02 14:04:11,194[0m] {[34mscheduler_job.py:[0m1379} INFO[0m - Searching for files in [01m/home/csmith/pgrad/airflow/dags[22m[0m
+[[34m2020-10-02 14:04:11,195[0m] {[34mscheduler_job.py:[0m1381} INFO[0m - There are 1 files in [01m/home/csmith/pgrad/airflow/dags[22m[0m
+[[34m2020-10-02 14:04:11,195[0m] {[34mscheduler_job.py:[0m1438} INFO[0m - Resetting orphaned tasks for active dag runs[0m
+[[34m2020-10-02 14:04:11,212[0m] {[34mdag_processing.py:[0m562} INFO[0m - Launched DagFileProcessorManager with pid: 29609[0m
+[[34m2020-10-02 14:04:11,215[0m] {[34msettings.py:[0m55} INFO[0m - Configured default timezone <Timezone [UTC]>[0m
+[2020-10-02 14:04:11,224] {dag_processing.py:776} WARNING - Because we cannot use more than 1 thread (max_threads = 2) when using sqlite. So we set parallelism to 1.
+[[34m2020-10-02 14:04:43,265[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 3 tasks up for execution:
+	[01m<TaskInstance: id_01.id_cleanup 2020-10-02 19:05:00+00:00 [scheduled]>
+	<TaskInstance: id_11.id_download_hrrr 2020-10-02 19:06:00+00:00 [scheduled]>
+	<TaskInstance: id_21.id_download_nam 2020-10-02 19:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:04:43,271[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 3 task instances ready to be queued[0m
+[[34m2020-10-02 14:04:43,271[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_11[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:04:43,271[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_21[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:04:43,272[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_01[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:04:43,276[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_11.id_download_hrrr 2020-10-02 19:06:00+00:00 [scheduled]>
+	<TaskInstance: id_21.id_download_nam 2020-10-02 19:09:00+00:00 [scheduled]>
+	<TaskInstance: id_01.id_cleanup 2020-10-02 19:05:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:04:43,312[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 3 tasks to queued state:
+	[01m<TaskInstance: id_01.id_cleanup 2020-10-02 19:05:00+00:00 [queued]>
+	<TaskInstance: id_11.id_download_hrrr 2020-10-02 19:06:00+00:00 [queued]>
+	<TaskInstance: id_21.id_download_nam 2020-10-02 19:09:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:04:43,313[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_01', 'id_cleanup', datetime.datetime(2020, 10, 2, 19, 5, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 1 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:04:43,313[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_01', 'id_cleanup', '2020-10-02T19:05:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:04:43,313[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_11', 'id_download_hrrr', datetime.datetime(2020, 10, 2, 19, 6, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 4 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:04:43,313[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_11', 'id_download_hrrr', '2020-10-02T19:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:04:43,313[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_21', 'id_download_nam', datetime.datetime(2020, 10, 2, 19, 9, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 4 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:04:43,314[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_21', 'id_download_nam', '2020-10-02T19:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:04:43,314[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_11', 'id_download_hrrr', '2020-10-02T19:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:04:44,682] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:04:44,682] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_11.id_download_hrrr 2020-10-02T19:06:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:04:49,948[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_21', 'id_download_nam', '2020-10-02T19:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:04:51,314] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:04:51,314] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_21.id_download_nam 2020-10-02T19:09:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:05:21,802[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_01', 'id_cleanup', '2020-10-02T19:05:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:05:23,291] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:05:23,292] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_01.id_cleanup 2020-10-02T19:05:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:05:28,701[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_11[22m.[01mid_download_hrrr[22m execution_date=[01m2020-10-02 19:06:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:05:28,709[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_21[22m.[01mid_download_nam[22m execution_date=[01m2020-10-02 19:09:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:05:28,712[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_01[22m.[01mid_cleanup[22m execution_date=[01m2020-10-02 19:05:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:05:29,773[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 2 tasks up for execution:
+	[01m<TaskInstance: id_31.id_download_gfs 2020-10-02 19:13:00+00:00 [scheduled]>
+	<TaskInstance: id_56.id_plot_data 2020-10-02 19:17:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:05:29,779[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 2 task instances ready to be queued[0m
+[[34m2020-10-02 14:05:29,780[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_31[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:05:29,781[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_56[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:05:29,788[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_31.id_download_gfs 2020-10-02 19:13:00+00:00 [scheduled]>
+	<TaskInstance: id_56.id_plot_data 2020-10-02 19:17:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:05:29,828[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 2 tasks to queued state:
+	[01m<TaskInstance: id_31.id_download_gfs 2020-10-02 19:13:00+00:00 [queued]>
+	<TaskInstance: id_56.id_plot_data 2020-10-02 19:17:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:05:29,829[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_31', 'id_download_gfs', datetime.datetime(2020, 10, 2, 19, 13, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 4 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:05:29,830[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_31', 'id_download_gfs', '2020-10-02T19:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:05:29,830[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_56', 'id_plot_data', datetime.datetime(2020, 10, 2, 19, 17, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 1 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:05:29,830[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_56', 'id_plot_data', '2020-10-02T19:17:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:05:29,830[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_31', 'id_download_gfs', '2020-10-02T19:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:05:31,123] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:05:31,123] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_31.id_download_gfs 2020-10-02T19:13:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:05:36,382[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_56', 'id_plot_data', '2020-10-02T19:17:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:05:37,581] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:05:37,581] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_56.id_plot_data 2020-10-02T19:17:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:06:07,920[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_31[22m.[01mid_download_gfs[22m execution_date=[01m2020-10-02 19:13:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:06:07,927[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_56[22m.[01mid_plot_data[22m execution_date=[01m2020-10-02 19:17:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:06:08,992[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 3 tasks up for execution:
+	[01m<TaskInstance: id_01.id_cleanup 2020-10-02 20:05:00+00:00 [scheduled]>
+	<TaskInstance: id_11.id_process_grib_hrrr 2020-10-02 19:06:00+00:00 [scheduled]>
+	<TaskInstance: id_21.id_process_grib_nam 2020-10-02 19:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:06:08,997[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 3 task instances ready to be queued[0m
+[[34m2020-10-02 14:06:08,997[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_11[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:06:08,998[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_21[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:06:08,998[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_01[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:06:09,003[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_11.id_process_grib_hrrr 2020-10-02 19:06:00+00:00 [scheduled]>
+	<TaskInstance: id_21.id_process_grib_nam 2020-10-02 19:09:00+00:00 [scheduled]>
+	<TaskInstance: id_01.id_cleanup 2020-10-02 20:05:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:06:09,042[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 3 tasks to queued state:
+	[01m<TaskInstance: id_11.id_process_grib_hrrr 2020-10-02 19:06:00+00:00 [queued]>
+	<TaskInstance: id_21.id_process_grib_nam 2020-10-02 19:09:00+00:00 [queued]>
+	<TaskInstance: id_01.id_cleanup 2020-10-02 20:05:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:06:09,042[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_11', 'id_process_grib_hrrr', datetime.datetime(2020, 10, 2, 19, 6, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 3 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:06:09,042[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_11', 'id_process_grib_hrrr', '2020-10-02T19:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:06:09,042[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_21', 'id_process_grib_nam', datetime.datetime(2020, 10, 2, 19, 9, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 3 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:06:09,042[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_21', 'id_process_grib_nam', '2020-10-02T19:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:06:09,043[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_01', 'id_cleanup', datetime.datetime(2020, 10, 2, 20, 5, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 1 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:06:09,043[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_01', 'id_cleanup', '2020-10-02T20:05:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:06:09,043[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_11', 'id_process_grib_hrrr', '2020-10-02T19:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:06:10,331] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:06:10,332] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_11.id_process_grib_hrrr 2020-10-02T19:06:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:06:15,662[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_21', 'id_process_grib_nam', '2020-10-02T19:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:06:16,884] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:06:16,885] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_21.id_process_grib_nam 2020-10-02T19:09:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:06:32,176[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_01', 'id_cleanup', '2020-10-02T20:05:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:06:33,269] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:06:33,269] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_01.id_cleanup 2020-10-02T20:05:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:06:38,600[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_11[22m.[01mid_process_grib_hrrr[22m execution_date=[01m2020-10-02 19:06:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:06:38,606[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_21[22m.[01mid_process_grib_nam[22m execution_date=[01m2020-10-02 19:09:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:06:38,608[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_01[22m.[01mid_cleanup[22m execution_date=[01m2020-10-02 20:05:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:06:39,664[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 2 tasks up for execution:
+	[01m<TaskInstance: id_11.id_download_hrrr 2020-10-02 20:06:00+00:00 [scheduled]>
+	<TaskInstance: id_31.id_process_grib_gfs 2020-10-02 19:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:06:39,669[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 2 task instances ready to be queued[0m
+[[34m2020-10-02 14:06:39,669[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_11[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:06:39,670[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_31[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:06:39,677[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_11.id_download_hrrr 2020-10-02 20:06:00+00:00 [scheduled]>
+	<TaskInstance: id_31.id_process_grib_gfs 2020-10-02 19:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:06:39,709[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 2 tasks to queued state:
+	[01m<TaskInstance: id_11.id_download_hrrr 2020-10-02 20:06:00+00:00 [queued]>
+	<TaskInstance: id_31.id_process_grib_gfs 2020-10-02 19:13:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:06:39,709[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_11', 'id_download_hrrr', datetime.datetime(2020, 10, 2, 20, 6, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 4 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:06:39,710[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_11', 'id_download_hrrr', '2020-10-02T20:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:06:39,710[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_31', 'id_process_grib_gfs', datetime.datetime(2020, 10, 2, 19, 13, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 3 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:06:39,710[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_31', 'id_process_grib_gfs', '2020-10-02T19:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:06:39,710[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_11', 'id_download_hrrr', '2020-10-02T20:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:06:41,164] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:06:41,164] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_11.id_download_hrrr 2020-10-02T20:06:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:06:46,451[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_31', 'id_process_grib_gfs', '2020-10-02T19:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:06:48,352] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:06:48,353] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_31.id_process_grib_gfs 2020-10-02T19:13:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:06:53,653[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_11[22m.[01mid_download_hrrr[22m execution_date=[01m2020-10-02 20:06:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:06:53,658[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_31[22m.[01mid_process_grib_gfs[22m execution_date=[01m2020-10-02 19:13:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:06:54,716[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 2 tasks up for execution:
+	[01m<TaskInstance: id_11.id_process_csv_hrrr 2020-10-02 19:06:00+00:00 [scheduled]>
+	<TaskInstance: id_21.id_process_csv_nam 2020-10-02 19:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:06:54,719[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 2 task instances ready to be queued[0m
+[[34m2020-10-02 14:06:54,720[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_11[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:06:54,720[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_21[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:06:54,725[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_11.id_process_csv_hrrr 2020-10-02 19:06:00+00:00 [scheduled]>
+	<TaskInstance: id_21.id_process_csv_nam 2020-10-02 19:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:06:54,763[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 2 tasks to queued state:
+	[01m<TaskInstance: id_11.id_process_csv_hrrr 2020-10-02 19:06:00+00:00 [queued]>
+	<TaskInstance: id_21.id_process_csv_nam 2020-10-02 19:09:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:06:54,764[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_11', 'id_process_csv_hrrr', datetime.datetime(2020, 10, 2, 19, 6, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 2 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:06:54,764[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_11', 'id_process_csv_hrrr', '2020-10-02T19:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:06:54,764[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_21', 'id_process_csv_nam', datetime.datetime(2020, 10, 2, 19, 9, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 2 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:06:54,764[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_21', 'id_process_csv_nam', '2020-10-02T19:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:06:54,765[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_11', 'id_process_csv_hrrr', '2020-10-02T19:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:06:56,181] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:06:56,182] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_11.id_process_csv_hrrr 2020-10-02T19:06:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:07:01,485[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_21', 'id_process_csv_nam', '2020-10-02T19:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:07:02,898] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:07:02,898] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_21.id_process_csv_nam 2020-10-02T19:09:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:07:08,163[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_11[22m.[01mid_process_csv_hrrr[22m execution_date=[01m2020-10-02 19:06:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:07:08,171[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_21[22m.[01mid_process_csv_nam[22m execution_date=[01m2020-10-02 19:09:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:07:09,233[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 2 tasks up for execution:
+	[01m<TaskInstance: id_11.id_process_grib_hrrr 2020-10-02 20:06:00+00:00 [scheduled]>
+	<TaskInstance: id_31.id_process_csv_gfs 2020-10-02 19:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:07:09,239[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 2 task instances ready to be queued[0m
+[[34m2020-10-02 14:07:09,239[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_11[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:07:09,239[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_31[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:07:09,245[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_11.id_process_grib_hrrr 2020-10-02 20:06:00+00:00 [scheduled]>
+	<TaskInstance: id_31.id_process_csv_gfs 2020-10-02 19:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:07:09,282[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 2 tasks to queued state:
+	[01m<TaskInstance: id_11.id_process_grib_hrrr 2020-10-02 20:06:00+00:00 [queued]>
+	<TaskInstance: id_31.id_process_csv_gfs 2020-10-02 19:13:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:07:09,282[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_11', 'id_process_grib_hrrr', datetime.datetime(2020, 10, 2, 20, 6, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 3 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:07:09,282[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_11', 'id_process_grib_hrrr', '2020-10-02T20:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:07:09,283[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_31', 'id_process_csv_gfs', datetime.datetime(2020, 10, 2, 19, 13, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 2 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:07:09,283[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_31', 'id_process_csv_gfs', '2020-10-02T19:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:07:09,283[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_11', 'id_process_grib_hrrr', '2020-10-02T20:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:07:10,721] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:07:10,722] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_11.id_process_grib_hrrr 2020-10-02T20:06:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:07:16,049[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_31', 'id_process_csv_gfs', '2020-10-02T19:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:07:17,186] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:07:17,187] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_31.id_process_csv_gfs 2020-10-02T19:13:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:07:22,500[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_11[22m.[01mid_process_grib_hrrr[22m execution_date=[01m2020-10-02 20:06:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:07:22,505[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_31[22m.[01mid_process_csv_gfs[22m execution_date=[01m2020-10-02 19:13:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:07:23,559[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 2 tasks up for execution:
+	[01m<TaskInstance: id_11.id_calc_pgrad_hrrr 2020-10-02 19:06:00+00:00 [scheduled]>
+	<TaskInstance: id_21.id_calc_pgrad_nam 2020-10-02 19:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:07:23,564[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 2 task instances ready to be queued[0m
+[[34m2020-10-02 14:07:23,565[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_11[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:07:23,565[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_21[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:07:23,570[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_11.id_calc_pgrad_hrrr 2020-10-02 19:06:00+00:00 [scheduled]>
+	<TaskInstance: id_21.id_calc_pgrad_nam 2020-10-02 19:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:07:23,618[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 2 tasks to queued state:
+	[01m<TaskInstance: id_11.id_calc_pgrad_hrrr 2020-10-02 19:06:00+00:00 [queued]>
+	<TaskInstance: id_21.id_calc_pgrad_nam 2020-10-02 19:09:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:07:23,618[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_11', 'id_calc_pgrad_hrrr', datetime.datetime(2020, 10, 2, 19, 6, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 1 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:07:23,618[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_11', 'id_calc_pgrad_hrrr', '2020-10-02T19:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:07:23,618[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_21', 'id_calc_pgrad_nam', datetime.datetime(2020, 10, 2, 19, 9, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 1 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:07:23,618[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_21', 'id_calc_pgrad_nam', '2020-10-02T19:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:07:23,618[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_11', 'id_calc_pgrad_hrrr', '2020-10-02T19:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:07:25,409] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:07:25,409] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_11.id_calc_pgrad_hrrr 2020-10-02T19:06:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:07:30,701[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_21', 'id_calc_pgrad_nam', '2020-10-02T19:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:07:31,775] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:07:31,776] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_21.id_calc_pgrad_nam 2020-10-02T19:09:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:07:37,095[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_11[22m.[01mid_calc_pgrad_hrrr[22m execution_date=[01m2020-10-02 19:06:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:07:37,103[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_21[22m.[01mid_calc_pgrad_nam[22m execution_date=[01m2020-10-02 19:09:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:07:38,174[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 2 tasks up for execution:
+	[01m<TaskInstance: id_11.id_process_csv_hrrr 2020-10-02 20:06:00+00:00 [scheduled]>
+	<TaskInstance: id_31.id_calc_pgrad_gfs 2020-10-02 19:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:07:38,179[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 2 task instances ready to be queued[0m
+[[34m2020-10-02 14:07:38,179[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_11[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:07:38,180[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_31[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:07:38,188[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_11.id_process_csv_hrrr 2020-10-02 20:06:00+00:00 [scheduled]>
+	<TaskInstance: id_31.id_calc_pgrad_gfs 2020-10-02 19:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:07:38,244[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 2 tasks to queued state:
+	[01m<TaskInstance: id_11.id_process_csv_hrrr 2020-10-02 20:06:00+00:00 [queued]>
+	<TaskInstance: id_31.id_calc_pgrad_gfs 2020-10-02 19:13:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:07:38,244[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_11', 'id_process_csv_hrrr', datetime.datetime(2020, 10, 2, 20, 6, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 2 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:07:38,244[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_11', 'id_process_csv_hrrr', '2020-10-02T20:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:07:38,245[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_31', 'id_calc_pgrad_gfs', datetime.datetime(2020, 10, 2, 19, 13, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 1 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:07:38,245[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_31', 'id_calc_pgrad_gfs', '2020-10-02T19:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:07:38,245[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_11', 'id_process_csv_hrrr', '2020-10-02T20:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:07:39,831] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:07:39,832] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_11.id_process_csv_hrrr 2020-10-02T20:06:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:07:45,125[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_31', 'id_calc_pgrad_gfs', '2020-10-02T19:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:07:46,266] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:07:46,267] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_31.id_calc_pgrad_gfs 2020-10-02T19:13:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:07:51,611[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_11[22m.[01mid_process_csv_hrrr[22m execution_date=[01m2020-10-02 20:06:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:07:51,615[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_31[22m.[01mid_calc_pgrad_gfs[22m execution_date=[01m2020-10-02 19:13:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:07:54,666[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 1 tasks up for execution:
+	[01m<TaskInstance: id_11.id_calc_pgrad_hrrr 2020-10-02 20:06:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:07:54,671[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 1 task instances ready to be queued[0m
+[[34m2020-10-02 14:07:54,671[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_11[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:07:54,686[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_11.id_calc_pgrad_hrrr 2020-10-02 20:06:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:07:54,733[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 1 tasks to queued state:
+	[01m<TaskInstance: id_11.id_calc_pgrad_hrrr 2020-10-02 20:06:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:07:54,733[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_11', 'id_calc_pgrad_hrrr', datetime.datetime(2020, 10, 2, 20, 6, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 1 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:07:54,733[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_11', 'id_calc_pgrad_hrrr', '2020-10-02T20:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:07:54,733[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_11', 'id_calc_pgrad_hrrr', '2020-10-02T20:06:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:07:56,172] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:07:56,173] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_11.id_calc_pgrad_hrrr 2020-10-02T20:06:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:08:01,501[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_11[22m.[01mid_calc_pgrad_hrrr[22m execution_date=[01m2020-10-02 20:06:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:09:02,626[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 1 tasks up for execution:
+	[01m<TaskInstance: id_21.id_download_nam 2020-10-02 20:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:09:02,630[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 1 task instances ready to be queued[0m
+[[34m2020-10-02 14:09:02,631[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_21[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:09:02,635[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_21.id_download_nam 2020-10-02 20:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:09:02,667[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 1 tasks to queued state:
+	[01m<TaskInstance: id_21.id_download_nam 2020-10-02 20:09:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:09:02,667[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_21', 'id_download_nam', datetime.datetime(2020, 10, 2, 20, 9, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 4 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:09:02,667[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_21', 'id_download_nam', '2020-10-02T20:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:09:02,667[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_21', 'id_download_nam', '2020-10-02T20:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:09:03,794] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:09:03,794] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_21.id_download_nam 2020-10-02T20:09:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:09:09,072[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_21[22m.[01mid_download_nam[22m execution_date=[01m2020-10-02 20:09:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:09:12,133[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 1 tasks up for execution:
+	[01m<TaskInstance: id_21.id_process_grib_nam 2020-10-02 20:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:09:12,135[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 1 task instances ready to be queued[0m
+[[34m2020-10-02 14:09:12,135[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_21[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:09:12,140[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_21.id_process_grib_nam 2020-10-02 20:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:09:12,178[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 1 tasks to queued state:
+	[01m<TaskInstance: id_21.id_process_grib_nam 2020-10-02 20:09:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:09:12,178[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_21', 'id_process_grib_nam', datetime.datetime(2020, 10, 2, 20, 9, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 3 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:09:12,178[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_21', 'id_process_grib_nam', '2020-10-02T20:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:09:12,178[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_21', 'id_process_grib_nam', '2020-10-02T20:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:09:13,391] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:09:13,391] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_21.id_process_grib_nam 2020-10-02T20:09:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:09:18,710[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_21[22m.[01mid_process_grib_nam[22m execution_date=[01m2020-10-02 20:09:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:09:21,780[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 1 tasks up for execution:
+	[01m<TaskInstance: id_21.id_process_csv_nam 2020-10-02 20:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:09:21,786[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 1 task instances ready to be queued[0m
+[[34m2020-10-02 14:09:21,786[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_21[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:09:21,791[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_21.id_process_csv_nam 2020-10-02 20:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:09:21,834[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 1 tasks to queued state:
+	[01m<TaskInstance: id_21.id_process_csv_nam 2020-10-02 20:09:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:09:21,834[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_21', 'id_process_csv_nam', datetime.datetime(2020, 10, 2, 20, 9, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 2 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:09:21,834[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_21', 'id_process_csv_nam', '2020-10-02T20:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:09:21,835[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_21', 'id_process_csv_nam', '2020-10-02T20:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:09:23,102] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:09:23,102] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_21.id_process_csv_nam 2020-10-02T20:09:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:09:28,382[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_21[22m.[01mid_process_csv_nam[22m execution_date=[01m2020-10-02 20:09:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:09:31,457[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 1 tasks up for execution:
+	[01m<TaskInstance: id_21.id_calc_pgrad_nam 2020-10-02 20:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:09:31,463[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 1 task instances ready to be queued[0m
+[[34m2020-10-02 14:09:31,463[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_21[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:09:31,468[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_21.id_calc_pgrad_nam 2020-10-02 20:09:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:09:31,490[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 1 tasks to queued state:
+	[01m<TaskInstance: id_21.id_calc_pgrad_nam 2020-10-02 20:09:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:09:31,491[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_21', 'id_calc_pgrad_nam', datetime.datetime(2020, 10, 2, 20, 9, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 1 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:09:31,491[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_21', 'id_calc_pgrad_nam', '2020-10-02T20:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:09:31,491[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_21', 'id_calc_pgrad_nam', '2020-10-02T20:09:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:09:32,672] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:09:32,673] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_21.id_calc_pgrad_nam 2020-10-02T20:09:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:09:37,956[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_21[22m.[01mid_calc_pgrad_nam[22m execution_date=[01m2020-10-02 20:09:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:13:03,239[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 1 tasks up for execution:
+	[01m<TaskInstance: id_31.id_download_gfs 2020-10-02 20:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:13:03,242[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 1 task instances ready to be queued[0m
+[[34m2020-10-02 14:13:03,242[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_31[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:13:03,245[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_31.id_download_gfs 2020-10-02 20:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:13:03,284[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 1 tasks to queued state:
+	[01m<TaskInstance: id_31.id_download_gfs 2020-10-02 20:13:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:13:03,284[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_31', 'id_download_gfs', datetime.datetime(2020, 10, 2, 20, 13, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 4 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:13:03,284[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_31', 'id_download_gfs', '2020-10-02T20:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:13:03,285[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_31', 'id_download_gfs', '2020-10-02T20:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:13:04,497] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:13:04,498] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_31.id_download_gfs 2020-10-02T20:13:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:13:09,791[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_31[22m.[01mid_download_gfs[22m execution_date=[01m2020-10-02 20:13:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:13:12,848[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 1 tasks up for execution:
+	[01m<TaskInstance: id_31.id_process_grib_gfs 2020-10-02 20:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:13:12,852[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 1 task instances ready to be queued[0m
+[[34m2020-10-02 14:13:12,852[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_31[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:13:12,855[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_31.id_process_grib_gfs 2020-10-02 20:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:13:12,891[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 1 tasks to queued state:
+	[01m<TaskInstance: id_31.id_process_grib_gfs 2020-10-02 20:13:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:13:12,892[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_31', 'id_process_grib_gfs', datetime.datetime(2020, 10, 2, 20, 13, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 3 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:13:12,892[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_31', 'id_process_grib_gfs', '2020-10-02T20:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:13:12,892[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_31', 'id_process_grib_gfs', '2020-10-02T20:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:13:14,088] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:13:14,088] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_31.id_process_grib_gfs 2020-10-02T20:13:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:13:19,350[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_31[22m.[01mid_process_grib_gfs[22m execution_date=[01m2020-10-02 20:13:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:13:22,417[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 1 tasks up for execution:
+	[01m<TaskInstance: id_31.id_process_csv_gfs 2020-10-02 20:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:13:22,420[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 1 task instances ready to be queued[0m
+[[34m2020-10-02 14:13:22,420[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_31[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:13:22,424[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_31.id_process_csv_gfs 2020-10-02 20:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:13:22,456[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 1 tasks to queued state:
+	[01m<TaskInstance: id_31.id_process_csv_gfs 2020-10-02 20:13:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:13:22,456[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_31', 'id_process_csv_gfs', datetime.datetime(2020, 10, 2, 20, 13, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 2 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:13:22,456[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_31', 'id_process_csv_gfs', '2020-10-02T20:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:13:22,456[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_31', 'id_process_csv_gfs', '2020-10-02T20:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:13:23,708] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:13:23,708] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_31.id_process_csv_gfs 2020-10-02T20:13:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:13:29,030[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_31[22m.[01mid_process_csv_gfs[22m execution_date=[01m2020-10-02 20:13:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:13:32,101[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 1 tasks up for execution:
+	[01m<TaskInstance: id_31.id_calc_pgrad_gfs 2020-10-02 20:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:13:32,107[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 1 task instances ready to be queued[0m
+[[34m2020-10-02 14:13:32,107[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_31[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:13:32,114[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_31.id_calc_pgrad_gfs 2020-10-02 20:13:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:13:32,169[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 1 tasks to queued state:
+	[01m<TaskInstance: id_31.id_calc_pgrad_gfs 2020-10-02 20:13:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:13:32,170[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_31', 'id_calc_pgrad_gfs', datetime.datetime(2020, 10, 2, 20, 13, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 1 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:13:32,170[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_31', 'id_calc_pgrad_gfs', '2020-10-02T20:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:13:32,170[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_31', 'id_calc_pgrad_gfs', '2020-10-02T20:13:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:13:33,278] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:13:33,278] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_31.id_calc_pgrad_gfs 2020-10-02T20:13:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:13:38,528[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_31[22m.[01mid_calc_pgrad_gfs[22m execution_date=[01m2020-10-02 20:13:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m
+[[34m2020-10-02 14:17:01,809[0m] {[34mscheduler_job.py:[0m963} INFO[0m - 1 tasks up for execution:
+	[01m<TaskInstance: id_56.id_plot_data 2020-10-02 20:17:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:17:01,813[0m] {[34mscheduler_job.py:[0m997} INFO[0m - Figuring out tasks to run in Pool(name=[01mdefault_pool[22m) with 128 open slots and 1 task instances ready to be queued[0m
+[[34m2020-10-02 14:17:01,813[0m] {[34mscheduler_job.py:[0m1025} INFO[0m - DAG [01mid_56[22m has 0/16 running and queued tasks[0m
+[[34m2020-10-02 14:17:01,816[0m] {[34mscheduler_job.py:[0m1085} INFO[0m - Setting the following tasks to queued state:
+	[01m<TaskInstance: id_56.id_plot_data 2020-10-02 20:17:00+00:00 [scheduled]>[22m[0m
+[[34m2020-10-02 14:17:01,849[0m] {[34mscheduler_job.py:[0m1159} INFO[0m - Setting the following 1 tasks to queued state:
+	[01m<TaskInstance: id_56.id_plot_data 2020-10-02 20:17:00+00:00 [queued]>[22m[0m
+[[34m2020-10-02 14:17:01,850[0m] {[34mscheduler_job.py:[0m1195} INFO[0m - Sending [01m('id_56', 'id_plot_data', datetime.datetime(2020, 10, 2, 20, 17, tzinfo=<Timezone [UTC]>), 1)[22m to executor with priority 1 and queue [01mdefault[22m[0m
+[[34m2020-10-02 14:17:01,850[0m] {[34mbase_executor.py:[0m58} INFO[0m - Adding to queue: [01m['airflow', 'run', 'id_56', 'id_plot_data', '2020-10-02T20:17:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[[34m2020-10-02 14:17:01,850[0m] {[34msequential_executor.py:[0m54} INFO[0m - Executing command: [01m['airflow', 'run', 'id_56', 'id_plot_data', '2020-10-02T20:17:00+00:00', '--local', '--pool', 'default_pool', '-sd', '/home/csmith/pgrad/airflow/dags/pgrad_dag.py'][22m[0m
+[2020-10-02 14:17:03,074] {__init__.py:50} INFO - Using executor SequentialExecutor
+[2020-10-02 14:17:03,074] {dagbag.py:417} INFO - Filling up the DagBag from /home/csmith/pgrad/airflow/dags/pgrad_dag.py
+Running %s on host %s <TaskInstance: id_56.id_plot_data 2020-10-02T20:17:00+00:00 [queued]> penguin
+[[34m2020-10-02 14:17:33,437[0m] {[34mscheduler_job.py:[0m1334} INFO[0m - Executor reports execution of [01mid_56[22m.[01mid_plot_data[22m execution_date=[01m2020-10-02 20:17:00+00:00[22m exited with status [01msuccess[22m for try_number 1[0m

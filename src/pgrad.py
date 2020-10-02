@@ -660,7 +660,8 @@ def process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr
 
 
 ###############################################################################
-def calc_pgrad(dict_stn_metadata, model_name_list, dt_init, bucket_name):
+#def calc_pgrad(dict_stn_metadata, model_name_list, dt_init, bucket_name):
+def calc_pgrad(dict_stn_metadata, model_name, dt_init, bucket_name):
 
     print      ('calc_pgrad begin ')
     logger.info('calc_pgrad begin ')
@@ -669,60 +670,62 @@ def calc_pgrad(dict_stn_metadata, model_name_list, dt_init, bucket_name):
     dir_name_ingest    = os.path.join('data', 'ingest',    dir_init_temp)
     dir_name_processed = os.path.join('data', 'processed', dir_init_temp)
 
-    model_name = 'hrrr'
-    for model_name in model_name_list:
-        print      ('    processing %s ' %(model_name))
-        logger.info('    processing %s ' %(model_name))
-        # read p_sfc file     
-        p_sfc1_master_file = os.path.join(dir_name_processed, 'p_sfc1_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
-        p_sfc2_master_file = os.path.join(dir_name_processed, 'p_sfc2_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
-        p_sfc1_diff_master_file = os.path.join(dir_name_processed, 'p_sfc1_diff_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
-        p_sfc2_diff_master_file = os.path.join(dir_name_processed, 'p_sfc2_diff_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
-        print      ('    input  file is %s ' %(p_sfc1_master_file))
-        logger.info('    input  file is %s ' %(p_sfc1_master_file))
-        print      ('    output file is %s ' %(p_sfc1_diff_master_file))
-        logger.info('    output file is %s ' %(p_sfc1_diff_master_file))
-        if not os.path.isfile(p_sfc1_master_file): 
-            print      ('    ERROR - input file not found %s ' %(p_sfc1_master_file))
-            logger.info('    ERROR - input file not found %s ' %(p_sfc1_master_file))
-        else:
-            # read master
-            p_sfc1_hr_s_df = pd.read_csv(p_sfc1_master_file, index_col=0)
-            #p_sfc1_hr_s = p_sfc1_hr_s_df.values
-            p_sfc2_hr_s_df = pd.read_csv(p_sfc2_master_file, index_col=0)
-            #p_sfc2_hr_s = p_sfc2_hr_s_df.values
-            dt_axis = p_sfc1_hr_s_df.index.values
-            forecast_horizon_hr = len(dt_axis)
-            p_sfc1_diff_hr_s = np.full([forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
-            p_sfc2_diff_hr_s = np.full([forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
-            column_str = [None]*dict_stn_metadata['n_stn']**2
-            s1 = 3
-            s2 = 5
-            print      ('    calculating pressure difference station pairs')
-            logger.info('    calculating pressure difference station pairs')
-            for s1 in range(0, dict_stn_metadata['n_stn']):
-                for s2 in range(0, dict_stn_metadata['n_stn']):
-                    p_sfc1_diff_hr_s[:,s1*dict_stn_metadata['n_stn']+s2] = p_sfc1_hr_s_df[dict_stn_metadata['stn_id'][s1]] - p_sfc1_hr_s_df[dict_stn_metadata['stn_id'][s2]]
-                    p_sfc2_diff_hr_s[:,s1*dict_stn_metadata['n_stn']+s2] = p_sfc2_hr_s_df[dict_stn_metadata['stn_id'][s1]] - p_sfc2_hr_s_df[dict_stn_metadata['stn_id'][s2]]
-                    column_str[s1*dict_stn_metadata['n_stn']+s2] = dict_stn_metadata['stn_id'][s1]+'-'+dict_stn_metadata['stn_id'][s2]
-                    
-            # write to master csv
-            print      ('    write p_sfc_diff master begin ')
-            logger.info('    write p_sfc_diff master begin ')
-            p_sfc1_diff_hr_s_df = pd.DataFrame(p_sfc1_diff_hr_s, index=dt_axis, columns=column_str).round(2) 
-            #p_sfc1_diff_hr_s_df = p_sfc1_diff_hr_s_df.round(2)
-            p_sfc1_diff_hr_s_df.to_csv(p_sfc1_diff_master_file) 
-            p_sfc2_diff_hr_s_df = pd.DataFrame(p_sfc2_diff_hr_s, index=dt_axis, columns=column_str).round(2) 
-            p_sfc2_diff_hr_s_df.to_csv(p_sfc2_diff_master_file) 
-            print      ('    write p_sfc_diff master end ')   
-            logger.info('    write p_sfc_diff master end ')   
-            
-            print      ('    p_sfc1_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc1_diff_hr_s), np.nanmax(p_sfc1_diff_hr_s)))
-            logger.info('    p_sfc1_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc1_diff_hr_s), np.nanmax(p_sfc1_diff_hr_s)))
-            print      ('    p_sfc2_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc2_diff_hr_s), np.nanmax(p_sfc2_diff_hr_s)))
-            logger.info('    p_sfc2_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc2_diff_hr_s), np.nanmax(p_sfc2_diff_hr_s)))
+    #model_name = 'hrrr'
+    #for model_name in model_name_list:
+    print      ('    processing %s ' %(model_name))
+    logger.info('    processing %s ' %(model_name))
+    # read p_sfc file     
+    p_sfc1_master_file = os.path.join(dir_name_processed, 'p_sfc1_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+    p_sfc2_master_file = os.path.join(dir_name_processed, 'p_sfc2_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+    p_sfc1_diff_master_file = os.path.join(dir_name_processed, 'p_sfc1_diff_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+    p_sfc2_diff_master_file = os.path.join(dir_name_processed, 'p_sfc2_diff_'+model_name+'_'+dt_init.strftime('%Y-%m-%d_%H')+'_t_all.csv')
+    print      ('    input  file is %s ' %(p_sfc1_master_file))
+    logger.info('    input  file is %s ' %(p_sfc1_master_file))
+    print      ('    output file is %s ' %(p_sfc1_diff_master_file))
+    logger.info('    output file is %s ' %(p_sfc1_diff_master_file))
+    if not os.path.isfile(p_sfc1_master_file): 
+        print      ('    ERROR - input file not found %s ' %(p_sfc1_master_file))
+        logger.info('    ERROR - input file not found %s ' %(p_sfc1_master_file))
+    else:
+        # read master
+        p_sfc1_hr_s_df = pd.read_csv(p_sfc1_master_file, index_col=0)
+        #p_sfc1_hr_s = p_sfc1_hr_s_df.values
+        p_sfc2_hr_s_df = pd.read_csv(p_sfc2_master_file, index_col=0)
+        #p_sfc2_hr_s = p_sfc2_hr_s_df.values
+        dt_axis = p_sfc1_hr_s_df.index.values
+        forecast_horizon_hr = len(dt_axis)
+        p_sfc1_diff_hr_s = np.full([forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
+        p_sfc2_diff_hr_s = np.full([forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
+        column_str = [None]*dict_stn_metadata['n_stn']**2
+        s1 = 3
+        s2 = 5
+        print      ('    calculating pressure difference station pairs')
+        logger.info('    calculating pressure difference station pairs')
+        for s1 in range(0, dict_stn_metadata['n_stn']):
+            for s2 in range(0, dict_stn_metadata['n_stn']):
+                p_sfc1_diff_hr_s[:,s1*dict_stn_metadata['n_stn']+s2] = p_sfc1_hr_s_df[dict_stn_metadata['stn_id'][s1]] - p_sfc1_hr_s_df[dict_stn_metadata['stn_id'][s2]]
+                p_sfc2_diff_hr_s[:,s1*dict_stn_metadata['n_stn']+s2] = p_sfc2_hr_s_df[dict_stn_metadata['stn_id'][s1]] - p_sfc2_hr_s_df[dict_stn_metadata['stn_id'][s2]]
+                column_str[s1*dict_stn_metadata['n_stn']+s2] = dict_stn_metadata['stn_id'][s1]+'-'+dict_stn_metadata['stn_id'][s2]
+                
+        # write to master csv
+        print      ('    write p_sfc_diff master begin ')
+        logger.info('    write p_sfc_diff master begin ')
+        p_sfc1_diff_hr_s_df = pd.DataFrame(p_sfc1_diff_hr_s, index=dt_axis, columns=column_str).round(2) 
+        #p_sfc1_diff_hr_s_df = p_sfc1_diff_hr_s_df.round(2)
+        p_sfc1_diff_hr_s_df.to_csv(p_sfc1_diff_master_file) 
+        p_sfc2_diff_hr_s_df = pd.DataFrame(p_sfc2_diff_hr_s, index=dt_axis, columns=column_str).round(2) 
+        p_sfc2_diff_hr_s_df.to_csv(p_sfc2_diff_master_file) 
+        print      ('    write p_sfc_diff master end ')   
+        logger.info('    write p_sfc_diff master end ')   
+        
+        print      ('    p_sfc1_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc1_diff_hr_s), np.nanmax(p_sfc1_diff_hr_s)))
+        logger.info('    p_sfc1_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc1_diff_hr_s), np.nanmax(p_sfc1_diff_hr_s)))
+        print      ('    p_sfc2_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc2_diff_hr_s), np.nanmax(p_sfc2_diff_hr_s)))
+        logger.info('    p_sfc2_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc2_diff_hr_s), np.nanmax(p_sfc2_diff_hr_s)))
+    
     print      ('calc_pgrad end ')
     logger.info('calc_pgrad end ')
+
 
 ###############################################################################
 def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_horizon_hr,  dt_start_lt, utc_conversion, time_zone_label, stn_id_pair_list_to_plot, bucket_name):
@@ -1883,7 +1886,8 @@ if __name__ == "__main__":
             elif process_name == 'process_csv':
                 process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr, bucket_name)
             elif process_name == 'calc_pgrad':                
-                calc_pgrad(dict_stn_metadata, model_name_list, dt_init, bucket_name)
+                calc_pgrad(dict_stn_metadata, model_name, dt_init, bucket_name)
+                #calc_pgrad(dict_stn_metadata, model_name_list, dt_init, bucket_name)
             dt_init += td(hours=update_frequency_hrs)
 
     dt_init = dt_init_expected
