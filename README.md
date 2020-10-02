@@ -1,5 +1,5 @@
 
-# pgrad
+# pGrad
 
 Operational pressure differences from key weather stations on the West Coast are often
 used a rubrics for the strenght of various wind events such as Sundowners and Diablo winds.

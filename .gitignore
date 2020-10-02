@@ -2,6 +2,7 @@
 data/
 logs/
 images/
+airflow/airflow.cfg
 airflow/miniconda3/
 airflow/logs/
 

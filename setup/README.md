@@ -57,7 +57,7 @@ as it will likely take 30 min or so.
 src/backfill.sh&
 ```
 
-The operational ETLs can be run using the provided crontab 
+The data pipelines can be operationalized using the provided crontab 
 ```
 crontab src/crontab.txt
 ```
@@ -78,7 +78,7 @@ airflow scheduler -D
 airflow webserver -D
 ```
 If you've opened port 8080 on your EC2 instance, you can browse the 
-dags at `http://localhost:8080/admin/`
+dags at `http://localhost:8080/admin/`.
 You can view the active dags using 
 ```
 airflow list_dags
