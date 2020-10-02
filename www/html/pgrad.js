@@ -1,15 +1,5 @@
 $(function() {
 
-
-//var results = $.csv.toObjects("../top_events/slp_diff_KWMC-KSAC.csv");
-//var results = $.csv.toArrays("../top_events/slp_diff_KWMC-KSAC.csv");
-
-//config = {header:true}
-//var results = Papa.parse("../top_events/slp_diff_KWMC-KSAC.csv", header=True);
-//var results = Papa.parse("../top_events/slp_diff_KWMC-KSAC.csv", config);
-//var results = Papa.parse("../top_events/temp1.csv");
-//console.log(results);
-
   $("#stationMapToggle").click(function(){
         $("img").toggle(50);
     });
@@ -17,30 +7,6 @@ $(function() {
   $('.dropdown-menu a').on('click', function(){    
     $(this).parent().parent().prev().html($(this).html()+'<span class="caret"></span>');    
   })
-
-//del_slp_all_init_KWMC-KSAC_gfs_10.png  
-//del_slp_all_init_KWMC-KSAC_gfs_4.png   
-
-//del_slp_all_init_KWMC-KSAC_nam_10.png   
-//del_slp_all_init_KWMC-KSAC_nam_4.png
-//del_slp_all_init_KWMC-KSAC_hrrr_10.png  
-//del_slp_all_init_KWMC-KSAC_hrrr_4.png   
-
-//del_slp_all_model_KWMC-KSAC_current_10.png
-//del_slp_all_model_KWMC-KSAC_current_4.png
-
-//  function createPlotName(plotStnPair, plotModel, plotTimeframe) {
-//    var plotName = "del_slp_all_init_"+plotStnPair+"_"+plotModel+"_"+plotTimeframe+".png"
-//    console.log(plotName);
-//    return (plotName);
-//  }
-
-//images/del_slp_all_init_KWMC-KSFO_gfs_10.png
-//images/del_slp_all_init_KWMC-KSFO_nam_3.png   
-//images/del_slp_all_init_KWMC-KSFO_hrrr_2.png  
-//images/del_slp_all_model_KWMC-KSFO_current_10.png
-//images/del_slp_all_model_KWMC-KSFO_current_3.png
-//images/del_slp_all_model_KWMC-KSFO_current_2.png
 
   function createPlotName(plotStnPair, plotModel, plotTimeframe) {
     //var plotName = plotVariable+"_"+plotRegion+"_stn_day_of_vs_time_"+plotTimeframe+".png"
@@ -64,13 +30,6 @@ $(function() {
     return (plotName);
   }
 
-//del_slp_all_model_KWMC-KSFO_current_2.png
-//del_slp_all_model_KWMC-KSFO_current_10.png  
-//del_slp_all_model_KWMC-KSFO_current_3.png
-//<li><a href="#plot_selected" data-toggle="pill" data-value="all_2d" data-text="all models">All 2d</a></li>
-//<li><a href="#plot_selected" data-toggle="pill" data-value="all_3d" data-text="all models">All 3d</a></li>
-//<li><a href="#plot_selected" data-toggle="pill" data-value="all_10d" data-text="all models">All 10d</a></li>
-
   function createPlotText(plotStnPairText, plotModelText) {
     //var plotText = "Forecast "+plotVariableText+" at "+plotRegionText+" for "+plotTimeframeText
     if (plotModel == "all_model") {
@@ -83,13 +42,13 @@ $(function() {
   }
 
   function createPlotCdfName(plotStnPair) {
-    var plotPlotCdfName = "del_slp_cdf_"+plotStnPair+".png"
+    var plotPlotCdfName = "del_alt_cdf_"+plotStnPair+".png"
     //console.log(plotPlotCdfName);
     return (plotPlotCdfName);
   }
 
   function createTableName(plotStnPair) {
-    var tableName = "del_slp_top_events_"+plotStnPair+".png"
+    var tableName = "del_alt_top_events_"+plotStnPair+".png"
     //console.log(tableName);
     return (tableName);
   }
