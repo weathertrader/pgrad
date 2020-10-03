@@ -2,12 +2,12 @@
 data/
 logs/
 images/
-airflow/airflow.cfg
-airflow/airflow.db
-airflow/airflow-*
-airflow/unittests.cfg
-airflow/miniconda3/
-airflow/logs/
+#airflow/airflow.cfg
+#airflow/airflow.db
+#airflow/airflow-*
+#airflow/unittests.cfg
+#airflow/miniconda3/
+#airflow/logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

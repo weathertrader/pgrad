@@ -12,20 +12,53 @@ http://54.70.6.52/pgrad.html
 
 ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-70-6-52.us-west-2.compute.amazonaws.com
 
+
+######################################
+# pip install 
+
+# move this to apt-get section
+sudo apt-get install libeccodes0
+
+export AIRFLOW_HOME=~/airflow
+
+pip install numpy pandas dask netCDF4 xarray spyder matplotlib cfgrib flask apache-airflow
+# check cfgrib installation
+python -m cfgrib selfcheck
+
 pip freeze > requirements.txt
+pip install -r requirements.txt
+
+
+
+
+
+# did not work
+psycopg2 
+# works on ubuntu, does not work on chromebook 
+conda install -c conda-forge eccodes cfgrib
+# works on chromebook 
+pip install cfgrib
+
+conda update conda 
+conda config --add channels conda-forge
+# does not work
+conda install -c conda-forge psycopg2 numpy pandas dask netCDF4 xarray spyder matplotlib
+# works 
+conda install -c conda-forge psycopg2 numpy pandas dask xarray matplotlib
+# works on ubuntu, does not work on chromebook 
+conda install -c conda-forge eccodes cfgrib
+# works on chromebook 
+sudo apt-get install libeccodes0
+pip install cfgrib
+python -m cfgrib selfcheck
+cd pgrad
+# pip install -r requirements.txt
 
 conda create -n cartopy -c conda-forge cartopy netCDF4 xarray 
 conda activate cartopy
 conda install spyder‑kernels
 
-
-pip freeze > requirements.txt
-pip install requirements.txt
-
-######################################
-# airflow 
-
-# airflow 
+# pip install 
 ######################################
 
 

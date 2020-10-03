@@ -35,20 +35,8 @@ source ~/.bashrc
 Install the environment (requirements.txt doesn't work yet)
 
 ```
-conda update conda 
-conda config --add channels conda-forge
-# does not work
-conda install -c conda-forge psycopg2 numpy pandas dask netCDF4 xarray spyder matplotlib
-# works 
-conda install -c conda-forge psycopg2 numpy pandas dask xarray matplotlib
-# works on ubuntu, does not work on chromebook 
-conda install -c conda-forge eccodes cfgrib
-# works on chromebook 
-sudo apt-get install libeccodes0
-pip install cfgrib
-python -m cfgrib selfcheck
-cd pgrad
-# pip install -r requirements.txt
+conda / pip goes here 
+
 ```
 
 Backfill data from the last few forecast runs.  I suggest backgrounding this process 
@@ -64,10 +52,11 @@ crontab src/crontab.txt
 or using Apache Airflow, which can be installed by adding the following to the `/.bashrc`
 ```
 export AIRFLOW_HOME=~/pgrad/airflow
-pip install apache-airflow
+
 ```
 and installing via pip. After installing, edit the `airflow.cfg` config file and set
 ```
+dags_folder = ~/pgrad/dags
 load_examples = False
 catchup_by_default = False
 ```
