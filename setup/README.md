@@ -16,7 +16,7 @@ ssh into the instance and
 
 Intall Postgres and Apache webserver
 ```
-sudo apt-get update && sudo apt upgrade && sudo apt-get install build-essential postgresql postgresql-contrib libpq-dev python3-psycopg2 apache2
+sudo apt-get update && sudo apt upgrade && sudo apt-get install build-essential postgresql postgresql-contrib libpq-dev python3-psycopg2 apache2 libeccodes0
 ```
 and navigate to the IP address to view the default index.html and check that Apache is running.
 
@@ -32,11 +32,17 @@ chmod 755 Miniconda3-latest-Linux-x86_64.sh
 source ~/.bashrc
 ```
 
-Install the environment (requirements.txt doesn't work yet)
+Install the environment from scratch or from the requirements.txt
 
 ```
-conda / pip goes here 
-
+pip install -r pgrad/requirements.txt
+```
+To recreate the environment and requirements.txt you can also use this 
+```
+pip install numpy pandas dask netCDF4 xarray spyder matplotlib cfgrib flask apache-airflow
+# check cfgrib installation
+python -m cfgrib selfcheck
+pip freeze > requirements.txt
 ```
 
 Backfill data from the last few forecast runs.  I suggest backgrounding this process 
@@ -51,10 +57,9 @@ crontab src/crontab.txt
 ```
 or using Apache Airflow, which can be installed by adding the following to the `/.bashrc`
 ```
-export AIRFLOW_HOME=~/pgrad/airflow
-
+export AIRFLOW_HOME=~/airflow
 ```
-and installing via pip. After installing, edit the `airflow.cfg` config file and set
+and edit the `airflow.cfg` config file and set
 ```
 dags_folder = ~/pgrad/dags
 load_examples = False
@@ -66,18 +71,19 @@ airflow initdb
 airflow scheduler -D
 airflow webserver -D
 ```
-If you've opened port 8080 on your EC2 instance, you can browse the 
+Browse to port 8080 on your EC2 instance and turn the dags on 
 dags at `http://localhost:8080/admin/`.
-You can view the active dags using 
+You can view and test the active dags using 
 ```
 airflow list_dags
-airflow list_tasks pgrad_dag
-airflow list_tasks pgrad_dag --tree
+airflow list_tasks id_21
+airflow list_tasks id_21 --tree
+airflow test id_21 download_grib_nam 2015-01-01
 ```
 In case you need to reset or kill airflow you can use the following
 ```
 airflow resetdb
-more ~/pgrad/airflow/airflow-webserver.pid
+more ~/airflow/airflow-webserver.pid
 ps -aux | grep airflow
 kill -9 pid
 ```

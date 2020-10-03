@@ -166,5 +166,5 @@ task_download_hrrr >> task_process_grib_hrrr >> task_process_csv_hrrr >> task_ca
 #run_this >> run_this_last
 #also_run_this >> run_this_last
 
-if __name__ == "__main__":
-    dag_01.cli()
+#if __name__ == "__main__":
+#    dag_01.cli()

@@ -16,18 +16,6 @@ ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-70-6-52.us-west-2.com
 ######################################
 # pip install 
 
-# move this to apt-get section
-sudo apt-get install libeccodes0
-
-export AIRFLOW_HOME=~/airflow
-
-pip install numpy pandas dask netCDF4 xarray spyder matplotlib cfgrib flask apache-airflow
-# check cfgrib installation
-python -m cfgrib selfcheck
-
-pip freeze > requirements.txt
-pip install -r requirements.txt
-
 
 
 
