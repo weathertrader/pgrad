@@ -3,7 +3,9 @@ data/
 logs/
 images/
 airflow/airflow.cfg
+airflow/airflow.db
 airflow/airflow-*
+airflow/unittests.cfg
 airflow/miniconda3/
 airflow/logs/
 
