@@ -60,14 +60,11 @@ def create_log_file(log_name_full_file_path, dt_start_utc, time_zone_label):
 ###############################################################################
 def close_logger(logger, process_name, dt_start_lt, utc_conversion, time_zone_label):
     dt_end_lt = dt.utcnow() - td(hours=utc_conversion)
-    #time_delta_minutes = (dt_start_lt - dt_end_lt).seconds/3600.0
-    time_delta_minutes = (dt_start_lt - dt_end_lt).seconds/(3600.0*24)
-    #time_delta_minutes = (dt_start_lt - dt_end_lt).seconds
-    print      ('total_time %s %05.1f minutes, %s - %s [%s]  ' % (process_name, time_delta_minutes, dt_start_lt.strftime('%Y-%m-%d_%H-%M'), dt_end_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label))
-    logger.info('total_time %s %05.1f minutes, %s - %s [%s]  ' % (process_name, time_delta_minutes, dt_start_lt.strftime('%Y-%m-%d_%H-%M'), dt_end_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label))
+    time_delta_minutes = (dt_end_lt - dt_start_lt).seconds/60.0
     print      ('###############################################################################') 
     logger.info('###############################################################################') 
-  
+    print      ('total_time %s %6.2f minutes, %s - %s [%s]  ' % (process_name, time_delta_minutes, dt_start_lt.strftime('%Y-%m-%d_%H-%M'), dt_end_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label))
+    logger.info('total_time %s %6.2f minutes, %s - %s [%s]  ' % (process_name, time_delta_minutes, dt_start_lt.strftime('%Y-%m-%d_%H-%M'), dt_end_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label))    
     
 ###############################################################################    
 def define_daylight_savings_or_not(dt_temp_utc):    
@@ -1901,6 +1898,7 @@ if __name__ == "__main__":
     if process_name == 'cleanup':
         cleanup(bucket_name)
   
+    time.sleep(5*60)
     # close log file
     print      ('close_logger begin ')
     logger.info('close_logger begin ')
