@@ -1898,7 +1898,6 @@ if __name__ == "__main__":
     if process_name == 'cleanup':
         cleanup(bucket_name)
   
-    time.sleep(5*60)
     # close log file
     print      ('close_logger begin ')
     logger.info('close_logger begin ')
