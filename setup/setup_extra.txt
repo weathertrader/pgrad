@@ -1,22 +1,45 @@
 
 24.6.126.210/32
 
-http://54.70.6.52/
+http://34.221.46.194/
+http://34.221.46.194:8080/admin/
 
 index.html access 
-http://54.70.6.52/
+
+http://34.221.46.194/
 http://ec2-54-70-6-52.us-west-2.compute.amazonaws.com/
 pgrad.html access
 http://ec2-54-70-6-52.us-west-2.compute.amazonaws.com//pgrad.html
 http://54.70.6.52/pgrad.html
 
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-70-6-52.us-west-2.compute.amazonaws.com
+ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-221-46-194.us-west-2.compute.amazonaws.com
 
 
 ######################################
-# pip install 
+# mongo stuff 
 
 
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+
+# sudo apt-get install gnupg
+ubunut 20.04
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+debian 10 
+echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+
+sudo systemctl start mongod
+sudo systemctl status mongod
+sudo systemctl enable mongod
+sudo systemctl stop mongod
+sudo systemctl restart mongod
+
+pip install pymongo
+
+
+# mongo stuff 
+######################################
 
 
 
@@ -45,9 +68,6 @@ cd pgrad
 conda create -n cartopy -c conda-forge cartopy netCDF4 xarray 
 conda activate cartopy
 conda install spyder‑kernels
-
-# pip install 
-######################################
 
 
 create test files on s3://to_process

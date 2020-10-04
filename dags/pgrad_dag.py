@@ -1,5 +1,5 @@
 
-"""Example DAG demonstrating the usage of the BashOperator."""
+"""pgrad dags"""
 
 from datetime import timedelta
 
