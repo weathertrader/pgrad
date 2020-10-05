@@ -1,18 +1,13 @@
 
 24.6.126.210/32
 
-http://34.221.46.194/
-http://34.221.46.194:8080/admin/
+http://34.221.234.53/pgrad.html
+http://34.221.234.53:8080/admin/
 
 index.html access 
 
-http://34.221.46.194/
-http://ec2-54-70-6-52.us-west-2.compute.amazonaws.com/
-pgrad.html access
-http://ec2-54-70-6-52.us-west-2.compute.amazonaws.com//pgrad.html
-http://54.70.6.52/pgrad.html
+ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-221-234-53.us-west-2.compute.amazonaws.com
 
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-221-46-194.us-west-2.compute.amazonaws.com
 
 
 ######################################

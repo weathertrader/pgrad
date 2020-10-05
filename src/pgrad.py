@@ -15,13 +15,13 @@ import pandas as pd
 import numpy as np
 import xarray as xr
 # import cfgrib
+#from netCDF4 import Dataset 
 import time
 from datetime import datetime as dt 
 from datetime import timedelta as td 
 import glob
 import requests
 import subprocess
-
 import matplotlib
 # plotting from cli
 matplotlib.use('Agg') 
@@ -31,10 +31,9 @@ from matplotlib.dates import drange, DateFormatter
 from matplotlib.ticker import MultipleLocator 
 import warnings
 import math
-
 import logging 
-#import xarray
-#from netCDF4 import Dataset 
+import pymongo
+from pymongo import MongoClient
 
 ###############################################################################    
 def create_log_file(log_name_full_file_path, dt_start_utc, time_zone_label):
@@ -409,7 +408,7 @@ def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_h
     # get list of files in ingest dir
     #file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*.grib2'))
     file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*'+dt_init.strftime('%Y-%m-%d_%H')+'*.grib2'))
-
+    file_list.sort()
     n_files = len(file_list)
     print      ('  found %s files to process' %(n_files))
     logger.info('  found %s files to process' %(n_files))
@@ -573,6 +572,7 @@ def process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr
     # get list of files in ingest dir
     #file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*.csv'))
     file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*'+dt_init.strftime('%Y-%m-%d_%H')+'*.csv'))
+    file_list.sort()
     n_files = len(file_list)
     print      ('  found %s files to process' %(n_files))
     logger.info('  found %s files to process' %(n_files))
@@ -657,8 +657,7 @@ def process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr
 
 
 ###############################################################################
-#def calc_pgrad(dict_stn_metadata, model_name_list, dt_init, bucket_name):
-def calc_pgrad(dict_stn_metadata, model_name, dt_init, bucket_name):
+def calc_pgrad(dict_stn_metadata, stn_id_pair_list_to_plot, model_name, dt_init, bucket_name):
 
     print      ('calc_pgrad begin ')
     logger.info('calc_pgrad begin ')
@@ -691,26 +690,30 @@ def calc_pgrad(dict_stn_metadata, model_name, dt_init, bucket_name):
         #p_sfc2_hr_s = p_sfc2_hr_s_df.values
         dt_axis = p_sfc1_hr_s_df.index.values
         forecast_horizon_hr = len(dt_axis)
-        p_sfc1_diff_hr_s = np.full([forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
-        p_sfc2_diff_hr_s = np.full([forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
-        column_str = [None]*dict_stn_metadata['n_stn']**2
+        n_stn_pair = len(stn_id_pair_list_to_plot)
+        p_sfc1_diff_hr_s = np.full([forecast_horizon_hr, n_stn_pair], np.nan, dtype=float)
+        p_sfc2_diff_hr_s = np.full([forecast_horizon_hr, n_stn_pair], np.nan, dtype=float)
         s1 = 3
         s2 = 5
         print      ('    calculating pressure difference station pairs')
         logger.info('    calculating pressure difference station pairs')
-        for s1 in range(0, dict_stn_metadata['n_stn']):
-            for s2 in range(0, dict_stn_metadata['n_stn']):
-                p_sfc1_diff_hr_s[:,s1*dict_stn_metadata['n_stn']+s2] = p_sfc1_hr_s_df[dict_stn_metadata['stn_id'][s1]] - p_sfc1_hr_s_df[dict_stn_metadata['stn_id'][s2]]
-                p_sfc2_diff_hr_s[:,s1*dict_stn_metadata['n_stn']+s2] = p_sfc2_hr_s_df[dict_stn_metadata['stn_id'][s1]] - p_sfc2_hr_s_df[dict_stn_metadata['stn_id'][s2]]
-                column_str[s1*dict_stn_metadata['n_stn']+s2] = dict_stn_metadata['stn_id'][s1]+'-'+dict_stn_metadata['stn_id'][s2]
+
+        stn_id_pair = stn_id_pair_list_to_plot[0]
+        for s, stn_id_pair in enumerate(stn_id_pair_list_to_plot):
+            stn_id1, stn_id2 = stn_id_pair.split('-')[0], stn_id_pair.split('-')[1]
+            s_id1 = list(dict_stn_metadata['stn_id']).index(stn_id1)
+            s_id2 = list(dict_stn_metadata['stn_id']).index(stn_id2)
+            p_sfc1_diff_hr_s[:,s] = p_sfc1_hr_s_df[dict_stn_metadata['stn_id'][s_id1]] - p_sfc1_hr_s_df[dict_stn_metadata['stn_id'][s_id2]]
+            p_sfc2_diff_hr_s[:,s] = p_sfc2_hr_s_df[dict_stn_metadata['stn_id'][s_id1]] - p_sfc2_hr_s_df[dict_stn_metadata['stn_id'][s_id2]]
+            #column_str[s1*dict_stn_metadata['n_stn']+s2] = dict_stn_metadata['stn_id'][s1]+'-'+dict_stn_metadata['stn_id'][s2]
                 
         # write to master csv
         print      ('    write p_sfc_diff master begin ')
         logger.info('    write p_sfc_diff master begin ')
-        p_sfc1_diff_hr_s_df = pd.DataFrame(p_sfc1_diff_hr_s, index=dt_axis, columns=column_str).round(2) 
+        p_sfc1_diff_hr_s_df = pd.DataFrame(p_sfc1_diff_hr_s, index=dt_axis, columns=stn_id_pair_list_to_plot).round(2) 
         #p_sfc1_diff_hr_s_df = p_sfc1_diff_hr_s_df.round(2)
         p_sfc1_diff_hr_s_df.to_csv(p_sfc1_diff_master_file) 
-        p_sfc2_diff_hr_s_df = pd.DataFrame(p_sfc2_diff_hr_s, index=dt_axis, columns=column_str).round(2) 
+        p_sfc2_diff_hr_s_df = pd.DataFrame(p_sfc2_diff_hr_s, index=dt_axis, columns=stn_id_pair_list_to_plot).round(2) 
         p_sfc2_diff_hr_s_df.to_csv(p_sfc2_diff_master_file) 
         print      ('    write p_sfc_diff master end ')   
         logger.info('    write p_sfc_diff master end ')   
@@ -726,7 +729,29 @@ def calc_pgrad(dict_stn_metadata, model_name, dt_init, bucket_name):
 
 ###############################################################################
 def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_horizon_hr,  dt_start_lt, utc_conversion, time_zone_label, stn_id_pair_list_to_plot, bucket_name):
-
+     
+    print      ('open connection to mongo ')
+    logger.info('open connection to mongo ')
+    # open connection to mongo 
+    mongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
+    #mongo_client =          MongoClient('mongodb://localhost:27017')
+    #mongo_client = MongoClient()
+    #mongo_client = MongoClient('localhost', 27017)
+    # list db names
+    # print(mongo_client.list_database_names())
+    # list collection names
+    # print(mongo_db.list_collection_names())
+    
+    # connect to the db collection 
+    mongo_db = mongo_client.models_avails
+    coll = mongo_db.models_avail
+    #mongo_db = mongo_client['models_avail']
+    #collection = mongo_db['models_avail']
+    # drop collection
+    # coll.drop()
+    # drop a db
+    # mongo_db.drop()
+    
     print      ('plot_data begin ')
     logger.info('plot_data begin ')
     warnings.filterwarnings("ignore") 
@@ -734,9 +759,10 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     if not os.path.isdir(dir_images):
         os.system('mkdir -p '+dir_images)
 
-    p_sfc1_diff_init_m_hr_s = np.full([5, 3, forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
+    n_stn_pair = len(stn_id_pair_list_to_plot)
+    p_sfc1_diff_init_m_hr_s = np.full([5, 3, forecast_horizon_hr, n_stn_pair], np.nan, dtype=float)
     np.shape(p_sfc1_diff_init_m_hr_s)   
-    p_sfc2_diff_init_m_hr_s = np.full([5, 3, forecast_horizon_hr, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
+    p_sfc2_diff_init_m_hr_s = np.full([5, 3, forecast_horizon_hr, n_stn_pair], np.nan, dtype=float)
     dt_axis_utc_init = np.full([5, forecast_horizon_hr], np.nan, dtype=object)
     dt_axis_lt_init  = np.full([5, forecast_horizon_hr], np.nan, dtype=object)
     dt_init_count = 0
@@ -777,14 +803,29 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                 dt_axis_lt  = pd.to_datetime(p_sfc1_diff_hr_s_df.index) - td(hours=utc_conversion)
                                 
                 #forecast_horizon_hr_temp = len(dt_axis_utc)
-                stn_id_pair_list = list(p_sfc1_diff_hr_s_df)
+                #stn_id_pair_list = list(p_sfc1_diff_hr_s_df)
                 # np.shape(p_sfc1_diff_hr_s_df)
                 # np.shape(p_sfc1_diff_init_hr_s)
-                p_sfc1_diff_init_m_hr_s[dt_init_count, m, 0:len(dt_axis_utc), :] = p_sfc1_diff_hr_s
-                p_sfc2_diff_init_m_hr_s[dt_init_count, m, 0:len(dt_axis_utc), :] = p_sfc2_diff_hr_s
+                n_hrs_found = len(dt_axis_utc)
+                p_sfc1_diff_init_m_hr_s[dt_init_count, m, 0:n_hrs_found, :] = p_sfc1_diff_hr_s
+                p_sfc2_diff_init_m_hr_s[dt_init_count, m, 0:n_hrs_found, :] = p_sfc2_diff_hr_s
                 if (model_name == 'gfs'):
                     dt_axis_utc_init[dt_init_count,:] = dt_axis_utc
                     dt_axis_lt_init [dt_init_count,:] = dt_axis_lt
+
+                # query mongodb to see if it exists
+                result = coll.find_one({'model':model_name, 'dt_init':dt_init})
+                # print(result)
+                #n_results = len(result)
+                # if (n_results == 0): # no existing entry 
+                if not result: # no existing entry 
+                    result = coll.insert_one({"model": model_name, "dt_init": dt_init, "hrs_avail": n_hrs_found})
+                    print      ('        inserting new data ')
+                    logger.info('        inserting new data ')
+                else: # update existing query 
+                    coll.update_one({'model':model_name, 'dt_init':dt_init},{"$set":{"hrs_avail":n_hrs_found}})
+                    print      ('        updating new data ')
+                    logger.info('        updating new data ')
 
         dt_init += td(hours=update_frequency_hrs)
         dt_init_count += 1        
@@ -801,11 +842,11 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     print      ('  set y-axis limits')
     logger.info('  set y-axis limits')
     y_axis_cache = {}
-    n_stn_pair = len(stn_id_pair_list)
-    for s,stn_id_pair in enumerate(stn_id_pair_list):
+    #n_stn_pair = len(stn_id_pair_list_to_plot)
+    for s,stn_id_pair in enumerate(stn_id_pair_list_to_plot):
         #if stn_id_pair == 'KWMC-KSAC':
-        if stn_id_pair in stn_id_pair_list_to_plot:
-            y_axis_cache[stn_id_pair] = [-20, 20, 5]
+        #if stn_id_pair in stn_id_pair_list_to_plot:
+        y_axis_cache[stn_id_pair] = [-20, 20, 5]
     y_axis_cache['KRDD-KSAC'] = [-10, 10, 2]
     y_axis_cache['KDAG-KLAX'] = [-10, 10, 2]
     y_axis_cache['KMFR-KSAC'] = [-4, 20, 4]
@@ -813,7 +854,6 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     y_axis_cache['KWMC-KSFO'] = [-4, 20, 4]
     y_axis_cache['KACV-KSFO'] = [-10, 10, 2]
      
-    
     print      ('  dt_init_list is ' )
     logger.info('  dt_init_list is ' )
     
@@ -821,7 +861,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     max_hrs_found = 0
     i_most_recent = 0
     m = 0 # check gfs
-    s = stn_id_pair_list.index('KWMC-KSAC')
+    s = stn_id_pair_list_to_plot.index('KWMC-KSAC')
     for i, dt_init in enumerate(dt_init_list):
          mask = ~np.isnan(p_sfc1_diff_init_m_hr_s[i,m,:,s])
          hrs_found = len(p_sfc1_diff_init_m_hr_s[i,m,mask,s])
@@ -849,7 +889,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     print      ('  plot latest init, all models ')
     logger.info('  plot latest init, all models ')
     stn_id_pair = 'KWMC-KSAC'
-    s = stn_id_pair_list.index('KWMC-KSAC')
+    s = stn_id_pair_list_to_plot.index('KWMC-KSAC')
     # note csmith - i_most_recent is off by one ? 
     i = i_most_recent
     dt_init_list[i]
@@ -858,7 +898,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     d, n_days = 0, 2    
     #d, n_days = 1, 3    
     #d, n_days = 2, 10    
-    for s,stn_id_pair in enumerate(stn_id_pair_list):
+    for s,stn_id_pair in enumerate(stn_id_pair_list_to_plot):
         #if stn_id_pair == 'KWMC-KSAC':
         if stn_id_pair in stn_id_pair_list_to_plot:
             print      ('    plotting %s %s ' %(s, stn_id_pair))
@@ -941,7 +981,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     m, model_name = 0, 'gfs'
     m, model_name = 1, 'nam'
     m, model_name = 2, 'hrrr'
-    for s,stn_id_pair in enumerate(stn_id_pair_list):
+    for s,stn_id_pair in enumerate(stn_id_pair_list_to_plot):
         #if stn_id_pair == 'KWMC-KSAC':
         if stn_id_pair in stn_id_pair_list_to_plot:
             print      ('    plotting %s %s ' %(s, stn_id_pair))
@@ -1417,12 +1457,14 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
 
     dir_sfc_obs_historical = os.path.join('data', 'sfc_obs_historical')
     utc_conversion = 8
-    dt_start = dt(2017, 1, 1)
-    dt_end   = dt(2020, 10, 1)
+    #dt_start = dt(2017, 1, 1)
+    #dt_end   = dt(2020, 10, 1)
     #dt_start = dt(2018, 11, 6)
     #dt_end   = dt(2018, 11, 21)
     #dt_start = dt(2018, 10, 10)
     #dt_start = dt(2018, 10,  1)
+    dt_start = dt(2019,  9, 10)
+    dt_end   = dt(2019, 11, 15)
     #dt_end = dt.utcnow()
 
     n_days = (dt_end - dt_start).days 
@@ -1500,34 +1542,34 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
             alt_obs_5min_s [:,s] = var_5min
             del var_5min, stn_read_df_f 
  
-    #pres_diff_5min_s = np.full([n_5min, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
-    alt_diff_5min_s  = np.full([n_5min, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
-    #slp_diff_5min_s  = np.full([n_5min, dict_stn_metadata['n_stn']**2], np.nan, dtype=float)
-    stn_id_pair_list = [None]*dict_stn_metadata['n_stn']**2
-    s1, s2 = 9, 2
-    s1, s2 = 2, 9
+    n_stn_pair = len(stn_id_pair_list_to_plot)
+    #pres_diff_5min_s = np.full([n_5min, n_stn_pair], np.nan, dtype=float)
+    alt_diff_5min_s  = np.full([n_5min, n_stn_pair], np.nan, dtype=float)
+    #slp_diff_5min_s  = np.full([n_5min,n_stn_pair], np.nan, dtype=float)
     print      ('  calculating pressure difference station pairs')
     logger.info('  calculating pressure difference station pairs')
-    for s1 in range(0, dict_stn_metadata['n_stn']):
-        print      ('      processing s1 %s ' %(s1))
-        logger.info('      processing s1 %s ' %(s1))
-        for s2 in range(0, dict_stn_metadata['n_stn']):
-            #if (s1 == 2 and s2 == 9) or (s1 == 9 and s2 == 2):
-            #pres_diff_5min_s[:,s1*dict_stn_metadata['n_stn']+s2] = pres_obs_5min_s[:,s1] - pres_obs_5min_s[:,s2] 
-            alt_diff_5min_s [:,s1*dict_stn_metadata['n_stn']+s2] =  alt_obs_5min_s[:,s1] -  alt_obs_5min_s[:,s2] 
-            #slp_diff_5min_s [:,s1*dict_stn_metadata['n_stn']+s2] =  slp_obs_5min_s[:,s1] -  slp_obs_5min_s[:,s2] 
-            stn_id_pair_list[s1*dict_stn_metadata['n_stn']+s2] = dict_stn_metadata['stn_id'][s1]+'-'+dict_stn_metadata['stn_id'][s2]
+    stn_id_pair = stn_id_pair_list_to_plot[0]
+    for s, stn_id_pair in enumerate(stn_id_pair_list_to_plot):
+        stn_id1, stn_id2 = stn_id_pair.split('-')[0], stn_id_pair.split('-')[1]
+        s_id1 = list(dict_stn_metadata['stn_id']).index(stn_id1)
+        s_id2 = list(dict_stn_metadata['stn_id']).index(stn_id2)
+        #dict_stn_metadata['stn_id'][s_id1]
+        #dict_stn_metadata['stn_id'][s_id2]
+        #pres_diff_5min_s[:,s1*dict_stn_metadata['n_stn']+s2] = pres_obs_5min_s[:,s1] - pres_obs_5min_s[:,s2] 
+        alt_diff_5min_s [:,s] = alt_obs_5min_s[:,s_id1] -  alt_obs_5min_s[:,s_id2] 
+        #slp_diff_5min_s [:,s1*dict_stn_metadata['n_stn']+s2] =  slp_obs_5min_s[:,s1] -  slp_obs_5min_s[:,s2] 
+        #stn_id_pair_list[s1*dict_stn_metadata['n_stn']+s2] = dict_stn_metadata['stn_id'][s1]+'-'+dict_stn_metadata['stn_id'][s2]
     # del slp_obs_5min_s
     # del pres_obs_5min_s, alt_obs_5min_s
             
     print      ('  create slp_diff df ') 
     logger.info('  create slp_diff df ') 
     # create df of the arrays        
-    #pres_diff_5min_s_df = pd.DataFrame(pres_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list).round(2)
+    #pres_diff_5min_s_df = pd.DataFrame(pres_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list_to_plot).round(2)
     #del pres_diff_5min_s
-    alt_diff_5min_s_df  = pd.DataFrame( alt_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list).round(2)
+    alt_diff_5min_s_df  = pd.DataFrame( alt_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list_to_plot).round(2)
     #del alt_diff_5min_s
-    #slp_diff_5min_s_df  = pd.DataFrame( slp_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list).round(2)
+    #slp_diff_5min_s_df  = pd.DataFrame( slp_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list_to_plot).round(2)
 
     #for n in range(0, n_5min):
     #for n in range(1420, 1760):
@@ -1552,134 +1594,133 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
     #n_top_events = 20
     n_top_events = 20
     stn_id_pair = 'KWMC-KSAC'
-    s = stn_id_pair_list.index('KWMC-KSAC')
-    for s,stn_id_pair in enumerate(stn_id_pair_list):
+    s = stn_id_pair_list_to_plot.index('KWMC-KSAC')
+    for s,stn_id_pair in enumerate(stn_id_pair_list_to_plot):
         #if stn_id_pair == 'KWMC-KSAC':
-        if stn_id_pair in stn_id_pair_list_to_plot:
-            slp_top_events_df  =  slp_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
-            #alt_top_events_df  =  alt_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
-            if len(slp_top_events_df) > 0:
-                #pres_top_events_df = pres_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
-                #file_name_stn_write = os.path.join('top_events', 'slp_diff_'+stn_id_pair+'.csv') 
-                #slp_top_events_df.to_csv(file_name_stn_write) 
-                alt_top_events_df = alt_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
-                file_name_stn_write = os.path.join('top_events', 'alt_diff_'+stn_id_pair+'.csv') 
-                alt_top_events_df.to_csv(file_name_stn_write) 
-                #file_name_stn_write = os.path.join('top_events', 'pres_diff_'+stn_id_pair+'.csv') 
-                #pres_top_events_df.to_csv(file_name_stn_write) 
-                print      ('%s top events ' %(stn_id_pair)) 
-                logger.info('%s top events ' %(stn_id_pair)) 
-                i = 8
-                #for i, row in enumerate(slp_top_events_df):
-                #print      ('  slp')
-                #logger.info('  slp')
-                #for i in range(0, n_top_events):
-                #    print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
-                #    logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
-                print      ('  alt')
-                logger.info('  alt')
-                for i in range(0, n_top_events):
-                    print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
-                    logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
-                #print      ('  pres')
-                #logger.info('  pres')
-                #for i in range(0, n_top_events):
-                #    print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), pres_top_events_df.index[i].strftime('%Y-%m-%d'), pres_top_events_df[i]))
-                #    logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), pres_top_events_df.index[i].strftime('%Y-%m-%d'), pres_top_events_df[i]))
-    
-                ################################################
-                # plot cdf 
-                mask = ~np.isnan(alt_diff_day_s_df[stn_id_pair])
-                var_temp = alt_diff_day_s_df[stn_id_pair][mask]
-                #np.min(var_temp)
-                #np.max(var_temp)
-                [x_min, x_max, x_int] = [float(math.floor(np.min(var_temp))), float(math.ceil(np.max(var_temp))), 2.0]
-                hist, var_bins = np.histogram(var_temp, bins=100, range=[x_min, x_max])
-                cdf = 100.0*np.cumsum(hist)/len(var_temp)
-                [y_min, y_max, y_int] = [80, 100, 2]
-                
-                
-                index = (cdf < 80.0).argmin()
-                [x_min, x_max, x_int] = [float(math.floor(var_bins[index])), float(math.ceil(np.max(var_temp))), 1.0]
-                y_ticks = list(np.arange(y_min, y_max+y_int, y_int))
-                x_ticks = list(np.arange(x_min, x_max+x_int, x_int))
-                # n_days_plot = (dt_max_plot - dt_min_plot).days 
-                
-                figsize_x, figsize_y = 9, 8
-                size_font = 14
-                
-                fig_num = 141
-                fig = plt.figure(num=fig_num,figsize=(figsize_x, figsize_y)) 
-                plt.clf()
-                plt.plot(var_bins[1:], cdf, 'r', linestyle='-', label=model_name.upper(), linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
-                #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
-                #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
-                #plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
-                for y_tick in y_ticks:
-                    plt.plot([x_min, x_max], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
-                for x_tick in x_ticks:
-                    plt.plot([x_tick, x_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
-                
-                #plt.gca().xaxis.set_major_formatter(DateFormatter(dt_format))
-                plt.xticks(x_ticks, visible=True, fontsize=size_font) 
-                plt.xlim([x_ticks[0], x_ticks[-1]])
-                plt.yticks(y_ticks, fontsize=size_font)
-                plt.ylim([y_min, y_max])
-                plt.ylabel('CDF [%]',fontsize=size_font,labelpad=00)
-                plt.xlabel('$\Delta$ alt [mb]',fontsize=size_font,labelpad=20)
-                plt.title('$\Delta$ alt %s, Observed CDF %s - %s ' % (stn_id_pair, dt_start.strftime('%Y-%m-%d'), dt_end.strftime('%Y-%m-%d')), \
-                  fontsize=size_font+2, x=0.5, y=1.01)                    
-                plt.show() 
-                #filename = 'del_alt_all_model_'+stn_id_pair+'_'+dt_init_list[i].strftime('%Y-%m-%d_%H')+'_'+str(n_days)+'.png' 
-                filename = 'del_alt_cdf_'+stn_id_pair+'.png' 
-                plot_name = os.path.join('top_events', filename)
-                plt.savefig(plot_name) 
-                
-                width_line = 2.0
-                [x_line1, x_line2, x_line3] = [0.5, 1.5, 2.5]  # 1.0, 2.0, 3.0
-                 
-                line_spacing = 1.0  
-                y_line_offset = 0.5 # was 0.2
-                n_lines = 20 
-                y_top = 21.0 # was 11.0
-                
-                fig_num = 151 
-                fig = plt.figure(num=fig_num,figsize=(8,7)) # was 11,9
-                plt.clf() 
-                
-                for l in range(0, n_lines+1, 1): 
-                    #print (l)
-                    #print (l*line_spacing)
-                    plt.plot([ 0, x_line3], [l*line_spacing, l*line_spacing], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
-                plt.plot([             0,              0], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
-                plt.plot([x_line1, x_line1], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
-                plt.plot([x_line2, x_line2], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
-                plt.plot([x_line3, x_line3], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
-                
-                plt.axis('off')
-                
-                [x_offset, y_offset] = [0.2, 0.5]
-                for l in range(0, n_lines, 1): 
-                    plt.text(               x_offset, l*line_spacing+y_offset, str(n_lines-l).zfill(2), fontsize=size_font,                            ha='left', va='center', color='k')  
-                    plt.text(x_line1+x_offset, l*line_spacing+y_offset, alt_top_events_df.index[n_lines-l-1].strftime('%Y-%m-%d'), fontsize=size_font, ha='left', va='center', color='k')  
-                    plt.text(x_line2+x_offset, l*line_spacing+y_offset, alt_top_events_df[n_lines-l-1], fontsize=size_font,                            ha='left', va='center', color='k')  
-                # headers
-                plt.text(               x_offset, 20.0+y_offset, 'rank', fontsize=size_font,                               ha='left', va='center', color='k')  
-                plt.text(x_line1+x_offset, 20.0+y_offset, 'date', fontsize=size_font,                               ha='left', va='center', color='k')  
-                plt.text(x_line2+x_offset, 20.0+y_offset, '$\Delta$ alt [mb]', fontsize=size_font,                               ha='left', va='center', color='k')  
-                plt.title('$\Delta$ alt %s, Top events %s - %s ' % (stn_id_pair, dt_start.strftime('%Y-%m-%d'), dt_end.strftime('%Y-%m-%d')), \
-                  fontsize=size_font+2, x=0.5, y=1.01) 
-                #plt.xlim([-0.2, 11.2])
-                #plt.ylim([-4.2, 12.0]) 
-                plt.show() 
-                plt.tight_layout()
-                filename = 'del_alt_top_events_'+stn_id_pair+'.png' 
-                plot_name = os.path.join('top_events', filename)
-                plt.savefig(plot_name) 
+        #if stn_id_pair in stn_id_pair_list_to_plot:
+        slp_top_events_df  =  slp_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
+        #alt_top_events_df  =  alt_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
+        if len(slp_top_events_df) > 0:
+            #pres_top_events_df = pres_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
+            #file_name_stn_write = os.path.join('top_events', 'slp_diff_'+stn_id_pair+'.csv') 
+            #slp_top_events_df.to_csv(file_name_stn_write) 
+            alt_top_events_df = alt_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
+            file_name_stn_write = os.path.join('top_events', 'alt_diff_'+stn_id_pair+'.csv') 
+            alt_top_events_df.to_csv(file_name_stn_write) 
+            #file_name_stn_write = os.path.join('top_events', 'pres_diff_'+stn_id_pair+'.csv') 
+            #pres_top_events_df.to_csv(file_name_stn_write) 
+            print      ('%s top events ' %(stn_id_pair)) 
+            logger.info('%s top events ' %(stn_id_pair)) 
+            i = 8
+            #for i, row in enumerate(slp_top_events_df):
+            #print      ('  slp')
+            #logger.info('  slp')
+            #for i in range(0, n_top_events):
+            #    print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
+            #    logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
+            print      ('  alt')
+            logger.info('  alt')
+            for i in range(0, n_top_events):
+                print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
+                logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
+            #print      ('  pres')
+            #logger.info('  pres')
+            #for i in range(0, n_top_events):
+            #    print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), pres_top_events_df.index[i].strftime('%Y-%m-%d'), pres_top_events_df[i]))
+            #    logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), pres_top_events_df.index[i].strftime('%Y-%m-%d'), pres_top_events_df[i]))
+
+            ################################################
+            # plot cdf 
+            mask = ~np.isnan(alt_diff_day_s_df[stn_id_pair])
+            var_temp = alt_diff_day_s_df[stn_id_pair][mask]
+            #np.min(var_temp)
+            #np.max(var_temp)
+            [x_min, x_max, x_int] = [float(math.floor(np.min(var_temp))), float(math.ceil(np.max(var_temp))), 2.0]
+            hist, var_bins = np.histogram(var_temp, bins=100, range=[x_min, x_max])
+            cdf = 100.0*np.cumsum(hist)/len(var_temp)
+            [y_min, y_max, y_int] = [80, 100, 2]
+            
+            
+            index = (cdf < 80.0).argmin()
+            [x_min, x_max, x_int] = [float(math.floor(var_bins[index])), float(math.ceil(np.max(var_temp))), 1.0]
+            y_ticks = list(np.arange(y_min, y_max+y_int, y_int))
+            x_ticks = list(np.arange(x_min, x_max+x_int, x_int))
+            # n_days_plot = (dt_max_plot - dt_min_plot).days 
+            
+            figsize_x, figsize_y = 9, 8
+            size_font = 14
+            
+            fig_num = 141
+            fig = plt.figure(num=fig_num,figsize=(figsize_x, figsize_y)) 
+            plt.clf()
+            plt.plot(var_bins[1:], cdf, 'r', linestyle='-', label=model_name.upper(), linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
+            #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
+            #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
+            #plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
+            for y_tick in y_ticks:
+                plt.plot([x_min, x_max], [y_tick, y_tick], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
+            for x_tick in x_ticks:
+                plt.plot([x_tick, x_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
+            
+            #plt.gca().xaxis.set_major_formatter(DateFormatter(dt_format))
+            plt.xticks(x_ticks, visible=True, fontsize=size_font) 
+            plt.xlim([x_ticks[0], x_ticks[-1]])
+            plt.yticks(y_ticks, fontsize=size_font)
+            plt.ylim([y_min, y_max])
+            plt.ylabel('CDF [%]',fontsize=size_font,labelpad=00)
+            plt.xlabel('$\Delta$ alt [mb]',fontsize=size_font,labelpad=20)
+            plt.title('$\Delta$ alt %s, Observed CDF %s - %s ' % (stn_id_pair, dt_start.strftime('%Y-%m-%d'), dt_end.strftime('%Y-%m-%d')), \
+              fontsize=size_font+2, x=0.5, y=1.01)                    
+            plt.show() 
+            #filename = 'del_alt_all_model_'+stn_id_pair+'_'+dt_init_list[i].strftime('%Y-%m-%d_%H')+'_'+str(n_days)+'.png' 
+            filename = 'del_alt_cdf_'+stn_id_pair+'.png' 
+            plot_name = os.path.join('top_events', filename)
+            plt.savefig(plot_name) 
+            
+            width_line = 2.0
+            [x_line1, x_line2, x_line3] = [0.5, 1.5, 2.5]  # 1.0, 2.0, 3.0
+             
+            line_spacing = 1.0  
+            y_line_offset = 0.5 # was 0.2
+            n_lines = 20 
+            y_top = 21.0 # was 11.0
+            
+            fig_num = 151 
+            fig = plt.figure(num=fig_num,figsize=(8,7)) # was 11,9
+            plt.clf() 
+            
+            for l in range(0, n_lines+1, 1): 
+                #print (l)
+                #print (l*line_spacing)
+                plt.plot([ 0, x_line3], [l*line_spacing, l*line_spacing], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+            plt.plot([             0,              0], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+            plt.plot([x_line1, x_line1], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+            plt.plot([x_line2, x_line2], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+            plt.plot([x_line3, x_line3], [ 0, y_top], 'k', linestyle='-', linewidth=width_line, marker='o', markersize=0) 
+            
+            plt.axis('off')
+            
+            [x_offset, y_offset] = [0.2, 0.5]
+            for l in range(0, n_lines, 1): 
+                plt.text(               x_offset, l*line_spacing+y_offset, str(n_lines-l).zfill(2), fontsize=size_font,                            ha='left', va='center', color='k')  
+                plt.text(x_line1+x_offset, l*line_spacing+y_offset, alt_top_events_df.index[n_lines-l-1].strftime('%Y-%m-%d'), fontsize=size_font, ha='left', va='center', color='k')  
+                plt.text(x_line2+x_offset, l*line_spacing+y_offset, alt_top_events_df[n_lines-l-1], fontsize=size_font,                            ha='left', va='center', color='k')  
+            # headers
+            plt.text(               x_offset, 20.0+y_offset, 'rank', fontsize=size_font,                               ha='left', va='center', color='k')  
+            plt.text(x_line1+x_offset, 20.0+y_offset, 'date', fontsize=size_font,                               ha='left', va='center', color='k')  
+            plt.text(x_line2+x_offset, 20.0+y_offset, '$\Delta$ alt [mb]', fontsize=size_font,                               ha='left', va='center', color='k')  
+            plt.title('$\Delta$ alt %s, Top events %s - %s ' % (stn_id_pair, dt_start.strftime('%Y-%m-%d'), dt_end.strftime('%Y-%m-%d')), \
+              fontsize=size_font+2, x=0.5, y=1.01) 
+            #plt.xlim([-0.2, 11.2])
+            #plt.ylim([-4.2, 12.0]) 
+            plt.show() 
+            plt.tight_layout()
+            filename = 'del_alt_top_events_'+stn_id_pair+'.png' 
+            plot_name = os.path.join('top_events', filename)
+            plt.savefig(plot_name) 
 
     print      ('obs_historical_process end ')
     logger.info('obs_historical_process end ')
-
 
 # top expected events 
 # 2011_12_01
@@ -1750,7 +1791,7 @@ def cleanup(bucket_name):
 ###############################################################################    
 if __name__ == "__main__":
 
-    #debug_mode = True
+    # debug_mode = True
     debug_mode = False
     if not debug_mode: 
         # parse inputs 
@@ -1859,15 +1900,20 @@ if __name__ == "__main__":
         'KMFR-KSAC',
         'KMFR-KSFO',
         'KRDD-KSAC',
+        'KSFO-KSAC',
         'KSMX-KSBA',
         'KWMC-KSAC',
         'KWMC-KSFO']
         
-    stn_list_to_use = ['KBFL', 'KSMX', 'KSBA', 'KLAX', 'KDAG', 'KSFO', 'KACV', 'KWMC', 'KSAC', 'KMFR', 'KRDD']
-    
-    #stn_id_pair_list_to_plot = [
-    #    'KWMC-KSFO']
- 
+    stn_list_to_use = set()
+    for pair in stn_id_pair_list_to_plot:
+        stn1, stn2 = pair.split('-')[0], pair.split('-')[1]
+        stn_list_to_use.add(stn1)
+        stn_list_to_use.add(stn2)
+    stn_list_to_use = list(stn_list_to_use)
+    # print(stn_list_to_use)
+    # stn_list_to_use = ['KBFL', 'KSMX', 'KSBA', 'KLAX', 'KDAG', 'KSFO', 'KACV', 'KWMC', 'KSAC', 'KMFR', 'KRDD']
+     
     dt_init = dt_init_expected - td(hours=hours_to_backfill)
     if  process_name in ['download', 'process_grib', 'process_csv', 'calc_pgrad']:
         while dt_init <= dt_init_expected: 
@@ -1883,7 +1929,7 @@ if __name__ == "__main__":
             elif process_name == 'process_csv':
                 process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr, bucket_name)
             elif process_name == 'calc_pgrad':                
-                calc_pgrad(dict_stn_metadata, model_name, dt_init, bucket_name)
+                calc_pgrad(dict_stn_metadata, stn_id_pair_list_to_plot, model_name, dt_init, bucket_name)
                 #calc_pgrad(dict_stn_metadata, model_name_list, dt_init, bucket_name)
             dt_init += td(hours=update_frequency_hrs)
 
