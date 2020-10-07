@@ -11,9 +11,12 @@ ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-34-221-234-53.us-west-2.
 
 
 ######################################
-# mongo stuff 
+# flask 
 
-# mongo stuff 
+pip install flask-cors
+
+
+# flask 
 ######################################
 
 

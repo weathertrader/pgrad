@@ -1,8 +1,85 @@
 $(function() {
 
+//http://127.0.0.1:5000/models_avail_page
+
+// works
+//  $.get( "http://127.0.0.1:5000/models_avail_page", function(model_data2) {
+//    console.log(model_data2);
+//  });
+
+
+  console.log('mark01')
+
+$(function() {
+    queryModelsAvail();
+    //data = queryModelsAvail();
+    //console.log(data)
+});
+
+  console.log('mark02')
+
+  function queryModelsAvail () {
+    $.get('http://127.0.0.1:5000/models_avail_page', function(data) { 
+        console.log(data);
+        var table_html = '';
+        $.each(data, function (i, item) {
+            table_html += '<tr><td style="text-align:center">' + item.model + '</td>\
+                               <td style="text-align:center">' + item.dt_init + '</td>\
+                               <td style="text-align:center">' + item.hrs_avail + '</td>\
+                               <td style="text-align:center">' + item.dt_proc_lt + '</td></tr>';
+        });
+        //$.each(data, function (i, item) {
+        //    table_html += '<tr><td style="text-align:center">' + item.model + '</td><td style="text-align:center">' + item.dt_init + '</td><td style="text-align:center">' + item.hrs_avail + '</td><td style="text-align:center">' + item.dt_proc_lt + '</td></tr>';
+        //});
+        $('#modelsAvailTable').append(table_html);
+    });
+    //console.log(data);
+    //return(data);
+  }
+
+  console.log('mark03')
+
+  console.log('mark04')
+
+  console.log('mark05')
+
+//  function queryModelsAvail() {
+//    $.get( "http://127.0.0.1:5000/models_avail_page", function(model_data2) {
+//     console.log(model_data2)
+//      return model_data2;
+//    });
+//    return model_data2
+//  }
+
+//  console.log('before query')
+//  model_data2 = queryModelsAvail();
+//  console.log('after query')
+
+//var jsonData = '[{"rank":"9","content":"Alon","UID":"5"},{"rank":"6","content":"Tala","UID":"6"}]';
+//var trHTML = '';
+//$.each(response, function (i, item) {
+//    trHTML += '<tr><td>' + item.rank + '</td><td>' + item.content + '</td><td>' + item.UID + '</td></tr>';
+//});
+//$('#records_table').append(trHTML);
+//
+
+
+//var myUrl = "http://127.0.0.1:5000/models_avail_page";    
+//$.get(myUrl, function(data){
+//    //data here will be object, should not used directly
+//    $("#statusToggle").html(data);
+//    alert("load was performed"); 
+//}, 'json');        
+       
+  $("#statusToggle").click(function(){
+        $("table").toggle(50);
+    });
+
   $("#stationMapToggle").click(function(){
         $("img").toggle(50);
     });
+
+
 
   $('.dropdown-menu a').on('click', function(){    
     $(this).parent().parent().prev().html($(this).html()+'<span class="caret"></span>');    

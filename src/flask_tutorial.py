@@ -3,9 +3,12 @@ from flask import Flask
 from flask import jsonify
 from flask import request
 from flask_pymongo import PyMongo
+from flask_cors import CORS
+from datetime import datetime as dt 
+from datetime import timedelta as td 
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/')
 def hello_world():
@@ -30,7 +33,6 @@ app.config['MONGO_URI'] = 'mongodb://localhost:27017/models_avail'
 
 mongo = PyMongo(app)
 
-
 #mongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
 #mongo_db = mongo_client.models_avail
 #coll = mongo_db.models_avail
@@ -41,6 +43,9 @@ mongo = PyMongo(app)
 
 # images/del_slp_all_init_KWMC-KSFO_hrrr_2.png
 
+dt_min = dt.utcnow() - td(hours=48)
+
+#@cross_origin()
 @app.route('/models_avail_page', methods=['GET'])
 def get_all_models_avail():
     #result = coll.find_one({'model':model_name, 'dt_init':dt_init})
@@ -49,6 +54,12 @@ def get_all_models_avail():
     output = []
     model_name = 'gfs'
     models = ['gfs', 'nam', 'hrrr']
+
+    #for result in coll.find({"model": "gfs"}):
+    cursor = coll.find({"dt_proc_lt": {"$gte": dt_min}}).sort([('model', 1), ('dt_init', -1)]).limit(20)
+    for result in cursor:
+        print(result)
+        output.append({'model':result['model'].upper(), 'dt_init':result['dt_init'].strftime('%Y-%m-%d_%H'), 'hrs_avail':result['hrs_avail'], 'dt_proc_lt':result['dt_proc_lt'].strftime('%Y-%m-%d_%H-%M')})
     #for result in coll.find():
     #    print(result)
     #    output.append({'model':result['model'], 'dt_init':result['dt_init'], 'hrs_avail':result['hrs_avail']})
@@ -57,9 +68,6 @@ def get_all_models_avail():
     #for result in coll.find({"model": {"$in": models}}):
     #output = []    
     # for result in coll.find({"model": {"$eq": 'nam'}}):
-    for result in coll.find({"model": "hrrr"}):
-        print(result)
-        output.append({'model':result['model'], 'dt_init':result['dt_init'], 'hrs_avail':result['hrs_avail']})
     #    output.append({'dt_init':result['dt_init'], 'hrs_avail':result['hrs_avail']})
     #for result in coll.find():
     #    output.append({'model':result['model'], 'dt_init':result['dt_init'], 'hrs_avail':result['hrs_avail']})
@@ -71,11 +79,8 @@ def get_all_models_avail():
     #    output.append({'model':result['model'], 'dt_init':result['dt_init'], 'hrs_avail':result['hrs_avail']})
     #else:
     #    output = "No such name"
-    return jsonify({'result' : output})
-
-
-
-
+    # return jsonify({'result' : output})
+    return jsonify(output)
 
 if __name__ == '__main__':
     app.run(debug=True)
