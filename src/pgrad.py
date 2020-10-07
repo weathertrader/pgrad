@@ -732,8 +732,10 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
      
     print      ('open connection to mongo ')
     logger.info('open connection to mongo ')
-    # open connection to mongo 
+    # open connection to mongo and connect to the db_connection
     mongo_client = pymongo.MongoClient("mongodb://localhost:27017/")
+    mongo_db = mongo_client.models_avail
+    coll = mongo_db.models_avail
     #mongo_client =          MongoClient('mongodb://localhost:27017')
     #mongo_client = MongoClient()
     #mongo_client = MongoClient('localhost', 27017)
@@ -743,8 +745,6 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     # print(mongo_db.list_collection_names())
     
     # connect to the db collection 
-    mongo_db = mongo_client.models_avails
-    coll = mongo_db.models_avail
     #mongo_db = mongo_client['models_avail']
     #collection = mongo_db['models_avail']
     # drop collection

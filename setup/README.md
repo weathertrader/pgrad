@@ -39,10 +39,28 @@ pip install -r pgrad/requirements.txt
 ```
 To recreate the environment and requirements.txt you can also use this 
 ```
-pip install numpy pandas dask netCDF4 xarray spyder matplotlib cfgrib flask apache-airflow
+pip install numpy pandas dask netCDF4 xarray spyder matplotlib cfgrib flask apache-airflow pymongo
+
 # check cfgrib installation
 python -m cfgrib selfcheck
 pip freeze > requirements.txt
+```
+Install MongoDB and start the service 
+
+```
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+# on ubuntu 20.04
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+# on debian 10 
+echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+sudo systemctl enable mongod
+sudo systemctl start mongod
+# to check, stop or restart the service
+sudo systemctl status mongod
+sudo systemctl stop mongod
+sudo systemctl restart mongod
 ```
 
 Backfill data from the last few forecast runs.  I suggest backgrounding this process 
