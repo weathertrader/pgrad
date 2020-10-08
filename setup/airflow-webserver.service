@@ -1,0 +1,20 @@
+#airflow-webserver.service
+
+[Unit]
+Description=Airflow webserver daemon
+After=network.target postgresql.service mysql.service redis.service rabbitmq-server.service
+Wants=postgresql.service mysql.service redis.service rabbitmq-server.service
+
+[Service]
+#EnvironmentFile=/etc/default/airflow
+Environment="PATH=/home/ubuntu/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+User=airflow
+Group=airflow
+Type=simple
+ExecStart=/home/ubuntu/miniconda3/bin/airflow webserver -p 8085 --pid /home/ubuntu/airflow/airflow-webserver.pid
+Restart=on-failure
+RestartSec=5s
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

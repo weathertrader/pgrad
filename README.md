@@ -47,7 +47,7 @@ All data and figures are refreshed hourly.
 ## Architecture and Setup
 
 Project currently runs on a t1 instance on AWS with no additional hard disk.
-ETLs are written in bash and python and scheduled using Airflow or cron jobs, and the website is served with Apache.
+ETLs are written in bash and python and scheduled using Airflow or Cron jobs, and the website is served with Apache.
 Details of jobs that are run can be found in the `src/crontab.txt` or `airflow/dags/pgrad_dag.py`.
 The state of model ingestion is stored in a NoSQL MongoDB.
 Further details on the setup can be found in the [`setup/README.md`](https://github.com/weathertrader/pgrad/blob/master/setup/README.md).
