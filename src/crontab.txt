@@ -1,36 +1,21 @@
 SHELL=/bin/bash
 BASH_ENV=/home/ubuntu/.bashrc
-56  * * * * bash -l -c '~/pgrad/src/cron_scripts/plot_data.bsh'
-53  * * * * bash -l -c '~/pgrad/src/cron_scripts/calc_pgrad_gfs.bsh'
-52  * * * * bash -l -c '~/pgrad/src/cron_scripts/calc_pgrad_nam.bsh'
-51  * * * * bash -l -c '~/pgrad/src/cron_scripts/calc_pgrad_hrrr.bsh'
-46  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_csv_gfs.bsh'
-41  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_csv_nam.bsh'
-36  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_csv_hrrr.bsh'
-31  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_grib_gfs.bsh'
-26  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_grib_nam.bsh'
-21  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_grib_hrrr.bsh'
-16  * * * * bash -l -c '~/pgrad/src/cron_scripts/download_gfs.bsh'
-11  * * * * bash -l -c '~/pgrad/src/cron_scripts/download_nam.bsh'
-6  * * * * bash -l -c '~/pgrad/src/cron_scripts/download_hrrr.bsh'
-1  * * * * bash -l -c '~/pgrad/src/cron_scripts/cleanup.bsh'
-#
-#
-#
-# */1  * * * * bash -l -c '~/pgrad/src/cron_scripts/plot_data.bsh'
-# */1  * * * * bash -l -c '/home/ubuntu/pgrad/src/cron_scripts/plot_data.bsh'
-# xyz
-# 1  * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_delete_old_model_data_flat_files.bsh'
-# 6  * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_delete_old_model_data_flat_files.bsh'
-# 11  * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_delete_old_model_data_flat_files.bsh'
-# xyz
-# */60 * * * * bash -l -c '/home/csmith/common/python_scripts/obs/download_sfc_obs_mesowest_raws.bsh'
+*/10  * * * * bash -l -c '~/pgrad/src/cron_scripts/plot_data.bsh'
+14,34,54 * * * * bash -l -c '~/pgrad/src/cron_scripts/calc_pgrad_gfs.bsh'
+11,31,51 * * * * bash -l -c '~/pgrad/src/cron_scripts/calc_pgrad_nam.bsh'
+8,28,48  * * * * bash -l -c '~/pgrad/src/cron_scripts/calc_pgrad_hrrr.bsh'
+13,33,53 * * * * bash -l -c '~/pgrad/src/cron_scripts/process_csv_gfs.bsh'
+10,30,50 * * * * bash -l -c '~/pgrad/src/cron_scripts/process_csv_nam.bsh'
+7,27,47  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_csv_hrrr.bsh'
+12,32,52 * * * * bash -l -c '~/pgrad/src/cron_scripts/process_grib_gfs.bsh'
+9,29,49  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_grib_nam.bsh'
+6,26,46  * * * * bash -l -c '~/pgrad/src/cron_scripts/process_grib_hrrr.bsh'
+7,27,47  * * * * bash -l -c '~/pgrad/src/cron_scripts/download_gfs.bsh'
+4,24,44  * * * * bash -l -c '~/pgrad/src/cron_scripts/download_nam.bsh'
+1,21,41  * * * * bash -l -c '~/pgrad/src/cron_scripts/download_hrrr.bsh'
+1,31  * * * * bash -l -c '~/pgrad/src/cron_scripts/cleanup.bsh'
 # check space 
 # */10 * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_check_space_calc.bsh'
 # */10 * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_check_space_plot.bsh'
-# delete/archive old model data 
-# 6  * * * * bash -l -c '/home/csmith/common/python_scripts/betterweather/cron_betterweather_delete_old_model_data_from_db.bsh'
-#####################################
-# monitors
 # master monitor
 #*/20  * * * * source /etc/profile; source /etc/bashrc; source /home/ubuntu/.bashrc; /home/csmith/python_scripts/wrf_run/wrf_operational_kill_jobs_and_processes_archer.bsh
