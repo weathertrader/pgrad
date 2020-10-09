@@ -9,6 +9,8 @@ EnvironmentFile=/etc/environment
 # EnvironmentFile=/etc/default/airflow
 # Environment="PATH=/home/ubuntu/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 # EnvironmentFile=/home/airflow/airflow.env
+Environment="PATH=/home/ubuntu/miniconda3/bin/bin"
+Environment="AIRFLOW_HOME=/home/ubuntu/airflow"
 # User=airflow
 # Group=airflow
 User=ubuntu

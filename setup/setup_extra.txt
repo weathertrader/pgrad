@@ -81,8 +81,12 @@ sudo systemctl status airflow-scheduler
 
 sudo journalctl -u airflow-webserver.service -f
 sudo journalctl -u airflow-webserver.service -u airflow-scheduler.service -n 10
+sudo journalctl -u airflow-webserver.service -n 10
+sudo journalctl -u airflow-scheduler.service -n 10
+
 
 sudo systemctl daemon-reload
+sudo systemctl restart airflow-webserver
 sudo systemctl restart airflow-scheduler
 sudo systemctl stop 
 sudo systemctl disable 
