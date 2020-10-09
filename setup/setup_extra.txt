@@ -1,21 +1,33 @@
 
 24.6.126.210/32
 
-http://54.191.77.127/pgrad.html
-http://54.191.77.127:8080/admin/
+http://35.164.84.231/pgrad.html
+http://35.164.84.231:8080/admin/
 
 index.html access 
 
-ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-54-191-77-127.us-west-2.compute.amazonaws.com
+ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-35-164-84-231.us-west-2.compute.amazonaws.com
 
 ######################################
 # airflow 
+
+
+This unit file needs a user called airflow, but if you want to use it for a different user, change the directives User= and Group= to the desired user. You might notice that the EnvironmentFile= and ExecStart= directives are changed. The EnvironmentFile= directive specifies the path to a file with environment variables that can be used by the service. Here you can define variables like SCHEDULER_RUNS, AIRFLOW_HOME or AIRFLOW_CONFIG. Ma
+
 
 sudo apt-get install postgresql postgresql-contrib libpq-dev python3-psycopg2
 
 pip install apache-airflow[postgres]
 pip install psycopg2
 
+
+
+parallelism = 2
+dag_concurrency = 2
+max_active_runs_per_dag = 2
+
+#load_default_connections = True
+load_default_connections = False
 
 airflow.cfg
 change executor to 
@@ -24,11 +36,13 @@ executor = LocalExecutor
 sql_alchemy_conn = postgresql+psycopg2://airflow:airflow@localhost:5432/airflow
 
 sudo -u postgres psql
+
 CREATE USER airflow WITH PASSWORD 'airflow';
 CREATE DATABASE airflow;
 # GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO airflow;
 # GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO airflow;
 GRANT ALL PRIVILEGES ON DATABASE airflow to airflow;
+
 
 sudo vi /etc/postgresql/11/main/pg_hba.conf
 didn't change anything
@@ -53,10 +67,39 @@ airflow initdb
 
 sudo cp setup/airflow-*.service /etc/systemd/system/.
 
-sudo systemctl enable airflow-scheduler
-sudo systemctl start airflow-scheduler
+
+
 sudo systemctl enable airflow-webserver
 sudo systemctl start airflow-webserver
+
+
+sudo systemctl restart airflow-scheduler
+
+sudo systemctl enable airflow-scheduler
+sudo systemctl start airflow-scheduler
+
+systemctl status airflow-webserver
+
+chmod 664 /etc/systemd/system/airflow-scheduler.service
+systemctl daemon-reload
+journalctl -u airflow-webserver.service -f
+
+
+sudo systemctl daemon-reload
+
+sudo systemctl start airflow-webserver.service
+sudo systemctl start airflow-scheduler.service
+
+sudo systemctl status airflow-webserver.service
+sudo systemctl status airflow-scheduler.service
+
+sudo systemctl enable airflow-webserver.service
+sudo systemctl enable airflow-scheduler.service
+
+sudo systemctl stop 
+sudo systemctl disable 
+
+sudo journalctl -u airflow-webserver.service -u airflow-scheduler.service -n 10
 
 
 # airflow 
