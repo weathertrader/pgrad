@@ -1,12 +1,23 @@
 
+airflow - just finished
+mongodb - just finished
+flask apis - pretty far along already
+Docker - developing locally and deploying to AWS 
+Go / C++ / Scala / Kubernetes / Serverless ETLs
+
 24.6.126.210/32
 
 http://35.164.84.231/pgrad.html
 http://35.164.84.231:8080/admin/
 
+ec2-35-164-84-231.us-west-2.compute.amazonaws.com/pgrad.html
+
 index.html access 
 
 ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-35-164-84-231.us-west-2.compute.amazonaws.com
+
+
+scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-35-164-84-231.us-west-2.compute.amazonaws.com:~/pgrad/images/archive/del_slp_all_model_KWMC-KSFO_* .
 
 ######################################
 # airflow 
@@ -88,8 +99,10 @@ sudo journalctl -u airflow-scheduler.service -n 10
 sudo systemctl daemon-reload
 sudo systemctl restart airflow-webserver
 sudo systemctl restart airflow-scheduler
-sudo systemctl stop 
-sudo systemctl disable 
+sudo systemctl stop airflow-webserver
+sudo systemctl stop airflow-scheduler
+sudo systemctl disable airflow-webserver
+sudo systemctl disable airflow-scheduler
 
 chmod 664 /etc/systemd/system/airflow-scheduler.service
 
@@ -103,11 +116,95 @@ sudo systemctl enable airflow-scheduler.service
 # airflow 
 ######################################
 
+-yqq answers yes to prompts and supresses output
 
+sudo apt-get -yqq update
 
 ######################################
 # docker 
-sudo yum install -y docker
+
+
+sudo apt install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+sudo apt update
+sudo apt install docker-ce
+sudo systemctl status docker
+sudo usermod -aG docker csmith
+sudo usermod -aG docker ubuntu 
+
+sudo docker run hello-world
+sudo docker run ubuntu 
+docker images 
+
+docker run -it ubuntu 
+docker ps
+docker ps -a 
+
+docker start id
+docker stop id
+docker rm id
+--name 
+
+docker commit -m "What you did to the image" -a "Author Name" container_id repository/new_image_name
+docker commit -m "added Node.js" -a "sammy" d42d0bbfbd35 sammy/ubuntu-nodejs
+
+docker pull busybox
+docker run -it busybox sh
+
+
+sudo docker build -t yourusername/catnip .
+sudo docker run -p 8888:5000 yourusername/catnip
+sudo 
+sudo 
+sudo 
+sudo 
+sudo 
+sudo 
+
+# get a bash shell inside the container 
+docker exec -it ad947a6b302 bash
+
+
+0.0.0.0:32769
+
+sudo docker run -d -P --name static-site prakhar1989/static-site
+sudo docker port static-site
+sudo docker run -p 8888:80 prakhar1989/static-site 
+
+
+
+# mount a volume 
+docker run -d -p 8080:8080 -v /path/to/dags/on/your/local/machine/:/usr/local/airflow/dags  puckel/docker-airflow webserver
+docker run -d -p 8080:8080 -v <local_path_to_your_dags>:/usr/local/airflow/dags  puckel/docker-airflow webserver
+
+
+
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+   
+
+sudo apt-get install docker
+
+
+
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+
+
 sudo service docker start
 docker info 
 docker run -d -p 80:8080 chandupriya/nodedemo:0.1

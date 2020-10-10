@@ -962,7 +962,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                     plt.plot(dt_axis_lt_init[i,mask], p_sfc1_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name.upper(), linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
                     #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
                 #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
-                plt.legend(loc=4,fontsize=size_font-2,ncol=1) 
+                plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
                 plt.plot([dt_start_lt, dt_start_lt], [y_min, y_max], 'y', linestyle='--', linewidth=1.0, marker='o', markersize=0, markeredgecolor='k') 
                 plt.plot([dt_ticks[0], dt_ticks[-1]], [0.0, 0.0], 'k', linestyle='-', linewidth=2.0, marker='o', markersize=0, markeredgecolor='k') 
                 for y_tick in y_ticks:
@@ -1049,7 +1049,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                             i -=1 
                             #plt.plot(dt_axis_lt_init[i,mask], p_sfc2_diff_init_m_hr_s[i,m,mask,s], color_list[m], linestyle='-', label=model_name, linewidth=3.0, marker='o', markersize=0, markeredgecolor='k') 
                         #plt.plot(dt_axis_lt_init[i,:], p_sfc1_diff_init_m_hr_s[i,m,:,s], 'r', linestyle='-', label='obs ws', linewidth=2.0, marker='o', markersize=2, markeredgecolor='k') 
-                        plt.legend(loc=4,fontsize=size_font-2,ncol=1) 
+                        plt.legend(loc=3,fontsize=size_font-2,ncol=1) 
                         plt.plot([dt_start_lt, dt_start_lt], [y_min, y_max], 'y', linestyle='--', linewidth=1.0, marker='o', markersize=0, markeredgecolor='k') 
                         plt.plot([dt_ticks[0], dt_ticks[-1]], [0.0, 0.0], 'k', linestyle='-', linewidth=2.0, marker='o', markersize=0, markeredgecolor='k') 
                         for y_tick in y_ticks:
