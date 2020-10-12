@@ -814,38 +814,41 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                     dt_axis_lt_init [dt_init_count,:] = dt_axis_lt
 
                 # query mongodb to see if it exists
-                result = coll.find_one({'model':model_name, 'dt_init':dt_init})
-                # print(result)
-                #n_results = len(result)
-                # if (n_results == 0): # no existing entry 
-                if not result: # no existing entry 
-                    #data = {"model": model_name,
-                    #        "dt_init": dt_init, 
-                    #        "hrs_avail": n_hrs_found,
-                    #        "dt_proc_lt": dt_start_lt.strftime('%Y-%m-%d_%H-%M')}
-                    data = {"model": model_name,
-                            "dt_init": dt_init, 
-                            "hrs_avail": n_hrs_found,
-                            "dt_proc_lt": dt_start_lt}
-                    # result = coll.insert_one({"model": model_name, "dt_init": dt_init, "hrs_avail": n_hrs_found})
-                    result = coll.insert_one(data)
-                    print      ('        inserting new data ')
-                    logger.info('        inserting new data ')
-                else: # update existing query 
-                    n_hrs_prev = result['hrs_avail']
-                    if n_hrs_found > n_hrs_prev:
-                        #coll.update_one({'model':model_name, 
-                        #                 'dt_init':dt_init},
-                        #                {"$set":{"hrs_avail":n_hrs_found, "dt_proc_lt": dt_start_lt.strftime('%Y-%m-%d_%H-%M')}})
-                        coll.update_one({'model':model_name, 
-                                         'dt_init':dt_init},
-                                        {"$set":{"hrs_avail":n_hrs_found, "dt_proc_lt": dt_start_lt}})
-                        print      ('        updating new data ')
-                        logger.info('        updating new data ')
-
-                    else: 
-                        print      ('        no new data to update')
-                        logger.info('        no new data to update')
+                try: 
+                    result = coll.find_one({'model':model_name, 'dt_init':dt_init})
+                    # print(result)
+                    #n_results = len(result)
+                    # if (n_results == 0): # no existing entry 
+                    if not result: # no existing entry 
+                        #data = {"model": model_name,
+                        #        "dt_init": dt_init, 
+                        #        "hrs_avail": n_hrs_found,
+                        #        "dt_proc_lt": dt_start_lt.strftime('%Y-%m-%d_%H-%M')}
+                        data = {"model": model_name,
+                                "dt_init": dt_init, 
+                                "hrs_avail": n_hrs_found,
+                                "dt_proc_lt": dt_start_lt}
+                        # result = coll.insert_one({"model": model_name, "dt_init": dt_init, "hrs_avail": n_hrs_found})
+                        result = coll.insert_one(data)
+                        print      ('        inserting new data ')
+                        logger.info('        inserting new data ')
+                    else: # update existing query 
+                        n_hrs_prev = result['hrs_avail']
+                        if n_hrs_found > n_hrs_prev:
+                            #coll.update_one({'model':model_name, 
+                            #                 'dt_init':dt_init},
+                            #                {"$set":{"hrs_avail":n_hrs_found, "dt_proc_lt": dt_start_lt.strftime('%Y-%m-%d_%H-%M')}})
+                            coll.update_one({'model':model_name, 
+                                             'dt_init':dt_init},
+                                            {"$set":{"hrs_avail":n_hrs_found, "dt_proc_lt": dt_start_lt}})
+                            print      ('        updating new data ')
+                            logger.info('        updating new data ')    
+                        else: 
+                            print      ('        no new data to update')
+                            logger.info('        no new data to update')
+                except:
+                    pass
+                  
         dt_init += td(hours=update_frequency_hrs)
         dt_init_count += 1        
 

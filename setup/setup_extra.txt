@@ -1,5 +1,5 @@
 
-airflow - just finished
+airflow - just -finished
 mongodb - just finished
 flask apis - pretty far along already
 Docker - developing locally and deploying to AWS 
@@ -120,64 +120,111 @@ sudo systemctl enable airflow-scheduler.service
 
 sudo apt-get -yqq update
 
-######################################
-# docker 
-
-
+#############################################
+# install docker on debian 10 chromebook
 sudo apt install apt-transport-https ca-certificates curl gnupg2 software-properties-common
 curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
 sudo apt update
-sudo apt install docker-ce
+sudo apt install docker-ce docker-compose
 sudo systemctl status docker
 sudo usermod -aG docker csmith
+
+#############################################
+# install docker on ubuntu 20.04 
+sudo apt update
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+sudo apt update
+sudo apt install docker-ce docker-compose
+sudo systemctl status docker
 sudo usermod -aG docker ubuntu 
 
-sudo docker run hello-world
-sudo docker run ubuntu 
-docker images 
 
-docker run -it ubuntu 
+######################################
+# docker 
+
+# build a Dockerfile and label the image
+docker build -t weathertrader1/flask-app .
+
+
+# list images
+docker images
+
+# run the image and give it a name 
+# -p host_port:container_port
+# --rm removes container after running 
+# --name your_name name the container 
+docker run -p 8888:5000 weathertrader1/flask-app
+# run as a daemon
+docker run -d -p 8888:5000 --name name-flask-app weathertrader1/flask-app
+# run in interactive mode
+docker run -it weathertrader1/flask-app bash
+# attach to an already running container 
+docker exec -it weathertrader1/flask-app bash
+# run interactively and remove after 
+docker run -it --rm weathertrader1/foodtrucks-web bash
+
+# list running images 
 docker ps
+
+# list all images 
 docker ps -a 
 
-docker start id
+# stop a container 
+docker stop es foodtrucks-web
 docker stop id
-docker rm id
---name 
 
+# remove a container 
+docker rm es foodtrucks-web
+docker rm id
+
+# commit image to repository 
 docker commit -m "What you did to the image" -a "Author Name" container_id repository/new_image_name
 docker commit -m "added Node.js" -a "sammy" d42d0bbfbd35 sammy/ubuntu-nodejs
 
-docker pull busybox
-docker run -it busybox sh
+# pull image from repository
+docker pull image_name
+
+# tag an image
+docker tag local-image:tagname weathertrader1:tagname
+
+# push image to repository
+docker push weathertrader1:tagname
+docker push weathertrader1/foodtrucks-web
+
+# compose 
+# -d daemonize the process 
+docker-compose build
+docker-compose up
+docker-compose up -d
+docker-compose -p
+docker-compose down -v
 
 
-sudo docker build -t yourusername/catnip .
-sudo docker run -p 8888:5000 yourusername/catnip
-sudo 
-sudo 
-sudo 
-sudo 
-sudo 
-sudo 
-
-# get a bash shell inside the container 
-docker exec -it ad947a6b302 bash
-
-
-0.0.0.0:32769
-
-sudo docker run -d -P --name static-site prakhar1989/static-site
-sudo docker port static-site
-sudo docker run -p 8888:80 prakhar1989/static-site 
-
-
+# network 
+docker network ls
+docker network inspect bridge
+docker network create foodtrucks-net
+docker network rm foodtrucks-net
+docker run -it --rm --net foodtrucks-net weathertrader1/foodtrucks-web bash
+docker run -d --name es --net foodtrucks-net -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+docker run -d --net foodtrucks-net -p 5000:5000 --name foodtrucks-web weathertrader1/foodtrucks-web
 
 # mount a volume 
 docker run -d -p 8080:8080 -v /path/to/dags/on/your/local/machine/:/usr/local/airflow/dags  puckel/docker-airflow webserver
 docker run -d -p 8080:8080 -v <local_path_to_your_dags>:/usr/local/airflow/dags  puckel/docker-airflow webserver
+docker run ... -v /var/www/docker:/var/www ... <Your image name>
+{host} docker run -v /path/to/hostdir:/mnt --name my_container my_image
+{host} docker exec -it my_container bash
+{container} cp /mnt/sourcefile /path/to/destfile
+docker cp /home/ubuntu/docker-work/sample.html apache:/usr/local/apache2/htdocs/
+https://www.digitalocean.com/community/tutorials/how-to-share-data-between-the-docker-container-and-the-host
+https://www.digitalocean.com/community/tutorials/how-to-share-data-between-docker-containers
 
+#####################################
+#####################################
 
 
 sudo apt-get install \
