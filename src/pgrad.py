@@ -267,8 +267,10 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
         dir_name_processed = os.path.join('data', 'processed', dir_init_temp)
         file_name_ingest    = os.path.join(dir_name_ingest, file_name)
         file_name_processed = os.path.join(dir_name_processed, file_name)
-        print      ('    file_ingest %s, file_processed %s ' % (file_name_ingest, file_name_processed))
-        logger.info('    file_ingest %s, file_processed %s ' % (file_name_ingest, file_name_processed))
+        print_file_names = False
+        if print_file_names:
+            print      ('    file_ingest %s, file_processed %s ' % (file_name_ingest, file_name_processed))
+            logger.info('    file_ingest %s, file_processed %s ' % (file_name_ingest, file_name_processed))
         # mkdir if doesnt exist
         if not os.path.isdir(dir_name_ingest):
             os.system('mkdir -p '+dir_name_ingest)
@@ -295,8 +297,10 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
                 url_folder_str2 = dt_init.strftime('%H')                
                 file_name_remote = model_name+'.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)
                 url_temp = base_url+url_folder_str1+'/'+url_folder_str2+'/'+file_name_remote
-            print      ('    url_temp is %s ' % (url_temp))
-            logger.info('    url_temp is %s ' % (url_temp))
+            print_grib_url = False
+            if print_grib_url:
+                print      ('    url_temp is %s ' % (url_temp))
+                logger.info('    url_temp is %s ' % (url_temp))
   
             #response = requests.head(url_temp+'no')
             response = requests.head(url_temp)
@@ -365,8 +369,10 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
                  
                  
                 #if model_name != 'gfs':
-                print      ('    curl_command is %s ' % (curl_command))
-                logger.info('    curl_command is %s ' % (curl_command))
+                print_curl_command = False
+                if print_curl_command:
+                    print      ('    curl_command is %s ' % (curl_command))
+                    logger.info('    curl_command is %s ' % (curl_command))
                 process_check = subprocess.Popen(curl_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 out,err = process_check.communicate(timeout=3*60) # 2 min doesnt seem to be long enough    
                 #if ('404 Not Found' in out_str):  # file does not exist 
@@ -503,9 +509,11 @@ def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_h
         # units conversion hpa -> mb
         p1_sfc_2d = 0.01*p1_sfc_2d
         p2_sfc_2d = 0.01*p2_sfc_2d
-         
-        print('    p1_sfc_2d min max is %5.2f %5.2f ' %(np.nanmin(p1_sfc_2d), np.nanmax(p1_sfc_2d)))
-        print('    p2_sfc_2d min max is %5.2f %5.2f ' %(np.nanmin(p2_sfc_2d), np.nanmax(p2_sfc_2d)))
+        
+        print_p_sfc_min_max = False
+        if print_p_sfc_min_max:
+            print('    p1_sfc_2d min max is %5.1f %5.1f ' %(np.nanmin(p1_sfc_2d), np.nanmax(p1_sfc_2d)))
+            print('    p2_sfc_2d min max is %5.1f %5.1f ' %(np.nanmin(p2_sfc_2d), np.nanmax(p2_sfc_2d)))
 
         ds_read.close()
         del ds_read        
@@ -526,11 +534,13 @@ def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_h
         #   print      ('    make new stn dir %s ' % (temp_command)) 
         #    logger.info('    make new stn dir %s ' % (temp_command)) 
         stn_file_name = os.path.join( dir_name_ingest , file_name.split('.')[0]+'.csv')
-        print      ('    stn_file_name %s ' % (stn_file_name)) 
-        logger.info('    stn_file_name %s ' % (stn_file_name)) 
+        print_stn_file_name = False
+        if print_stn_file_name:
+            print      ('    stn_file_name %s ' % (stn_file_name)) 
+            logger.info('    stn_file_name %s ' % (stn_file_name)) 
 
-        print      ('    write p_sfc begin ')
-        logger.info('    write p_sfc begin ')
+        #print      ('    write p_sfc begin ')
+        #logger.info('    write p_sfc begin ')
         column_str = ['stn_id', 'p1', 'p2']
         p_sfc_data = [dict_stn_metadata['stn_id'], p1_sfc_stn, p2_sfc_stn]
         #stn_info_transpose = np.transpose(stn_info) 
@@ -538,16 +548,18 @@ def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_h
         #stn_info_df = stn_info_df.sort_values(by='stn_mnet_id') 
         # stn_info_df = stn_info_df.sort_values(by='stn_name') 
         p_sfc_df.to_csv(stn_file_name) 
-        print      ('    write p_sfc end ')   
-        logger.info('    write p_sfc end ')   
+        #print      ('    write p_sfc end ')   
+        #logger.info('    write p_sfc end ')   
 
         # archive raw grib file 
         temp_command = 'mv -f '+file_temp+' '+file_name_processed
-        print      ('    archive output %s ' % (temp_command)) 
-        logger.info('    archive output %s ' % (temp_command)) 
+        print_archive_output = False
+        if print_archive_output:
+            print      ('    archive output %s ' % (temp_command)) 
+            logger.info('    archive output %s ' % (temp_command)) 
         os.system(temp_command)
-        print      ('    archive output: success ' ) 
-        logger.info('    archive_output: success ' ) 
+        #print      ('    archive output: success ' ) 
+        #logger.info('    archive_output: success ' ) 
         
     # clean up idx files
     temp_command = 'rm -f '+dir_name_ingest+'/*.idx'    
@@ -634,10 +646,10 @@ def process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr
     print      ('  write p_sfc master end ')   
     logger.info('  write p_sfc master end ')   
 
-    print      ('  p_sfc1_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc1_hr_s), np.nanmax(p_sfc1_hr_s)))
-    logger.info('  p_sfc1_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc1_hr_s), np.nanmax(p_sfc1_hr_s)))
-    print      ('  p_sfc2_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc2_hr_s), np.nanmax(p_sfc2_hr_s)))
-    logger.info('  p_sfc2_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc2_hr_s), np.nanmax(p_sfc2_hr_s)))
+    print      ('  p_sfc1_hr_s min max is %5.1f %5.1f ' %(np.nanmin(p_sfc1_hr_s), np.nanmax(p_sfc1_hr_s)))
+    logger.info('  p_sfc1_hr_s min max is %5.1f %5.1f ' %(np.nanmin(p_sfc1_hr_s), np.nanmax(p_sfc1_hr_s)))
+    print      ('  p_sfc2_hr_s min max is %5.1f %5.1f ' %(np.nanmin(p_sfc2_hr_s), np.nanmax(p_sfc2_hr_s)))
+    logger.info('  p_sfc2_hr_s min max is %5.1f %5.1f ' %(np.nanmin(p_sfc2_hr_s), np.nanmax(p_sfc2_hr_s)))
 
     # archive csv ingest file to processed
     print      ('  archive output begin' ) 
@@ -647,8 +659,10 @@ def process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr
         file_name = os.path.basename(file_temp)
         file_name_processed = os.path.join(dir_name_processed, file_name)
         temp_command = 'mv -f '+file_temp+' '+file_name_processed
-        #print      ('    archive output %s ' % (temp_command)) 
-        #logger.info('    archive output %s ' % (temp_command)) 
+        print_archive_output = False
+        if print_archive_output:
+            print      ('    archive output %s ' % (temp_command)) 
+            logger.info('    archive output %s ' % (temp_command)) 
         os.system(temp_command)
         #print      ('    archive output: success ' ) 
         #logger.info('    archive_output: success ' ) 
@@ -718,10 +732,10 @@ def calc_pgrad(dict_stn_metadata, stn_id_pair_list_to_plot, model_name, dt_init,
         print      ('    write p_sfc_diff master end ')   
         logger.info('    write p_sfc_diff master end ')   
         
-        print      ('    p_sfc1_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc1_diff_hr_s), np.nanmax(p_sfc1_diff_hr_s)))
-        logger.info('    p_sfc1_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc1_diff_hr_s), np.nanmax(p_sfc1_diff_hr_s)))
-        print      ('    p_sfc2_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc2_diff_hr_s), np.nanmax(p_sfc2_diff_hr_s)))
-        logger.info('    p_sfc2_diff_hr_s min max is %5.2f %5.2f ' %(np.nanmin(p_sfc2_diff_hr_s), np.nanmax(p_sfc2_diff_hr_s)))
+        print      ('    p_sfc1_diff_hr_s min max is %5.1f %5.1f ' %(np.nanmin(p_sfc1_diff_hr_s), np.nanmax(p_sfc1_diff_hr_s)))
+        logger.info('    p_sfc1_diff_hr_s min max is %5.1f %5.1f ' %(np.nanmin(p_sfc1_diff_hr_s), np.nanmax(p_sfc1_diff_hr_s)))
+        print      ('    p_sfc2_diff_hr_s min max is %5.1f %5.1f ' %(np.nanmin(p_sfc2_diff_hr_s), np.nanmax(p_sfc2_diff_hr_s)))
+        logger.info('    p_sfc2_diff_hr_s min max is %5.1f %5.1f ' %(np.nanmin(p_sfc2_diff_hr_s), np.nanmax(p_sfc2_diff_hr_s)))
     
     print      ('calc_pgrad end ')
     logger.info('calc_pgrad end ')
@@ -869,12 +883,16 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
         #if stn_id_pair == 'KWMC-KSAC':
         #if stn_id_pair in stn_id_pair_list_to_plot:
         y_axis_cache[stn_id_pair] = [-20, 20, 5]
-    y_axis_cache['KRDD-KSAC'] = [-10, 10, 2]
+    y_axis_cache['KACV-KSFO'] = [-2, 12, 2]
+    y_axis_cache['KBFL-KSBA'] = [-10, 10, 2]
     y_axis_cache['KDAG-KLAX'] = [-10, 10, 2]
+    y_axis_cache['KMFR-KRDD'] = [-2, 12, 2]
     y_axis_cache['KMFR-KSAC'] = [-4, 20, 4]
+    y_axis_cache['KMFR-KSFO'] = [-4, 20, 4]
+    y_axis_cache['KRDD-KSAC'] = [-2, 12, 2]
+    y_axis_cache['KSMX-KSBA'] = [-6, 6, 1]
     y_axis_cache['KWMC-KSAC'] = [-4, 20, 4]
     y_axis_cache['KWMC-KSFO'] = [-4, 20, 4]
-    y_axis_cache['KACV-KSFO'] = [-10, 10, 2]
      
     print      ('  dt_init_list is ' )
     logger.info('  dt_init_list is ' )
@@ -1135,7 +1153,6 @@ def obs_historical_download(dict_stn_metadata, stn_list_to_use, utc_conversion, 
                     # NOTE CSMITH - need to filter to only variables needed - alt and slp yes, pres no
                     # &vars=air_temp,volt&token=YOUR_TOKEN_HERE        
                     # &vars=sea_level_pressure,altimeter&token=YOUR_TOKEN_HERE
-     
                     print      ('    url_temp is %s ' % (url_temp))
                     logger.info('    url_temp is %s ' % (url_temp))
                     web_temp = requests.get(url_temp)

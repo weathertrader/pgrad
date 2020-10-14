@@ -141,11 +141,11 @@ $(function() {
     $("#plot_table").find('img').attr("src", "../../top_events/"+tableName);
   }
 
-  var plotStnPair = "KWMC-KSAC";
+  var plotStnPair = "KWMC-KSFO";
   var plotModel = "gfs";
   var plotTimeframe = "10";
 
-  var plotStnPairText = "Winnemucca - Sacramento";
+  var plotStnPairText = "Winnemucca - San Francisco";
   var plotModelText = "GFS";
   var plotTimeframeText = "10 days";
      
