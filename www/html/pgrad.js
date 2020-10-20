@@ -88,17 +88,17 @@ $(function() {
   function createPlotName(plotStnPair, plotModel, plotTimeframe) {
     //var plotName = plotVariable+"_"+plotRegion+"_stn_day_of_vs_time_"+plotTimeframe+".png"
     //ws_foothill_region_day_of_vs_time_current.png
-    if (plotModel == "all_10d") {
-        var plotTimeframe = "10" // can be 2, 3 or 10 here
+    if (plotModel == "all_8d") {
+        var plotTimeframe = "8" // can be 2, 3 or 8 here
         var plotName = "del_slp_all_model_"+plotStnPair+"_current_"+plotTimeframe+".png"
     } else if (plotModel == "all_3d") {
-        var plotTimeframe = "3" // can be 2, 3 or 10 here
+        var plotTimeframe = "3" // can be 2, 3 or 8 here
         var plotName = "del_slp_all_model_"+plotStnPair+"_current_"+plotTimeframe+".png"
     } else if (plotModel == "all_2d") {
-        var plotTimeframe = "2" // can be 2, 3 or 10 here
+        var plotTimeframe = "2" // can be 2, 3 or 8 here
         var plotName = "del_slp_all_model_"+plotStnPair+"_current_"+plotTimeframe+".png"
     } else {
-        if (plotModel == "gfs") {var plotTimeframe = "10"}
+        if (plotModel == "gfs") {var plotTimeframe = "8"}
         else if (plotModel == "nam") {var plotTimeframe = "3"}
         else if (plotModel == "hrrr") {var plotTimeframe = "2"}    
         var plotName = "del_slp_all_init_"+plotStnPair+"_"+plotModel+"_"+plotTimeframe+".png"   
@@ -143,11 +143,11 @@ $(function() {
 
   var plotStnPair = "KWMC-KSFO";
   var plotModel = "gfs";
-  var plotTimeframe = "10";
+  var plotTimeframe = "8";
 
   var plotStnPairText = "Winnemucca - San Francisco";
   var plotModelText = "GFS";
-  var plotTimeframeText = "10 days";
+  var plotTimeframeText = "8 days";
      
   plotName = createPlotName(plotStnPair, plotModel);
   plotText = createPlotText(plotStnPairText, plotModelText);

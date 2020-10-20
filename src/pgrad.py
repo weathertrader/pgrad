@@ -871,7 +871,8 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     
     color_list = ['r', 'b', 'g', 'c', 'm', 'y', 'k']    
     #n_days_list = [2, 4, 10]
-    n_days_list = [2, 3, 10]
+    #n_days_list = [2, 3, 10]
+    n_days_list = [2, 3, 8]
     figsize_x, figsize_y = 10, 5
     size_font = 14
     
@@ -892,7 +893,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     y_axis_cache['KRDD-KSAC'] = [-2, 12, 2]
     y_axis_cache['KSMX-KSBA'] = [-6, 6, 1]
     y_axis_cache['KWMC-KSAC'] = [-4, 20, 4]
-    y_axis_cache['KWMC-KSFO'] = [-4, 20, 4]
+    y_axis_cache['KWMC-KSFO'] = [-5, 25, 5]
      
     print      ('  dt_init_list is ' )
     logger.info('  dt_init_list is ' )
@@ -954,7 +955,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                 elif n_days == 3:
                     delta_ticks = td(hours=12)
                     dt_format = '%m/%d %H'    
-                elif n_days == 10:
+                elif n_days == 8:
                     delta_ticks = td(hours=24)
                     dt_format = '%m/%d'
                 delta_lines = td(hours=24)
@@ -992,7 +993,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                     plt.plot([dt_tick, dt_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
                 for dt_tick in dt_newday_ticks:
                     plt.plot([dt_tick, dt_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=1.0, marker='o', markersize=0) 
-                if n_days < 10:
+                if n_days < 8:
                     for dt_tick in dt_nighttime_ticks:
                         plt.axvspan(dt_tick, dt_tick+0.5, color='grey', alpha=alpha_night, linewidth=0)    
                 plt.xlim([dt_ticks[0], dt_ticks[-1]])
@@ -1028,7 +1029,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
             logger.info('    plotting %s %s ' %(s, stn_id_pair))
             for m, model_name in enumerate(model_name_list):
                 for d, n_days in enumerate(n_days_list):
-                    if (model_name == 'hrrr' and n_days == 2) or (model_name == 'nam' and n_days == 3) or (model_name == 'gfs' and n_days == 10):
+                    if (model_name == 'hrrr' and n_days == 2) or (model_name == 'nam' and n_days == 3) or (model_name == 'gfs' and n_days == 8):
                         #dt_min_plot = dt(dt_axis_lt_init[4,0].year, dt_axis_lt_init[4,0].month, dt_axis_lt_init[i,0].day, 0, 0, 0)
                         dt_min_plot = dt(dt_axis_lt_init[-1,0].year, dt_axis_lt_init[-1,0].month, dt_axis_lt_init[-1,0].day, 0, 0, 0)
                         #dt_max_plot = dt_min_plot + td(days=n_days+1)
@@ -1039,7 +1040,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                         elif n_days == 3:
                             delta_ticks = td(hours=12)
                             dt_format = '%m/%d %H'    
-                        elif n_days == 10:
+                        elif n_days == 8:
                             delta_ticks = td(hours=24)
                             dt_format = '%m/%d'
                         delta_lines = td(hours=24)
@@ -1079,7 +1080,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
                             plt.plot([dt_tick, dt_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=0.5, marker='o', markersize=0) 
                         for dt_tick in dt_newday_ticks:
                             plt.plot([dt_tick, dt_tick], [y_min, y_max], 'gray', linestyle='-', linewidth=1.0, marker='o', markersize=0) 
-                        if n_days < 10:
+                        if n_days < 8:
                             for dt_tick in dt_nighttime_ticks:
                                 plt.axvspan(dt_tick, dt_tick+0.5, color='grey', alpha=alpha_night, linewidth=0)    
                         plt.xlim([dt_ticks[0], dt_ticks[-1]])
