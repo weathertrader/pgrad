@@ -22,67 +22,7 @@ http://0.0.0.0:8888/
 172.18.0.1 
 172.19.0.1 
 172.20.0.1 
-
-
-(base) csmith@penguin:~/flaskapp$ hostname -I
-(base) csmith@penguin:~/flaskapp$ ip addr
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    inet 127.0.0.1/8 scope host lo
-       valid_lft forever preferred_lft forever
-    inet6 ::1/128 scope host 
-       valid_lft forever preferred_lft forever
-2: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
-    link/ether 02:42:61:18:23:0c brd ff:ff:ff:ff:ff:ff
-    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
-       valid_lft forever preferred_lft forever
-    inet6 fe80::42:61ff:fe18:230c/64 scope link 
-       valid_lft forever preferred_lft forever
-5: eth0@if6: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
-    link/ether 00:16:3e:b8:b1:c5 brd ff:ff:ff:ff:ff:ff link-netnsid 0
-    inet 100.115.92.200/28 brd 100.115.92.207 scope global eth0
-       valid_lft forever preferred_lft forever
-    inet6 2601:648:8180:8fe0:216:3eff:feb8:b1c5/64 scope global dynamic mngtmpaddr 
-       valid_lft 5876sec preferred_lft 5876sec
-    inet6 fe80::216:3eff:feb8:b1c5/64 scope link 
-       valid_lft forever preferred_lft forever
-58: br-d6d5203444dd: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
-    link/ether 02:42:75:8e:8b:a8 brd ff:ff:ff:ff:ff:ff
-    inet 172.18.0.1/16 brd 172.18.255.255 scope global br-d6d5203444dd
-       valid_lft forever preferred_lft forever
-    inet6 fe80::42:75ff:fe8e:8ba8/64 scope link 
-       valid_lft forever preferred_lft forever
-       
-73: br-cd3c24a755f2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
-    link/ether 02:42:ac:3e:ff:ac brd ff:ff:ff:ff:ff:ff
-    inet 172.19.0.1/16 brd 172.19.255.255 scope global br-cd3c24a755f2
-       valid_lft forever preferred_lft forever
-    inet6 fe80::42:acff:fe3e:ffac/64 scope link 
-       valid_lft forever preferred_lft forever
-74: br-4c8d33bd78e8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
-    link/ether 02:42:3b:4c:3b:a9 brd ff:ff:ff:ff:ff:ff
-    inet 172.20.0.1/16 brd 172.20.255.255 scope global br-4c8d33bd78e8
-       valid_lft forever preferred_lft forever
-    inet6 fe80::42:3bff:fe4c:3ba9/64 scope link 
-       valid_lft forever preferred_lft forever
-86: veth519b238@if85: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-cd3c24a755f2 state UP group default 
-    link/ether ae:e2:6b:51:63:bd brd ff:ff:ff:ff:ff:ff link-netnsid 1
-    inet6 fe80::ace2:6bff:fe51:63bd/64 scope link 
-       valid_lft forever preferred_lft forever
-88: veth709c953@if87: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-4c8d33bd78e8 state UP group default 
-    link/ether 06:e5:49:e5:54:c5 brd ff:ff:ff:ff:ff:ff link-netnsid 2
-    inet6 fe80::4e5:49ff:fee5:54c5/64 scope link 
-       valid_lft forever preferred_lft forever
-90: vetha4d70aa@if89: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-cd3c24a755f2 state UP group default 
-    link/ether 96:1f:79:fb:cf:e6 brd ff:ff:ff:ff:ff:ff link-netnsid 2
-    inet6 fe80::941f:79ff:fefb:cfe6/64 scope link 
-       valid_lft forever preferred_lft forever
-92: veth67c200f@if91: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-4c8d33bd78e8 state UP group default 
-    link/ether 66:90:a9:61:be:d0 brd ff:ff:ff:ff:ff:ff link-netnsid 3
-    inet6 fe80::6490:a9ff:fe61:bed0/64 scope link 
-       valid_lft forever preferred_lft forever       
-       
-       
+ 
 
 airflow - just -finished
 mongodb - just finished
