@@ -44,6 +44,21 @@ ssh -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-35-164-84-231.us-west-2.
 
 scp -i ~/.ssh/sundownerwatch-IAM-keypair.pem ubuntu@ec2-35-164-84-231.us-west-2.compute.amazonaws.com:~/pgrad/images/archive/del_slp_all_model_KWMC-KSFO_* .
 
+# nomads down 
+They are still available via HTTPS and FTP on FTPPRD here:
+GEFS
+https://ftpprd.ncep.noaa.gov/data/nccf/com/gens/
+ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com/gens/
+NAM
+https://ftpprd.ncep.noaa.gov/data/nccf/com/nam/
+ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com/nam/
+
+During issues with our NOMADS site you can use the following sites to access data:
+https://ftp.ncep.noaa.gov/data/nccf/com/
+or
+ftp://ftp.ncep.noaa.gov/pub/data/nccf/com/
+
+
 ######################################
 # airflow 
 

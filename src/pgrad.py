@@ -886,7 +886,7 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
         y_axis_cache[stn_id_pair] = [-20, 20, 5]
     y_axis_cache['KACV-KSFO'] = [-2, 12, 2]
     y_axis_cache['KBFL-KSBA'] = [-10, 10, 2]
-    y_axis_cache['KDAG-KLAX'] = [-10, 10, 2]
+    y_axis_cache['KDAG-KLAX'] = [-2, 12, 2]
     y_axis_cache['KMFR-KRDD'] = [-2, 12, 2]
     y_axis_cache['KMFR-KSAC'] = [-4, 20, 4]
     y_axis_cache['KMFR-KSFO'] = [-4, 20, 4]
@@ -1119,16 +1119,22 @@ def obs_historical_download(dict_stn_metadata, stn_list_to_use, utc_conversion, 
             
     s = 2 # KSAC
     s = 9 # KWMC
+    
+    # KSFO, KWMC, KDAG, KLAX 
+    
     #for s in range(6,8,1): 
-    for s in range(0, dict_stn_metadata['n_stn']): 
+    #for s in range(0, dict_stn_metadata['n_stn']): 
+    for s in [1, 4, 9, 10]:
         #if ('SJS' in dict_stn_metadata['stn_name'][s]):
         #if ('JBG' in dict_stn_metadata['stn_id'][s]):
         print      ('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
         logger.info('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
         #for d in range(0, n_days, 1):
         if (dict_stn_metadata['stn_id'][s] in stn_list_to_use):
-            yy = 2017 # 2017, 2018, 2019, 2020 done already 
-            while yy <= dt.utcnow().year:
+            #yy = 2017 # 2017, 2018, 2019, 2020 done already 
+            #while yy <= dt.utcnow().year:
+            yy = 2000 # 2017, 2018, 2019, 2020 done already 
+            while yy < 2017:
                 #dt_start = dt(2020, 9, 25)
                 #dt_end   = dt(2020, 9, 29)            
                 dt_start = dt(yy, 1, 1)
@@ -1145,10 +1151,10 @@ def obs_historical_download(dict_stn_metadata, stn_list_to_use, utc_conversion, 
                     # url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_start.strftime('%Y%m%d0000')+'&end='+dt_end.strftime('%Y%m%d2359')+'&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
                     # slp and alt 
                     #url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_start.strftime('%Y%m%d0000')+'&end='+dt_end.strftime('%Y%m%d2359')+'&vars=sea_level_pressure,altimeter&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
-                    # slp only 
-                    # url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_start.strftime('%Y%m%d0000')+'&end='+dt_end.strftime('%Y%m%d2359')+'&vars=sea_level_pressure&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
                     # alt only
-                    url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_start.strftime('%Y%m%d0000')+'&end='+dt_end.strftime('%Y%m%d2359')+'&vars=altimeter&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
+                    #url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_start.strftime('%Y%m%d0000')+'&end='+dt_end.strftime('%Y%m%d2359')+'&vars=altimeter&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
+                    # slp only 
+                    url_temp = url_base+str(dict_stn_metadata['stn_id'][s])+'&start='+dt_start.strftime('%Y%m%d0000')+'&end='+dt_end.strftime('%Y%m%d2359')+'&vars=sea_level_pressure&token='+mesowest_token+'&obtimezone=utc'+'&timeformat=%Y-%m-%d_%H-%M' 
 
                     # print(url_temp)
                     # NOTE CSMITH - need to filter to only variables needed - alt and slp yes, pres no
@@ -1372,8 +1378,8 @@ def datematch_to_5min(var_raw, dt_axis_raw, dt_axis_5min_lst, obs_window_minutes
     # n = 100812
     for n in range(0, n_5min, 1):  
         if (n%10000 == 0):
-            print      ('      processing %s of %s' %(str(n).zfill(6), n_5min))
-            logger.info('      processing %s of %s' %(str(n).zfill(6), n_5min))
+            print      ('      processing %s of %s' %(str(n).zfill(7), str(n_5min).zfill(7)))
+            logger.info('      processing %s of %s' %(str(n).zfill(7), str(n_5min).zfill(7)))
         index_min = (var_raw_df.index <= dt_axis_5min_lst_df.index[n]-td(minutes=2)).argmin() 
         index_max = (var_raw_df.index <= dt_axis_5min_lst_df.index[n]+td(minutes=2)).argmin() 
         if (index_min < nt and index_max > 0):
@@ -1491,20 +1497,20 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
 
     # debug KWMC-KSAC 2018/11/07 - 2018/11/21 
     
-
     print      ('obs_historical_process begin ')
     logger.info('obs_historical_process begin ')
 
     dir_sfc_obs_historical = os.path.join('data', 'sfc_obs_historical')
     utc_conversion = 8
-    #dt_start = dt(2017, 1, 1)
-    #dt_end   = dt(2020, 10, 1)
+    dt_start = dt(2000, 1, 1)
+    dt_end   = dt(2020, 1, 1)
     #dt_start = dt(2018, 11, 6)
     #dt_end   = dt(2018, 11, 21)
     #dt_start = dt(2018, 10, 10)
     #dt_start = dt(2018, 10,  1)
-    dt_start = dt(2019,  9, 10)
-    dt_end   = dt(2019, 11, 15)
+    #dt_start = dt(2019,  9, 1)
+    #dt_start = dt(2017,  9,  1)
+    #dt_end   = dt(2019, 11, 15)
     #dt_end = dt.utcnow()
 
     n_days = (dt_end - dt_start).days 
@@ -1532,60 +1538,66 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
     dummy_axis = np.arange(0, n_5min)
     axis_5min_lst_df = pd.DataFrame(dummy_axis, index=dt_axis_5min_lst)
     
-    #slp_obs_5min_s  = np.full([n_5min, dict_stn_metadata['n_stn']], np.nan, dtype='float') 
-    alt_obs_5min_s  = np.full([n_5min, dict_stn_metadata['n_stn']], np.nan, dtype='float') 
+    slp_obs_5min_s  = np.full([n_5min, dict_stn_metadata['n_stn']], np.nan, dtype='float') 
+    #alt_obs_5min_s  = np.full([n_5min, dict_stn_metadata['n_stn']], np.nan, dtype='float') 
     
     replace_nan_with_null = False
     
     s = 2 # KSAC
     s = 9 # KWMC
-    for s in range(0, dict_stn_metadata['n_stn']):
-        #if (s == 2 or s == 9):
-        print      ('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
-        logger.info('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
-        file_name_list = glob.glob(os.path.join(dir_sfc_obs_historical,'stn_obs*'+dict_stn_metadata['stn_id'][s]+'*csv'))    
-        file_name_list.sort()
-        n_files = len(file_name_list)
-        print      ('  stn_id %s, n_files %s ' % (dict_stn_metadata['stn_id'][s], n_files)) 
-        logger.info('  stn_id %s, n_files %s ' % (dict_stn_metadata['stn_id'][s], n_files)) 
-        f_count = 0
-        if (n_files > 0): 
-            for f in range(0, n_files, 1): 
-                file_name_full_path = file_name_list[f] 
-                #if ('2014' in file_name_full_path or '2015' in file_name_full_path):
-                #if ('2016' in file_name_full_path):
-                #if ('20' in file_name_full_path):
-                print      ('    file %s of %s ' % (f, n_files))
+    # for s in range(0, dict_stn_metadata['n_stn']):
+    for s in [1, 4, 9, 10]:
+         
+        # done s - 1,4
+         
+        if (dict_stn_metadata['stn_id'][s] in stn_list_to_use):
+            #if (s == 2 or s == 9):
+            print      ('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
+            logger.info('  processing s %s, s = %s of %s ' % (dict_stn_metadata['stn_id'][s], s, dict_stn_metadata['n_stn']))  
+            file_name_list = glob.glob(os.path.join(dir_sfc_obs_historical,'stn_obs*'+dict_stn_metadata['stn_id'][s]+'*csv')) 
+            file_name_list.sort()
+            n_files = len(file_name_list)
+            print      ('  stn_id %s, n_files %s ' % (dict_stn_metadata['stn_id'][s], n_files)) 
+            logger.info('  stn_id %s, n_files %s ' % (dict_stn_metadata['stn_id'][s], n_files)) 
+            f_count = 0
+            if (n_files > 0): 
+                for f in range(0, n_files, 1): 
+                    file_name_full_path = file_name_list[f] 
+                    #if ('2014' in file_name_full_path or '2015' in file_name_full_path):
+                    #if ('2016' in file_name_full_path):
+                    #if ('20' in file_name_full_path):
+                    print      ('    file %s of %s ' % (f, n_files))
+        
+                    stn_read_df = read_sfc_obs_csv_data(file_name_full_path, replace_nan_with_null)
+                    # convert dt string to dt type and convert to lst     
+                    dt_read_lst  = pd.to_datetime(stn_read_df.index) - td(hours=8)
+                    stn_read_df = stn_read_df.set_index(dt_read_lst)
+                    #stn_read_df.index    
+                    if (f_count == 0):
+                        stn_read_df_f = stn_read_df
+                    else: 
+                        stn_read_df_f = pd.concat([stn_read_df_f, stn_read_df])
+                    del stn_read_df
+                    f_count += 1
     
-                stn_read_df = read_sfc_obs_csv_data(file_name_full_path, replace_nan_with_null)
-                # convert dt string to dt type and convert to lst     
-                dt_read_lst  = pd.to_datetime(stn_read_df.index) - td(hours=8)
-                stn_read_df = stn_read_df.set_index(dt_read_lst)
-                #stn_read_df.index    
-                if (f_count == 0):
-                    stn_read_df_f = stn_read_df
-                else: 
-                    stn_read_df_f = pd.concat([stn_read_df_f, stn_read_df])
-                del stn_read_df
-                f_count += 1
+                print      ('    datematch start ' ) 
+                logger.info('    datematch start ' ) 
+                #var_raw = np.vstack((stn_read_df_f['pres'].values, stn_read_df_f['alt'].values, stn_read_df_f['slp'].values)).T
+                
+                #print(len(stn_read_df_f), n_5min)
+                # var_raw = np.vstack((stn_read_df_f['alt'].values, stn_read_df_f['slp'].values)).T
+     
+                var_5min = datematch_to_5min(stn_read_df_f['slp'].values, stn_read_df_f.index, dt_axis_5min_lst, obs_window_minutes)
+                slp_obs_5min_s [:,s] = var_5min
+                del var_5min, stn_read_df_f 
 
-            print      ('    datematch start ' ) 
-            logger.info('    datematch start ' ) 
-            #var_raw = np.vstack((stn_read_df_f['pres'].values, stn_read_df_f['alt'].values, stn_read_df_f['slp'].values)).T
-            
-            #print(len(stn_read_df_f), n_5min)
-            # var_raw = np.vstack((stn_read_df_f['alt'].values, stn_read_df_f['slp'].values)).T
-            
-            # var_5min = datematch_to_5min(stn_read_df_f['slp'].values, stn_read_df_f.index, dt_axis_5min_lst, obs_window_minutes)
-            var_5min = datematch_to_5min(stn_read_df_f['alt'].values, stn_read_df_f.index, dt_axis_5min_lst, obs_window_minutes)
-            #slp_obs_5min_s [:,s] = var_5min
-            alt_obs_5min_s [:,s] = var_5min
-            del var_5min, stn_read_df_f 
- 
+    print      ('  read stn data end ' ) 
+    logger.info('  read stn data end ' ) 
+    
     n_stn_pair = len(stn_id_pair_list_to_plot)
     #pres_diff_5min_s = np.full([n_5min, n_stn_pair], np.nan, dtype=float)
-    alt_diff_5min_s  = np.full([n_5min, n_stn_pair], np.nan, dtype=float)
-    #slp_diff_5min_s  = np.full([n_5min,n_stn_pair], np.nan, dtype=float)
+    #alt_diff_5min_s  = np.full([n_5min, n_stn_pair], np.nan, dtype=float)
+    slp_diff_5min_s  = np.full([n_5min,n_stn_pair], np.nan, dtype=float)
     print      ('  calculating pressure difference station pairs')
     logger.info('  calculating pressure difference station pairs')
     stn_id_pair = stn_id_pair_list_to_plot[0]
@@ -1596,7 +1608,8 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
         #dict_stn_metadata['stn_id'][s_id1]
         #dict_stn_metadata['stn_id'][s_id2]
         #pres_diff_5min_s[:,s1*dict_stn_metadata['n_stn']+s2] = pres_obs_5min_s[:,s1] - pres_obs_5min_s[:,s2] 
-        alt_diff_5min_s [:,s] = alt_obs_5min_s[:,s_id1] -  alt_obs_5min_s[:,s_id2] 
+        #alt_diff_5min_s [:,s] = alt_obs_5min_s[:,s_id1] -  alt_obs_5min_s[:,s_id2] 
+        slp_diff_5min_s [:,s] = slp_obs_5min_s[:,s_id1] -  slp_obs_5min_s[:,s_id2] 
         #slp_diff_5min_s [:,s1*dict_stn_metadata['n_stn']+s2] =  slp_obs_5min_s[:,s1] -  slp_obs_5min_s[:,s2] 
         #stn_id_pair_list[s1*dict_stn_metadata['n_stn']+s2] = dict_stn_metadata['stn_id'][s1]+'-'+dict_stn_metadata['stn_id'][s2]
     # del slp_obs_5min_s
@@ -1607,22 +1620,22 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
     # create df of the arrays        
     #pres_diff_5min_s_df = pd.DataFrame(pres_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list_to_plot).round(2)
     #del pres_diff_5min_s
-    alt_diff_5min_s_df  = pd.DataFrame( alt_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list_to_plot).round(2)
+    #alt_diff_5min_s_df  = pd.DataFrame( alt_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list_to_plot).round(2)
     #del alt_diff_5min_s
-    #slp_diff_5min_s_df  = pd.DataFrame( slp_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list_to_plot).round(2)
+    slp_diff_5min_s_df  = pd.DataFrame( slp_diff_5min_s, index=dt_axis_5min_lst, columns=stn_id_pair_list_to_plot).round(2)
 
     #for n in range(0, n_5min):
     #for n in range(1420, 1760):
     #    print(' %s, %s, %s, %s ' % ( dt_axis_5min_lst[n].strftime('%Y-%m-%d %H:%M'), alt_diff_5min_s_df['KWMC-KSAC'][n], alt_obs_5min_s[n,9], alt_obs_5min_s[n, 2])) 
-    del alt_diff_5min_s
+    #del alt_diff_5min_s
  
     # roll up to daily daily max
     print      ('  calculating daily roll-ups') 
     logger.info('  calculating daily roll-ups') 
     
     #pres_diff_day_s_df = pres_diff_5min_s_df.resample('D').max()
-    #slp_diff_day_s_df = slp_diff_5min_s_df.resample('D').max()
-    alt_diff_day_s_df =  alt_diff_5min_s_df.resample('D').max()
+    slp_diff_day_s_df = slp_diff_5min_s_df.resample('D').max()
+    #alt_diff_day_s_df =  alt_diff_5min_s_df.resample('D').max()
     #pres_diff_day_s_df['KWMC-KSAC'].head()
     #alt_diff_day_s_df['KWMC-KSAC'].head()
     #slp_diff_day_s_df['KWMC-KSAC'].head(50)
@@ -1630,39 +1643,44 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
     print      ('  find top events ') 
     logger.info('  find top events ') 
     
+    
+    
     # find top events and write to file
     #n_top_events = 20
     n_top_events = 20
-    stn_id_pair = 'KWMC-KSAC'
-    s = stn_id_pair_list_to_plot.index('KWMC-KSAC')
+    #stn_id_pair = 'KWMC-KSFO'
+    #stn_id_pair = 'KDAG-KLAX'
+    #s = stn_id_pair_list_to_plot.index('KWMC-KSAC')
+    s = stn_id_pair_list_to_plot.index(stn_id_pair)
     for s,stn_id_pair in enumerate(stn_id_pair_list_to_plot):
         #if stn_id_pair == 'KWMC-KSAC':
         #if stn_id_pair in stn_id_pair_list_to_plot:
         slp_top_events_df  =  slp_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
         #alt_top_events_df  =  alt_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
         if len(slp_top_events_df) > 0:
-            #pres_top_events_df = pres_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
+            #slp_top_events_df = pres_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
             #file_name_stn_write = os.path.join('top_events', 'slp_diff_'+stn_id_pair+'.csv') 
             #slp_top_events_df.to_csv(file_name_stn_write) 
-            alt_top_events_df = alt_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
-            file_name_stn_write = os.path.join('top_events', 'alt_diff_'+stn_id_pair+'.csv') 
-            alt_top_events_df.to_csv(file_name_stn_write) 
+            # write file to csv 
+            #alt_top_events_df = alt_diff_day_s_df[stn_id_pair].nlargest(n_top_events).round(1)
+            #file_name_stn_write = os.path.join('top_events', 'alt_diff_'+stn_id_pair+'.csv') 
+            #alt_top_events_df.to_csv(file_name_stn_write) 
             #file_name_stn_write = os.path.join('top_events', 'pres_diff_'+stn_id_pair+'.csv') 
             #pres_top_events_df.to_csv(file_name_stn_write) 
             print      ('%s top events ' %(stn_id_pair)) 
             logger.info('%s top events ' %(stn_id_pair)) 
             i = 8
             #for i, row in enumerate(slp_top_events_df):
-            #print      ('  slp')
-            #logger.info('  slp')
-            #for i in range(0, n_top_events):
-            #    print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
-            #    logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
-            print      ('  alt')
-            logger.info('  alt')
+            print      ('  slp')
+            logger.info('  slp')
             for i in range(0, n_top_events):
-                print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
-                logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
+                print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
+                logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), slp_top_events_df.index[i].strftime('%Y-%m-%d'), slp_top_events_df[i]))
+            #print      ('  alt')
+            #logger.info('  alt')
+            #for i in range(0, n_top_events):
+            #    print      ('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
+            #    logger.info('     %s,  %s  %s ' %(str(i+1).zfill(2), alt_top_events_df.index[i].strftime('%Y-%m-%d'), alt_top_events_df[i]))
             #print      ('  pres')
             #logger.info('  pres')
             #for i in range(0, n_top_events):
@@ -1762,6 +1780,44 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
     print      ('obs_historical_process end ')
     logger.info('obs_historical_process end ')
 
+
+
+
+# KWMC-KSAC top events 
+#   slp
+  
+#   01,  2019-10-30  26.1 
+#   04,  2019-10-29  24.5 
+
+#   02,  2017-10-09  25.2 
+#   05,  2019-10-10  24.4 
+
+#   03,  2018-11-08  25.1 
+#   07,  2018-11-09  23.8 
+
+#   08,  2018-11-11  23.4 
+#   11,  2018-11-12  22.1 
+
+#   12,  2017-12-10  22.0 
+#   20,  2017-12-11  20.8 
+#   10,  2017-12-12  22.5 
+#   18,  2017-12-13  21.0 
+#   06,  2017-12-14  24.1 
+
+#   09,  2017-12-17  22.7 
+
+#   13,  2019-10-24  21.6 
+
+#   14,  2017-12-05  21.5 
+
+#   15,  2018-10-15  21.5 
+
+#   16,  2017-12-06  21.4 
+#   17,  2017-12-07  21.1 
+
+#   19,  2018-11-20  20.9 
+
+
 # top expected events 
 # 2011_12_01
 
@@ -1777,8 +1833,59 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
 # 2019_10_23
 # 2019_10_27
 
-# slp_diff_day_s_df['KWMC-KSAC']['2017-10-06':'2017-10-12']
-# slp_diff_day_s_df['KWMC-KSAC']['2018-11-05':'2018-11-12']
+#slp_diff_day_s_df['KDAG-KLAX']['2003-10-21':'2003-10-29']    
+#slp_diff_day_s_df['KDAG-KLAX']['2007-10-15':'2007-10-31']    
+
+#12z GFS peaked LAX-DAG gradients at -10.2 and LAX-TPH at -15.42z GF
+#Cedar Fire October 25, 2003
+#Witch Fire October 21, 2007 
+
+
+
+# slp1_diff_day_s_df['KWMC-KSAC']['2017-10-06':'2017-10-12']
+# slp1_diff_day_s_df['KWMC-KSAC']['2018-11-05':'2018-11-12']
+
+# slp1_diff_day_s_df['KWMC-KSAC']['2019-10-21':'2019-10-31']
+    
+# temp,ws,wsg,wd,rh,slp,pres,alt           
+# psfc  po * exp(-g h M / (To Ro))
+# 1000.0* -9.80665*0.02896968/(288.16*8.314462618)
+# 1/0.1185 
+# ht in km / 8.43 
+# 8.3*288/9.8
+# 1000.0/243.9
+# slp1 -> slp -> yes
+# slp2 -> pres -> no
+# slp3 -> alt -> no
+# slp4 -> formula above 
+# slp5 -> -formula above  -> no
+ 
+# KWMC-KSAC top events 
+#   slp1
+#      01,  2019-10-30  26.1 
+#      02,  2019-10-29  24.5 
+#      03,  2019-10-10  24.4 
+#      04,  2019-10-24  21.6 
+#      05,  2019-10-28  19.3 
+#      06,  2019-10-09  19.2 
+#      07,  2019-10-11  19.1 
+#      08,  2019-10-31  19.0 
+#      09,  2019-10-27  18.5 
+#      10,  2019-11-01  18.3 
+#      11,  2019-10-23  17.8 
+#      12,  2019-11-02  17.0 
+#      13,  2019-10-25  16.8 
+#      14,  2019-10-26  15.4 
+#      15,  2019-11-07  15.4 
+#      16,  2019-11-05  15.4 
+#      17,  2019-11-04  15.4 
+#      18,  2019-11-08  15.1 
+#      19,  2019-11-11  15.1 
+#      20,  2019-10-06  15.0 
+
+
+
+
 
 ###############################################################################
 def cleanup(bucket_name):
@@ -1849,16 +1956,16 @@ if __name__ == "__main__":
         #os.chdir('/home/csmith/pgrad')
         bucket_name = 'data'
         #model_name = 'hrrr'    
-        model_name = 'nam'    
-        #model_name = 'gfs'    
-        #batch_mode = 'operational'
-        batch_mode = 'backfill'
+        #model_name = 'nam'    
+        model_name = 'gfs'    
+        batch_mode = 'operational'
+        #batch_mode = 'backfill'
         #process_name = 'download'
         #process_name = 'process_grib'
         #process_name = 'process_csv'
-        process_name = 'plot_data'
+        #process_name = 'plot_data'
         #process_name = 'obs_dl_operational'
-        #process_name = 'obs_historical_download'
+        process_name = 'obs_historical_download'
         #process_name = 'obs_historical_process'
         #process_name = 'cleanup'
         
@@ -1919,31 +2026,48 @@ if __name__ == "__main__":
     stn_metadata_file_name = os.path.join(os.environ['HOME'], project_name, 'station_list_'+project_name+'.csv') 
     (dict_stn_metadata) = read_stn_metadata_from_csv(stn_metadata_file_name, use_stn, print_stn_info)
 
-    # stn_id_pair_list
-    # dict_stn_metadata['stn_id']
-    # stn_id_pair_list_to_plot = [
-    #     'KWMC-KSAC',
-    #     'KWMC-KSFO',
-    #     'KVBG-KSBA', 
-    #     'KSMX-KSBA', 
-    #     'KBFL-KSBA', 
-    #     'KRDD-KSAC',
-    #     'KRDD-KBFL',
-    #     'KSAC-KBFL',
-    #     'KACV-KSAC']
+    #stn_id_pair_list_to_plot = [
+    #    'KWMC-KSAC']
 
     stn_id_pair_list_to_plot = [
-        'KACV-KSFO',
-        'KBFL-KSBA',
         'KDAG-KLAX',
-        'KMFR-KRDD',
-        'KMFR-KSAC',
-        'KMFR-KSFO',
-        'KRDD-KSAC',
-        'KSFO-KSAC',
-        'KSMX-KSBA',
-        'KWMC-KSAC',
         'KWMC-KSFO']
+
+    # stn_id_pair_list_to_plot = [
+    #     'KMFR-KSAC',
+    #     'KMFR-KSFO',
+    #     'KRDD-KSAC',
+    #     'KRDD-KBFL',
+    #     'KRDD-KSFO',
+    #     'KWMC-KSAC',
+    #     'KWMC-KSFO']
+
+    # stn_id_pair_list_to_plot = [
+    #     'KACV-KSFO',
+    #     'KBFL-KSBA',
+    #     'KDAG-KLAX',
+    #     'KMFR-KRDD',
+    #     'KMFR-KSAC',
+    #     'KMFR-KSFO',
+    #     'KRDD-KSAC',
+    #     'KSFO-KSAC',
+    #     'KSMX-KSBA',
+    #     'KWMC-KSAC',
+    #     'KWMC-KSFO']
+
+    # top stns - 4
+    #KSFO
+    #KWMC 
+    #KDAG
+    #KLAX
+    
+    # second stns 10 (4+6) 
+    #KSAC
+    #KMFR
+    #KRDD
+    #KBFL
+    #KSBA 
+    #KSMX 
         
     stn_list_to_use = set()
     for pair in stn_id_pair_list_to_plot:
