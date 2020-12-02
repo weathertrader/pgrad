@@ -2027,11 +2027,8 @@ if __name__ == "__main__":
     (dict_stn_metadata) = read_stn_metadata_from_csv(stn_metadata_file_name, use_stn, print_stn_info)
 
     #stn_id_pair_list_to_plot = [
-    #    'KWMC-KSAC']
-
-    stn_id_pair_list_to_plot = [
-        'KDAG-KLAX',
-        'KWMC-KSFO']
+    #    'KDAG-KLAX',
+    #    'KWMC-KSFO']
 
     # stn_id_pair_list_to_plot = [
     #     'KMFR-KSAC',
@@ -2042,18 +2039,18 @@ if __name__ == "__main__":
     #     'KWMC-KSAC',
     #     'KWMC-KSFO']
 
-    # stn_id_pair_list_to_plot = [
-    #     'KACV-KSFO',
-    #     'KBFL-KSBA',
-    #     'KDAG-KLAX',
-    #     'KMFR-KRDD',
-    #     'KMFR-KSAC',
-    #     'KMFR-KSFO',
-    #     'KRDD-KSAC',
-    #     'KSFO-KSAC',
-    #     'KSMX-KSBA',
-    #     'KWMC-KSAC',
-    #     'KWMC-KSFO']
+    stn_id_pair_list_to_plot = [
+        'KACV-KSFO',
+        'KBFL-KSBA',
+        'KDAG-KLAX',
+        'KMFR-KRDD',
+        'KMFR-KSAC',
+        'KMFR-KSFO',
+        'KRDD-KSAC',
+        'KSFO-KSAC',
+        'KSMX-KSBA',
+        'KWMC-KSAC',
+        'KWMC-KSFO']
 
     # top stns - 4
     #KSFO
