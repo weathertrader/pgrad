@@ -292,11 +292,16 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
                 file_name_remote = model_name+'.t'+dt_init.strftime('%H')+'z.conusnest.hiresf'+str(hr).rjust(2,'0')+'.tm00.grib2'
                 url_temp = base_url+url_folder_str+'/'+file_name_remote
             elif (model_name == 'gfs'):
+                # old gfs                
+                # https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.20210327/12/      gfs.t12z.pgrb2.0p25.f000                
+                # new gfs 2021/03 
+                # https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gfs.20210327/12/atmos/gfs.t12z.pgrb2.0p25.f000                
                 base_url = 'https://nomads.ncep.noaa.gov/pub/data/nccf/com/'+model_name+'/prod/'
                 url_folder_str1 = model_name+'.'+dt_init.strftime('%Y%m%d')
                 url_folder_str2 = dt_init.strftime('%H')                
                 file_name_remote = model_name+'.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)
-                url_temp = base_url+url_folder_str1+'/'+url_folder_str2+'/'+file_name_remote
+                #url_temp = base_url+url_folder_str1+'/'+url_folder_str2+'/'+file_name_remote
+                url_temp = base_url+url_folder_str1+'/'+url_folder_str2+'/atmos/'+file_name_remote
             print_grib_url = False
             if print_grib_url:
                 print      ('    url_temp is %s ' % (url_temp))
@@ -339,35 +344,12 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
                     # https://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl?file=nam.t00z.conusnest.hiresf00.tm00.grib2&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&dir=%2Fnam.20200811
   
                 elif (model_name == 'gfs'):       
-                    # gfs 
-                    # prev curl command does not work
-                    # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)+'&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F12" -o '+file_name_ingest
-                    # now trying 
-                    curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)+'&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F'+url_folder_str2+'" -o '+file_name_ingest
-                    # works 
-                    # curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t18z.pgrb2.0p25.f000&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fgfs.20200918%2F18" -o data/ingest/2020-09-18/gfs_2020-09-18_18_t_00.grib2
-                    # filter_gfs_0p25_1hr.pl
-                    # filter_gfs_0p25.pl                    
-
-
-                    #temp_command = 'wget '+url_temp+' -O '+file_name_ingest
-                    #print      ('    temp_command is %s ' % (temp_command)) 
-                    #logger.info('    temp_command is %s ' % (temp_command)) 
-                    #os.system(temp_command)
-                    #print      ('    wget success ' ) 
-                    #logger.info('    wget success ' ) 
-                    
-                    #                     https://nomads.ncep.noaa.gov/cgi-bin/?file=                                          gfs.t00z.pgrb2.0p25.f000                 &lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on           &leftlon=0&rightlon=360&toplat=90&bottomlat=-90   &dir=%2Fgfs.20200918%2F00
-                    #                     https://nomads.ncep.noaa.gov/cgi-bin/?file    =                                      gfs.t00z.pgrb2.0p25.f000                 &lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on           &leftlon=0&rightlon=360&toplat=90&bottomlat=-90   &dir=%2Fgfs.20200918%2F00
-                    # works
-                    # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t12z.pgrb2.0p25.f000&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fgfs.20200810%2F12" -o '+file_name_ingest
-                    # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t12z.pgrb2.0p25.f000&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F12" -o '+file_name_ingest
-                    # use this one 
-                    # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)+'&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F12" -o '+file_name_ingest
-                    # https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25_1hr.pl?file=gfs.t12z.pgrb2.0p25.anl&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&dir=%2Fgfs.20200811%2F12
-                    # https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t12z.pgrb2.0p25.anl&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&dir=%2Fgfs.20200811%2F12
-                 
-                 
+                    # old gfs 
+                    #curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)+'&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F'+url_folder_str2+'" -o '+file_name_ingest
+                    # new gfs 
+                    curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)+'&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F'+url_folder_str2+'%2Fatmos''" -o '+file_name_ingest
+                    #                      https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t12                        z.pgrb2.0p25.f000                 &lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fgfs.20210327       %2F12%2Fatmos
+ 
                 #if model_name != 'gfs':
                 print_curl_command = False
                 if print_curl_command:
@@ -1960,12 +1942,12 @@ if __name__ == "__main__":
         model_name = 'gfs'    
         batch_mode = 'operational'
         #batch_mode = 'backfill'
-        #process_name = 'download'
+        process_name = 'download'
         #process_name = 'process_grib'
         #process_name = 'process_csv'
         #process_name = 'plot_data'
         #process_name = 'obs_dl_operational'
-        process_name = 'obs_historical_download'
+        #process_name = 'obs_historical_download'
         #process_name = 'obs_historical_process'
         #process_name = 'cleanup'
         
