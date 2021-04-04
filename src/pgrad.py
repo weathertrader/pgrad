@@ -21,6 +21,8 @@ from datetime import datetime as dt
 from datetime import timedelta as td 
 import glob
 import requests
+import pymongo
+from pymongo import MongoClient
 import subprocess
 import matplotlib
 # plotting from cli
@@ -32,8 +34,6 @@ from matplotlib.ticker import MultipleLocator
 import warnings
 import math
 import logging 
-import pymongo
-from pymongo import MongoClient
 
 ###############################################################################    
 def create_log_file(log_name_full_file_path, dt_start_utc, time_zone_label):

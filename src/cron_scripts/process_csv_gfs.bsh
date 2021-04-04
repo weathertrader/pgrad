@@ -3,4 +3,4 @@
 # source /etc/bashrc
 # source /home/ubuntu/.bashrc
 # plot_data
-~/miniconda3/bin/python ~/pgrad/src/pgrad.py --model_name=gfs --process_name=process_csv --bucket_name=data --batch_mode=operational
+python3 ~/pgrad/src/pgrad.py --model_name=gfs --process_name=process_csv --bucket_name=data --batch_mode=operational
