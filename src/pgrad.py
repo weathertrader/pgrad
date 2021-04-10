@@ -37,16 +37,31 @@ import logging
 
 ###############################################################################    
 def create_log_file(log_name_full_file_path, dt_start_utc, time_zone_label):
-    if not (os.path.isdir(os.path.dirname(log_name_full_file_path))):
-        #os.mkdir(os.path.dirname(log_name_full_file_path))
-        os.system('mkdir -p '+os.path.dirname(log_name_full_file_path))    
-    formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s') 
-    logger    = logging.getLogger(log_name_full_file_path)
-    handler   = logging.FileHandler(log_name_full_file_path) 
-    formatter = logging.Formatter('%(message)s')
-    handler.setFormatter(formatter) 
-    logger.addHandler(handler) 
-    logger.setLevel(logging.INFO) # INFO, DEBUG,INFO,WARNING,ERROR,CRITICAL    
+    
+    use_new_logger = True 
+    if not use_new_logger: 
+        if not (os.path.isdir(os.path.dirname(log_name_full_file_path))):
+            #os.mkdir(os.path.dirname(log_name_full_file_path))
+            os.system('mkdir -p '+os.path.dirname(log_name_full_file_path))    
+        formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s') 
+        logger    = logging.getLogger(log_name_full_file_path)
+        handler   = logging.FileHandler(log_name_full_file_path) 
+        handler.setFormatter(formatter) 
+        logger.addHandler(handler) 
+        logger.setLevel(logging.INFO) # INFO, DEBUG,INFO,WARNING,ERROR,CRITICAL    
+    else: # new_logger 
+        #logging.basicConfig(level=logging.DEBUG, filename='app2.log', format='%(name)s %(asctime)s %(levelname)s:%(message)s')
+        logging.basicConfig(level=logging.DEBUG, format='%(name)s %(asctime)s %(levelname)s:%(message)s')
+        logger = logging.getLogger(__name__)
+        try:
+          c = 4 / 0
+        except Exception as e:
+          logger.error("Exception occurred", exc_info=True)
+        logger.info("logger info")
+        logger.warning("logger warning")
+        logger.debug("logger debug")
+        logger.error("logger error")
+    
     print      ('###############################################################################') 
     logger.info('###############################################################################') 
     print      ('instantiate_logger log_name is %s ' % (log_name_full_file_path))     
@@ -421,12 +436,15 @@ def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_h
 
         try:
             ds_read = xr.open_dataset(file_temp, engine='cfgrib')        
-        except:
-            temp_command = 'rm -f '+file_temp    
-            print      ('  ERROR reading %s ' %(file_temp))
-            logger.info('  ERROR reading %s ' %(file_temp))
+        except Error as e:
+            print      ('  ERROR reading %s ' %(e))
+            logger.info('  ERROR reading %s ' %(e))
             os.system(temp_command)
+            temp_command = 'rm -f '+file_temp    
             continue
+        #except:
+        #    print      ('  ERROR reading %s ' %(file_temp))
+        #    logger.info('  ERROR reading %s ' %(file_temp))
             
         #sorted(ds_read.variables)
         # ds_sfc = xr.open_dataset(file_temp, engine='cfgrib',
