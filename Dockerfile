@@ -1,7 +1,6 @@
 #####################################
 # flask and cron container working on now 
 FROM continuumio/miniconda3
-# RUN apt-get update && apt-get -y install cron curl vim htop systemd
 RUN apt-get update && apt-get -y install cron curl vim htop
 ENV HOME /.
 WORKDIR /pgrad
@@ -20,10 +19,30 @@ ENV PATH /opt/conda/envs/env_pgrad/bin:$PATH
 # RUN echo "source activate env_pgrad" > ~/.bashrc
 
 #####################################
-# my cron - works
 RUN touch /var/log/cron.log
 RUN crontab ~/pgrad/src/crontab.txt
+
+# opt1 - works
 CMD service cron start && tail -f /var/log/cron.log
+# opt2 - works
+# CMD ["service", "cron", "start"]
+# CMD ["cron", "-f"]
+
+# opt2 - cron is not running
+# CMD ["service", "cron", "start"]
+# CMD ["tail", "-f", "/var/log/cron.log"]
+# does not work
+# CMD ["service", "cron", "start", "&&", "cron", "-f"]
+# CMD ["service", "cron", "start", "&&", "tail", "-f", "/var/log/cron.log"]
+# ENTRYPOINT ["service", "cron", "start"]
+# CMD ["service", "cron", "start", "&&", "tail", "-f", "/var/log/cron.log"]
+# CMD ["service", "cron", "start", "&&", "cron", "-f"]
+
+# havent tried these
+# ENTRYPOINT ["cron", "-f"]
+
+
+
 
 # does not work
 #RUN service cron start
@@ -32,12 +51,8 @@ CMD service cron start && tail -f /var/log/cron.log
 # RUN cron
 # CMD tail -f /var/log/cron.log
 # does not work
-# CMD ["cron", "-f"]
 # does not work
-# ENTRYPOINT ["service" "cron" "start"]
 # does not work
-# CMD ["service" "cron" "start"]
-# CMD ["tail" "-f" "/var/log/cron.log"]
 
 #ENTRYPOINT service cron start
 #CMD tail -f /var/log/cron.log
