@@ -1,6 +1,6 @@
 #!/bin/bash
 # source /etc/profile
-# source /etc/bashrc
+# source /etc/bash.bashrc
 # source /home/ubuntu/.bashrc
 # plot_data
 python3 ~/pgrad/src/pgrad.py --process_name=plot_data --bucket_name=data --batch_mode=operational

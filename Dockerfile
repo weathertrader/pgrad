@@ -1,20 +1,49 @@
 #####################################
 # flask and cron container working on now 
 FROM continuumio/miniconda3
-RUN apt-get update && apt-get -y install cron curl vim
+# RUN apt-get update && apt-get -y install cron curl vim htop systemd
+RUN apt-get update && apt-get -y install cron curl vim htop
 ENV HOME /.
 WORKDIR /pgrad
 COPY . .
+
 RUN conda update -y -n base -c defaults conda
 RUN conda env create -f environment.yml
+
 ###########################
-# option 1 trying now
+# option 1 works from cli, does not work from cron since bash has no bashrc to source
 ENV PATH /opt/conda/envs/env_pgrad/bin:$PATH
-RUN /bin/bash -c "source activate env_pgrad"
+# RUN /bin/bash -c "source activate env_pgrad"
 ###########################
 # option 2 - have not tried yet
 # ENV PATH /opt/conda/envs/env_pgrad/bin:$PATH
 # RUN echo "source activate env_pgrad" > ~/.bashrc
+
+#####################################
+# my cron - works
+RUN touch /var/log/cron.log
+RUN crontab ~/pgrad/src/crontab.txt
+CMD service cron start && tail -f /var/log/cron.log
+
+# does not work
+#RUN service cron start
+# does not work
+# CMD service cron start
+# RUN cron
+# CMD tail -f /var/log/cron.log
+# does not work
+# CMD ["cron", "-f"]
+# does not work
+# ENTRYPOINT ["service" "cron" "start"]
+# does not work
+# CMD ["service" "cron" "start"]
+# CMD ["tail" "-f" "/var/log/cron.log"]
+
+#ENTRYPOINT service cron start
+#CMD tail -f /var/log/cron.log
+
+# CMD ["/bin/bash" "service" "cron" "start" "&&" "tail" "-f" "/var/log/cron.log"]
+#CMD ["service" "cron" "start" "&&" "tail" "-f" "/var/log/cron.log"]
 
 
 # does not work
@@ -39,13 +68,6 @@ RUN /bin/bash -c "source activate env_pgrad"
 
 # CMD ["bash"]
 
-#####################################
-# my cron - works
-RUN crontab ~/pgrad/src/crontab.txt
-RUN touch /var/log/cron.log 
-CMD cron && tail -f /var/log/cron.log
-# havent tried this below 
-# CMD ["cron", "-f"]
 
 #####################################
 # flask container works 

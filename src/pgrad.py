@@ -38,7 +38,7 @@ import logging
 ###############################################################################    
 def create_log_file(log_name_full_file_path, dt_start_utc, time_zone_label):
     
-    use_new_logger = True 
+    use_new_logger = False
     if not use_new_logger: 
         if not (os.path.isdir(os.path.dirname(log_name_full_file_path))):
             #os.mkdir(os.path.dirname(log_name_full_file_path))
