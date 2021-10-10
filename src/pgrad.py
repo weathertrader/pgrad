@@ -814,14 +814,23 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     y_axis_cache['KACV-KSFO'] = [-2, 12, 2]
     y_axis_cache['KBFL-KSBA'] = [-10, 10, 2]
     y_axis_cache['KDAG-KLAX'] = [-2, 12, 2]
-    y_axis_cache['KMFR-KRDD'] = [-2, 12, 2]
+    y_axis_cache['KMFR-KRDD'] = [-2, 16, 2] # 12 was not enough
     y_axis_cache['KMFR-KSAC'] = [-4, 20, 4]
     y_axis_cache['KMFR-KSFO'] = [-4, 20, 4]
     y_axis_cache['KRDD-KSAC'] = [-2, 12, 2]
-    y_axis_cache['KSMX-KSBA'] = [-6, 6, 1]
+    y_axis_cache['KRDD-KBFL'] = [-2, 12, 2]
+    y_axis_cache['KSMX-KSBA'] = [-8, 8, 2] # 6 probably not enough
+    y_axis_cache['KBFL-KSBA'] = [-8, 8, 2]
     y_axis_cache['KWMC-KSAC'] = [-4, 20, 4]
     y_axis_cache['KWMC-KSFO'] = [-5, 25, 5]
-     
+    y_axis_cache['KSFO-KSAC'] = [-6, 6, 2]
+    y_axis_cache['KBND-KONP'] = [-20, 20, 4]
+    y_axis_cache['KBND-KSLE'] = [-20, 20, 4]
+    y_axis_cache['KRDM-KONP'] = [-20, 20, 4]
+    y_axis_cache['KRDM-KSLE'] = [-20, 20, 4]
+    y_axis_cache['KSLE-KONP'] = [-20, 20, 4]
+    y_axis_cache['KSAC-KBFL'] = [-2, 12, 2]
+
     print      ('  dt_init_list is ' )
     logger.info('  dt_init_list is ' )
     
@@ -1974,24 +1983,23 @@ if __name__ == "__main__":
     #    'KDAG-KLAX',
     #    'KWMC-KSFO']
 
-    # stn_id_pair_list_to_plot = [
-    #     'KMFR-KSAC',
-    #     'KMFR-KSFO',
-    #     'KRDD-KSAC',
-    #     'KRDD-KBFL',
-    #     'KRDD-KSFO',
-    #     'KWMC-KSAC',
-    #     'KWMC-KSFO']
-
     stn_id_pair_list_to_plot = [
         'KACV-KSFO',
         'KBFL-KSBA',
+        'KBFL-KSBA',
+        'KBND-KONP',
+        'KBND-KSLE',
         'KDAG-KLAX',
         'KMFR-KRDD',
         'KMFR-KSAC',
         'KMFR-KSFO',
+        'KRDD-KBFL',
         'KRDD-KSAC',
+        'KRDM-KONP',
+        'KRDM-KSLE',
+        'KSAC-KBFL',
         'KSFO-KSAC',
+        'KSLE-KONP',
         'KSMX-KSBA',
         'KWMC-KSAC',
         'KWMC-KSFO']

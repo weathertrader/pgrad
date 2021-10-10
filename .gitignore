@@ -8,6 +8,7 @@ images/
 #airflow/unittests.cfg
 #airflow/miniconda3/
 #airflow/logs/
+.idea/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
