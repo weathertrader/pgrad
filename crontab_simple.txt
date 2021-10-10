@@ -1,2 +1,0 @@
-* * * * * root python3 /code/populatePDBbackground.py >> /var/log/cron.log
-# Empty line
