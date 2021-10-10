@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 BASH_ENV=/home/ubuntu/.bashrc
-*/10  * * * * bash -l -c '~/pgrad/src/cron_scripts/plot_data.bsh'
+*/30  * * * * bash -l -c '~/pgrad/src/cron_scripts/plot_data.bsh'
 15,35,55 * * * * bash -l -c '~/pgrad/src/cron_scripts/calc_pgrad_gfs.bsh'
 12,32,52 * * * * bash -l -c '~/pgrad/src/cron_scripts/calc_pgrad_nam.bsh'
 9,29,49  * * * * bash -l -c '~/pgrad/src/cron_scripts/calc_pgrad_hrrr.bsh'

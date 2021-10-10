@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1f7d5415-52b6-44b2-be95-44f6ed5aa87c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/crontab.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/crontab.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/www/html/pgrad.html" beforeDir="false" afterPath="$PROJECT_DIR$/www/html/pgrad.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -21,7 +23,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/www/html/pgrad.js" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/crontab.txt" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
