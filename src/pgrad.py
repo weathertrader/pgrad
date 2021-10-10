@@ -3,8 +3,7 @@
 name: pgrad.py 
 purpose: process and analyze pressure gradient forcing from NWP models 
 author: Craig Smith, craig.matthew.smith@gmail.com
-usage: ./src/run.sh n  where n is the number of batteries to analyze [1-5]
-repo: https://github.com/weathertrader/battery_charge
+usage: crontab -e crontab.txt 
 '''
 
 import os
@@ -14,8 +13,6 @@ import argparse
 import pandas as pd
 import numpy as np
 import xarray as xr
-# import cfgrib
-#from netCDF4 import Dataset 
 import time
 from datetime import datetime as dt 
 from datetime import timedelta as td 
@@ -23,8 +20,7 @@ import glob
 import requests
 import subprocess
 import matplotlib
-# plotting from cli
-matplotlib.use('Agg') 
+matplotlib.use('Agg')
 #matplotlib.use('Agg',warn=False) 
 import matplotlib.pyplot as plt
 from matplotlib.dates import drange, DateFormatter
@@ -35,7 +31,7 @@ import logging
 import pymongo
 from pymongo import MongoClient
 
-###############################################################################    
+
 def create_log_file(log_name_full_file_path, dt_start_utc, time_zone_label):
     if not (os.path.isdir(os.path.dirname(log_name_full_file_path))):
         #os.mkdir(os.path.dirname(log_name_full_file_path))
@@ -56,7 +52,6 @@ def create_log_file(log_name_full_file_path, dt_start_utc, time_zone_label):
     return logger
 
 
-###############################################################################
 def close_logger(logger, process_name, dt_start_lt, utc_conversion, time_zone_label):
     dt_end_lt = dt.utcnow() - td(hours=utc_conversion)
     time_delta_minutes = (dt_end_lt - dt_start_lt).seconds/60.0
@@ -65,10 +60,8 @@ def close_logger(logger, process_name, dt_start_lt, utc_conversion, time_zone_la
     print      ('total_time %s %6.2f minutes, %s - %s [%s]  ' % (process_name, time_delta_minutes, dt_start_lt.strftime('%Y-%m-%d_%H-%M'), dt_end_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label))
     logger.info('total_time %s %6.2f minutes, %s - %s [%s]  ' % (process_name, time_delta_minutes, dt_start_lt.strftime('%Y-%m-%d_%H-%M'), dt_end_lt.strftime('%Y-%m-%d_%H-%M'), time_zone_label))    
     
-###############################################################################    
-def define_daylight_savings_or_not(dt_temp_utc):    
-    #yy_temp = dt.strftime(dt_temp_utc,'%Y')
-    #yy_temp = int(yy_temp) 
+
+def define_daylight_savings_or_not(dt_temp_utc):
     yy_temp = dt_temp_utc.year
     if   (yy_temp == 2018):
         dt_dst_start = dt(2018,  3, 11, 10) 
@@ -97,7 +90,7 @@ def define_daylight_savings_or_not(dt_temp_utc):
         utc_conversion, time_zone_label = 8, 'PST'
     return utc_conversion, time_zone_label
 
-###############################################################################
+
 def define_expected_forecast_available_from_wallclock(logger, model_name, update_frequency_hrs):
     '''get expected most recent forecast based on wall clock time  '''
     
@@ -144,7 +137,6 @@ def define_expected_forecast_available_from_wallclock(logger, model_name, update
     return dt_init_expected
 
 
-###############################################################################
 def read_stn_metadata_from_csv(stn_metadata_file_name, use_stn, print_stn_info):
     '''read station metadata'''
  
@@ -204,7 +196,7 @@ def read_stn_metadata_from_csv(stn_metadata_file_name, use_stn, print_stn_info):
         #stn_notes          = stn_notes         [use_stn] 
 
     n_stn = len(stn_lat)
-    if (print_stn_info): 
+    if print_stn_info:
         print ('station infomation list ') 
         # for s,stn_name_temp in enumerate(stn_name):          
         for s in range(0, n_stn, 1): 
@@ -230,7 +222,6 @@ def read_stn_metadata_from_csv(stn_metadata_file_name, use_stn, print_stn_info):
     return stn_metadata_dict 
 
 
-###############################################################################
 def map_stn_locations_to_grid_locations(logger, stn_metadata_dict, lon_2d, lat_2d, print_flag):
     ''' find grid indices of station locations'''
     i_loc_s = np.zeros([stn_metadata_dict['n_stn']], dtype='int') 
@@ -238,7 +229,6 @@ def map_stn_locations_to_grid_locations(logger, stn_metadata_dict, lon_2d, lat_2
     s = 0
     for s in range(0, stn_metadata_dict['n_stn'], 1):
         total_diff_2d = np.abs(lon_2d - stn_metadata_dict['stn_lon'][s]) + np.abs(lat_2d - stn_metadata_dict['stn_lat'][s])
-        #[j_loc_s[s], i_loc_s[s]] = np.unravel_index(total_diff_2d.argmin(), total_diff_2d.shape)
         [j_loc_s[s], i_loc_s[s]] = np.argwhere(total_diff_2d == np.min(total_diff_2d))[0]
         del total_diff_2d                
     if (print_flag):
@@ -250,7 +240,6 @@ def map_stn_locations_to_grid_locations(logger, stn_metadata_dict, lon_2d, lat_2
     return j_loc_s, i_loc_s 
 
 
-###############################################################################
 def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
 
     print      ('download_data begin ')
@@ -276,8 +265,6 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
             os.system('mkdir -p '+dir_name_ingest)
         if not os.path.isdir(dir_name_processed):
             os.system('mkdir -p '+dir_name_processed)
-        #if   (model_name == 'hrrr'):        
-        #elif (model_name == 'nam'):        
 
         if not (os.path.isfile(file_name_ingest) or os.path.isfile(file_name_processed)):
             # check if exists on remote            
@@ -320,21 +307,15 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
                 logger.info('    file exists on remote')
   
                 if   (model_name == 'hrrr'):
+                    curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_hrrr_2d.pl?file='+file_name_remote+'&lev_mean_sea_level=on&lev_surface=on&var_HGT=on&var_MSLMA=on&var_PRES=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fhrrr.'+url_folder_str+'%2Fconus" -o '+file_name_ingest
                     # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_hrrr_2d.pl?file='+file_name_remote+'&lev_10_m_above_ground=on&lev_2_m_above_ground=on&lev_surface=on&var_HGT=on&var_PRES=on&var_RH=on&var_TMP=on&var_UGRD=on&var_VGRD=on&var_APCP=on&var_DPT=on&var_FRICV=on&var_GUST=on&var_LAND=on&var_WIND=on&var_HGT=on&var_PRES=on&var_RH=on&var_TMP=on&var_UGRD=on&var_VGRD=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fhrrr.'+url_folder_str+'%2Fconus" -o '+file_name_ingest
                     # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_hrrr_2d.pl?file='+file_name_remote+'&lev_2_m_above_ground=on&lev_mean_sea_level=on&lev_surface=on&var_HGT=on&var_MSLMA=on&var_PRES=on&var_APCP=on&var_UGRD=on&var_VGRD=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fhrrr.'+url_folder_str+'%2Fconus" -o '+file_name_ingest
                     # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_hrrr_2d.pl?file='+file_name_remote+'&lev_mean_sea_level=on&lev_surface=on&var_HGT=on&var_MSLMA=on&var_PRES=on&var_UGRD=on&var_VGRD=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fhrrr.'+url_folder_str+'%2Fconus" -o '+file_name_ingest
                     # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_hrrr_2d.pl?file='+file_name_remote+'&lev_mean_sea_level=on&lev_surface=on&var_HGT=on&var_MSLMA=on&var_PRES=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fhrrr.'+url_folder_str+'%2Fconus" -o '+file_name_ingest
-                    curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_hrrr_2d.pl?file='+file_name_remote+'&lev_mean_sea_level=on&lev_surface=on&var_HGT=on&var_MSLMA=on&var_PRES=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fhrrr.'+url_folder_str+'%2Fconus" -o '+file_name_ingest
-                
-                
                 elif (model_name == 'nam'):
+                    curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl?file=nam.t'+dt_init.strftime('%H')+'z.conusnest.hiresf'+str(hr).zfill(2)+'.tm00.grib2&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fnam.'+url_folder_str+'" -o '+file_name_ingest
                     # previous
                     # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_nam.pl?file=nam.t'+dt_init.strftime('%H')+'z.awphys'+str(hr).zfill(2)+'.tm00.grib2&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fnam.'+url_folder_str+'" -o '+file_name_ingest
-                    # new?    
-                    curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl?file=nam.t'+dt_init.strftime('%H')+'z.conusnest.hiresf'+str(hr).zfill(2)+'.tm00.grib2&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fnam.'+url_folder_str+'" -o '+file_name_ingest
-                    #                     https://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl?file=nam.t00                        z.conusnest.hiresf00                  .tm00.grib2&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fnam.20200919
-                    
-                    # nam   
                     # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_nam.pl?file=nam.t00z.awphys00.tm00.grib2&lev_10_m_above_ground=on&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&var_UGRD=on&var_VGRD=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fnam.20200810" -o '+file_name_ingest
                     # curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_nam.pl?file=nam.t00z.awphys00.tm00.grib2&lev_10_m_above_ground=on&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&var_UGRD=on&var_VGRD=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fnam.'+url_folder_str+'" -o '+file_name_ingest
                     # use this one
@@ -342,15 +323,13 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
                     # https://nomads.ncep.noaa.gov/cgi-bin/filter_nam.pl?file=nam.t00z.awphys00.tm00.grib2&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&dir=%2Fnam.20200811
                     # nam hires nest 
                     # https://nomads.ncep.noaa.gov/cgi-bin/filter_nam_conusnest.pl?file=nam.t00z.conusnest.hiresf00.tm00.grib2&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&leftlon=0&rightlon=360&toplat=90&bottomlat=-90&dir=%2Fnam.20200811
-  
                 elif (model_name == 'gfs'):       
-                    # old gfs 
+                    curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)+'&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F'+url_folder_str2+'%2Fatmos''" -o '+file_name_ingest
+                    # old gfs
                     #curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)+'&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F'+url_folder_str2+'" -o '+file_name_ingest
                     # new gfs 
-                    curl_command = 'curl "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t'+dt_init.strftime('%H')+'z.pgrb2.0p25.f'+str(hr).zfill(3)+'&lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2F'+url_folder_str1+'%2F'+url_folder_str2+'%2Fatmos''" -o '+file_name_ingest
                     #                      https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl?file=gfs.t12                        z.pgrb2.0p25.f000                 &lev_mean_sea_level=on&lev_surface=on&var_PRES=on&var_PRMSL=on&subregion=&leftlon=-160&rightlon=-110&toplat=50&bottomlat=25&dir=%2Fgfs.20210327       %2F12%2Fatmos
  
-                #if model_name != 'gfs':
                 print_curl_command = False
                 if print_curl_command:
                     print      ('    curl_command is %s ' % (curl_command))
@@ -373,9 +352,7 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
                     print      ('    download_forecast_grid_and_write_to_local: err is %s' %(err)) 
                     logger.info('    download_forecast_grid_and_write_to_local: err is %s' %(err)) 
                  
-        #if   (model_name == 'nam' and hr > 36):        
-        #    hr += 3
-        if   (model_name == 'gfs' and hr >= 120):        
+        if   (model_name == 'gfs' and hr >= 120):
             hr += 3
         else:
             hr += 1
@@ -383,7 +360,6 @@ def download_data(model_name, dt_init, forecast_horizon_hr, bucket_name):
     logger.info('download_data end ')
 
             
-###############################################################################
 def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr, bucket_name):
 
     print      ('process_grib_data begin ')
@@ -394,7 +370,6 @@ def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_h
     dir_name_processed = os.path.join('data', 'processed', dir_init_temp)
     
     # get list of files in ingest dir
-    #file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*.grib2'))
     file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*'+dt_init.strftime('%Y-%m-%d_%H')+'*.grib2'))
     file_list.sort()
     n_files = len(file_list)
@@ -415,7 +390,6 @@ def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_h
         print      ('    processing file %s of %s' %(n, n_files))
         logger.info('    processing file %s of %s' %(n, n_files))
 
-        #file_name = os.path.dirname(file_temp)
         file_name = os.path.basename(file_temp)
         file_name_processed = os.path.join(dir_name_processed, file_name)
 
@@ -466,7 +440,6 @@ def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_h
             (j_loc_s, i_loc_s) = map_stn_locations_to_grid_locations(logger, dict_stn_metadata, lon_2d, lat_2d, print_flag)
             initial_read = True
 
-        #dt_init = ds_read['time']
         dt_valid = ds_read['valid_time']
         
         if model_name == 'hrrr':
@@ -501,48 +474,31 @@ def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_h
         del ds_read        
 
         # grab data at station location
-        # does not work 
-        #p1_sfc_stn = p1_sfc_2d[j_loc_s, i_loc_s]
-        #np.shape(p1_sfc_stn)
         p1_sfc_stn = np.zeros([dict_stn_metadata['n_stn']], dtype=float)
         p2_sfc_stn = np.zeros([dict_stn_metadata['n_stn']], dtype=float)
         for s in range(0, dict_stn_metadata['n_stn']):
             p1_sfc_stn[s] = p1_sfc_2d[j_loc_s[s], i_loc_s[s]]
             p2_sfc_stn[s] = p2_sfc_2d[j_loc_s[s], i_loc_s[s]]
 
-        #dir_ingest_stn = os.path.join('data/ingest/stn_csv')
-        #if not os.path.isdir(dir_ingest_stn):
-        #    temp_command = 'mkdir -p '+dir_ingest_stn
-        #   print      ('    make new stn dir %s ' % (temp_command)) 
-        #    logger.info('    make new stn dir %s ' % (temp_command)) 
         stn_file_name = os.path.join( dir_name_ingest , file_name.split('.')[0]+'.csv')
         print_stn_file_name = False
         if print_stn_file_name:
             print      ('    stn_file_name %s ' % (stn_file_name)) 
             logger.info('    stn_file_name %s ' % (stn_file_name)) 
 
-        #print      ('    write p_sfc begin ')
-        #logger.info('    write p_sfc begin ')
         column_str = ['stn_id', 'p1', 'p2']
         p_sfc_data = [dict_stn_metadata['stn_id'], p1_sfc_stn, p2_sfc_stn]
-        #stn_info_transpose = np.transpose(stn_info) 
-        p_sfc_df = pd.DataFrame(np.transpose(p_sfc_data), columns=column_str) 
-        #stn_info_df = stn_info_df.sort_values(by='stn_mnet_id') 
-        # stn_info_df = stn_info_df.sort_values(by='stn_name') 
-        p_sfc_df.to_csv(stn_file_name) 
-        #print      ('    write p_sfc end ')   
-        #logger.info('    write p_sfc end ')   
+        p_sfc_df = pd.DataFrame(np.transpose(p_sfc_data), columns=column_str)
+        p_sfc_df.to_csv(stn_file_name)
 
-        # archive raw grib file 
+        # archive raw grib file
         temp_command = 'mv -f '+file_temp+' '+file_name_processed
         print_archive_output = False
         if print_archive_output:
             print      ('    archive output %s ' % (temp_command)) 
             logger.info('    archive output %s ' % (temp_command)) 
         os.system(temp_command)
-        #print      ('    archive output: success ' ) 
-        #logger.info('    archive_output: success ' ) 
-        
+
     # clean up idx files
     temp_command = 'rm -f '+dir_name_ingest+'/*.idx'    
     print      ('  clean up idx files ') 
@@ -552,19 +508,16 @@ def process_grib_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_h
     logger.info('process_grib_data end ')
 
 
-###############################################################################
 def process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr, bucket_name):
 
     print      ('process_csv begin ')
     logger.info('process_csv begin ')
-
 
     dir_init_temp = dt_init.strftime('%Y-%m-%d')
     dir_name_ingest    = os.path.join('data', 'ingest',    dir_init_temp)
     dir_name_processed = os.path.join('data', 'processed', dir_init_temp)
     
     # get list of files in ingest dir
-    #file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*.csv'))
     file_list = glob.glob(os.path.join(dir_name_ingest, model_name+'*'+dt_init.strftime('%Y-%m-%d_%H')+'*.csv'))
     file_list.sort()
     n_files = len(file_list)
@@ -596,9 +549,6 @@ def process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr
 
     file_temp = file_list[0]
     for n, file_temp in enumerate(file_list): 
-        #print      ('    processing file %s of %s, %s' %(n, n_files, file_temp))
-        #logger.info('    processing file %s of %s, %s' %(n, n_files, file_temp))
-        #file_name = os.path.dirname(file_temp)
         file_name = os.path.basename(file_temp)
         file_name_processed = os.path.join(dir_name_processed, file_name)
 
@@ -606,12 +556,9 @@ def process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr
         p_sfc_df = pd.read_csv(file_temp, index_col=0)
         # calc hr from forecast_horizon in model name
         # find correct place in csv
-        # need to verify works for gfs and nam
         hr = int(file_name.split('.')[0].split('_')[-1])
         # dont need stn_id, should automatically line up    
         stn_id = p_sfc_df['stn_id'].values
-        #p_sfc1 = p_sfc_df['p_sfc1'].values
-        #p_sfc2 = p_sfc_df['p_sfc2'].values
         p_sfc1 = p_sfc_df['p1'].values
         p_sfc2 = p_sfc_df['p2'].values
         # can combine above and below steps 
@@ -652,7 +599,6 @@ def process_csv_data(dict_stn_metadata, model_name, dt_init, forecast_horizon_hr
     logger.info('process_csv end ')
 
 
-###############################################################################
 def calc_pgrad(dict_stn_metadata, stn_id_pair_list_to_plot, model_name, dt_init, bucket_name):
 
     print      ('calc_pgrad begin ')
@@ -723,7 +669,6 @@ def calc_pgrad(dict_stn_metadata, stn_id_pair_list_to_plot, model_name, dt_init,
     logger.info('calc_pgrad end ')
 
 
-###############################################################################
 def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_horizon_hr,  dt_start_lt, utc_conversion, time_zone_label, stn_id_pair_list_to_plot, bucket_name):
      
     print      ('open connection to mongo ')
@@ -1086,7 +1031,6 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     logger.info('plot_data end ')
 
 
-###############################################################################
 def obs_historical_download(dict_stn_metadata, stn_list_to_use, utc_conversion, time_zone_label, bucket_name):
 
     print      ('obs_historical_download begin ')
@@ -1233,7 +1177,7 @@ def obs_historical_download(dict_stn_metadata, stn_list_to_use, utc_conversion, 
     print      ('obs_historical_download end ')
     logger.info('obs_historical_download end ')
 
-###############################################################################
+
 def datematch_to_hourly(var_raw, dt_axis_raw, dt_axis_hr_lst, obs_window_minutes):
     # debugging    
     # var_raw = stn_read_df_f['slp'].values
@@ -1326,7 +1270,7 @@ def datematch_to_hourly(var_raw, dt_axis_raw, dt_axis_hr_lst, obs_window_minutes
 
     return var_hr  
 
-###############################################################################
+
 def datematch_to_5min(var_raw, dt_axis_raw, dt_axis_5min_lst, obs_window_minutes):
     # debugging    
     # var_raw = stn_read_df_f['slp'].values
@@ -1419,8 +1363,8 @@ def datematch_to_5min(var_raw, dt_axis_raw, dt_axis_5min_lst, obs_window_minutes
 
     return var_5min  
 
-###############################################################################
-def read_sfc_obs_csv_data(file_name_full_path, replace_nan_with_null): 
+
+def read_sfc_obs_csv_data(file_name_full_path, replace_nan_with_null):
     
     np.warnings.filterwarnings('ignore')    
     #import warnings
@@ -1474,7 +1418,6 @@ def read_sfc_obs_csv_data(file_name_full_path, replace_nan_with_null):
     return stn_read_df
    
     
-###############################################################################
 def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, stn_id_pair_list_to_plot, bucket_name):
 
     # debug KWMC-KSAC 2018/11/07 - 2018/11/21 
@@ -1869,7 +1812,6 @@ def obs_historical_process(dict_stn_metadata, utc_conversion, time_zone_label, s
 
 
 
-###############################################################################
 def cleanup(bucket_name):
 
     print      ('cleanup begin ')
@@ -1877,7 +1819,6 @@ def cleanup(bucket_name):
 
     print      ('  cleanup data directories ')
     logger.info('  cleanup data directories ')
-
 
     dt_now = dt.utcnow()
     dir_init_temp = dt_init.strftime('%Y-%m-%d')
@@ -1912,7 +1853,28 @@ def cleanup(bucket_name):
             #except: 
             #    pass 
         del time_temp, time_delta_days
-        
+
+
+    print      ('  cleanup archive images ')
+    logger.info('  cleanup archive images ')
+
+    n_days_to_retain = 7.0
+    time_now = time.time()
+    image_list = glob.glob(os.path.join('images/archive', '*.png'))
+    image_list.sort(key=os.path.getmtime)
+    for image_temp in image_list:
+        time_temp = os.path.getmtime(image_temp)
+        time_delta_days = (time_now - time_temp)/(24.*3600.)
+        if (time_delta_days > n_days_to_retain):
+            #try:
+            os.remove(image_temp)
+            #os.system('rm '+file_temp)
+            #except:
+            #    pass
+        del time_temp, time_delta_days
+
+
+
     print      ('cleanup end ')
     logger.info('cleanup end ')
     
