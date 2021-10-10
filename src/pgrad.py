@@ -824,8 +824,8 @@ def plot_data(dict_stn_metadata, model_name_list, dt_init_expected, forecast_hor
     y_axis_cache['KWMC-KSAC'] = [-4, 20, 4]
     y_axis_cache['KWMC-KSFO'] = [-5, 25, 5]
     y_axis_cache['KSFO-KSAC'] = [-6, 6, 2]
-    y_axis_cache['KBND-KONP'] = [-20, 20, 4]
-    y_axis_cache['KBND-KSLE'] = [-20, 20, 4]
+    y_axis_cache['KBDN-KONP'] = [-20, 20, 4]
+    y_axis_cache['KBDN-KSLE'] = [-20, 20, 4]
     y_axis_cache['KRDM-KONP'] = [-20, 20, 4]
     y_axis_cache['KRDM-KSLE'] = [-20, 20, 4]
     y_axis_cache['KSLE-KONP'] = [-20, 20, 4]
@@ -1987,8 +1987,8 @@ if __name__ == "__main__":
         'KACV-KSFO',
         'KBFL-KSBA',
         'KBFL-KSBA',
-        'KBND-KONP',
-        'KBND-KSLE',
+        'KBDN-KONP',
+        'KBDN-KSLE',
         'KDAG-KLAX',
         'KMFR-KRDD',
         'KMFR-KSAC',
